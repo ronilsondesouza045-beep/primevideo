@@ -59,6 +59,87 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
     }
   }, [messages, isOpen]);
 
+  const getSmartBotResponse = (query: string, currentUser?: User | null): string => {
+    const lower = query.toLowerCase();
+    const firstName = currentUser?.name ? currentUser.name.split(' ')[0] : 'Cliente';
+
+    // 1. Prime Video
+    if (
+      lower.includes('prime') ||
+      lower.includes('gratis') ||
+      lower.includes('gratuito') ||
+      lower.includes('resgatar') ||
+      lower.includes('como') ||
+      lower.includes('senha') ||
+      lower.includes('conta') ||
+      lower.includes('acesso')
+    ) {
+      return `🎬 **Como resgatar seu Prime Video 100% Grátis:**\n\n` +
+        `1️⃣ Entre na sua conta StreamHub VIP (já logado como ${firstName}).\n` +
+        `2️⃣ Na página principal, clique no card **"Prime Video"**.\n` +
+        `3️⃣ Clique no botão vermelho **"Gerar Acesso Grátis"**.\n` +
+        `4️⃣ O e-mail e a senha VIP serão liberados na hora!\n\n` +
+        `📌 **Dica:** Se você já gerou seu acesso anteriormente, ele fica salvo para você na seção **"Meus Acessos Liberados"** no menu do seu perfil!`;
+    }
+
+    // 2. Netflix / Valor / Ton / Pix
+    if (
+      lower.includes('netflix') ||
+      lower.includes('10') ||
+      lower.includes('pagar') ||
+      lower.includes('comprar') ||
+      lower.includes('valor') ||
+      lower.includes('preço') ||
+      lower.includes('pix') ||
+      lower.includes('ton')
+    ) {
+      return `🍿 **Netflix VIP (Em Breve):**\n\n` +
+        `O serviço da Netflix está temporariamente indisponível para novos pedidos pois nosso estoque de contas VIP está em fase de reabastecimento.\n\n` +
+        `Assim que reabastecido, estará disponível por apenas **R$ 10,00/mês** via Pix ou Cartão pelo nosso checkout oficial Ton.\n\n` +
+        `💡 Enquanto isso, aproveite o **Prime Video 100% GRATUITO** disponível na plataforma!`;
+    }
+
+    // 3. Admin / Suporte / Contato / Roni
+    if (
+      lower.includes('admin') ||
+      lower.includes('administrador') ||
+      lower.includes('suporte') ||
+      lower.includes('falar') ||
+      lower.includes('roni') ||
+      lower.includes('dono') ||
+      lower.includes('contato') ||
+      lower.includes('email')
+    ) {
+      return `✉️ **Atendimento com o Administrador:**\n\n` +
+        `Você pode entrar em contato diretamente com a administração oficial:\n` +
+        `• **E-mail do Admin:** \`ronisouza495@gmail.com\`\n` +
+        `• **Atendimento:** Resposta rápida em até 24 horas.\n\n` +
+        `Como posso te ajudar por aqui enquanto isso, ${firstName}?`;
+    }
+
+    // 4. Saudações
+    if (
+      lower.includes('ola') ||
+      lower.includes('olá') ||
+      lower.includes('oi') ||
+      lower.includes('bom dia') ||
+      lower.includes('boa tarde') ||
+      lower.includes('boa noite') ||
+      lower.includes('tudo bem') ||
+      lower.includes('fala')
+    ) {
+      return `👋 Olá, ${firstName}! Sou a **Assistente Virtual StreamHub VIP**! 🤖🍿\n\nComo posso te ajudar hoje? Você pode me perguntar sobre como resgatar o Prime Video grátis ou como falar com o suporte.`;
+    }
+
+    // 5. Resposta Padrão de Suporte VIP
+    return `🤖 **Atendimento de Suporte StreamHub VIP**\n\n` +
+      `Como posso ajudar você, ${firstName}?\n\n` +
+      `• 🎬 **Prime Video:** 100% Gratuito! Clique em "Prime Video" na tela inicial para resgatar.\n` +
+      `• 🍿 **Netflix VIP:** Em breve por R$ 10,00/mês.\n` +
+      `• ✉️ **Suporte Admin:** Fale pelo e-mail \`ronisouza495@gmail.com\`.\n\n` +
+      `Digite sua dúvida aqui que eu te ajudo na hora!`;
+  };
+
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || input).trim();
     if (!query) return;
@@ -74,6 +155,8 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
     if (!textToSend) setInput('');
     setLoading(true);
 
+    let replyText = '';
+
     try {
       const historyPayload = messages.map((m) => ({ role: m.role, content: m.content }));
 
@@ -83,29 +166,29 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
         body: JSON.stringify({ message: query, history: historyPayload })
       });
 
-      const data = await res.json();
-
-      const botMsg: ChatMessage = {
-        id: `bot_${Date.now()}`,
-        role: 'assistant',
-        content: data.reply || 'Como posso te ajudar no StreamHub VIP?',
-        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-      };
-
-      setMessages((prev) => [...prev, botMsg]);
-    } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `bot_err_${Date.now()}`,
-          role: 'assistant',
-          content: 'Desculpe, ocorreu um erro de conexão. Tente novamente em instantes!',
-          timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.reply) {
+          replyText = data.reply;
         }
-      ]);
-    } finally {
-      setLoading(false);
+      }
+    } catch (err) {
+      console.log('Server API offline/static deployment, utilizing smart client response engine');
     }
+
+    if (!replyText) {
+      replyText = getSmartBotResponse(query, user);
+    }
+
+    const botMsg: ChatMessage = {
+      id: `bot_${Date.now()}`,
+      role: 'assistant',
+      content: replyText,
+      timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages((prev) => [...prev, botMsg]);
+    setLoading(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
