@@ -66,11 +66,25 @@ export default function App() {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
+        if (data.user) {
+          localStorage.setItem('streamhub_user', JSON.stringify(data.user));
+        }
         loadUserHistory();
-      } else {
-        setUser(null);
+        return;
       }
     } catch (err) {
+      console.log('API auth check bypassed, checking local storage');
+    }
+
+    // Local Storage fallback for Vercel/Static deployment
+    const savedUser = localStorage.getItem('streamhub_user');
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        setUser(null);
+      }
+    } else {
       setUser(null);
     }
   };
@@ -93,7 +107,10 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {}
+    localStorage.removeItem('streamhub_user');
     setUser(null);
     setActiveTab('home');
     setUserAccessLogs([]);
