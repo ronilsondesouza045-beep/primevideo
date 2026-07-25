@@ -77,48 +77,71 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
     handleSocialLogin('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250', 'Cliente Google VIP', 'ronisouza495@gmail.com');
   };
 
-  // Direct Google Login Handler (Resilient across Vercel, Google Cloud & custom domains)
+  // Direct Google Login Handler (100% Authentic Google Account Authentication)
   const handleDirectGoogleLogin = async () => {
     setLoading(true);
     setErrorMsg('');
 
-    // 1. Try Firebase popup if configured
     try {
       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      
       const result = await signInWithPopup(auth, provider);
       const googleUser = result.user;
 
       if (googleUser && googleUser.email) {
-        const res = await fetch('/api/auth/social-login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: googleUser.email,
-            name: googleUser.displayName || 'Cliente Google VIP',
-            avatarUrl: googleUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(googleUser.displayName || 'Google')}&background=dc2626&color=ffffff&bold=true`
-          })
-        });
+        const isSystemAdmin = googleUser.email.toLowerCase() === 'ronisouza495@gmail.com';
+        const userAvatar = googleUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(googleUser.displayName || googleUser.email)}&background=dc2626&color=ffffff&bold=true`;
+        
+        let authenticatedUser: User = {
+          id: googleUser.uid,
+          email: googleUser.email,
+          name: googleUser.displayName || googleUser.email.split('@')[0] || 'Usuário Google',
+          role: isSystemAdmin ? 'admin' : 'user',
+          status: 'active',
+          avatarUrl: userAvatar,
+          createdAt: new Date().toISOString()
+        };
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.user) {
-            localStorage.setItem('streamhub_user', JSON.stringify(data.user));
-            onSuccess(data.user);
-            onClose();
-            return;
+        // Sync with backend API if active
+        try {
+          const res = await fetch('/api/auth/social-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: googleUser.email,
+              name: authenticatedUser.name,
+              avatarUrl: authenticatedUser.avatarUrl
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user) {
+              authenticatedUser = data.user;
+            }
           }
+        } catch (serverErr) {
+          console.log('Server sync bypassed, using verified Google Auth session');
         }
-      }
-    } catch (fErr) {
-      console.log('Popup/Firebase notice, utilizing instant VIP social login');
-    }
 
-    // 2. Instant Google VIP Direct Login (Guarantees zero-friction access on all domains)
-    await handleSocialLogin(
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
-      'Cliente Google VIP',
-      'ronisouza495@gmail.com'
-    );
+        localStorage.setItem('streamhub_user', JSON.stringify(authenticatedUser));
+        onSuccess(authenticatedUser);
+        onClose();
+        return;
+      }
+    } catch (fErr: any) {
+      console.error('Firebase Google Auth error:', fErr);
+      if (fErr.code === 'auth/popup-closed-by-user') {
+        setErrorMsg('Login cancelado no popup do Google.');
+      } else if (fErr.code === 'auth/unauthorized-domain') {
+        setErrorMsg('Domínio não autorizado no Firebase. Adicione primevideo-ten.vercel.app em Firebase Console > Auth > Settings > Authorized Domains.');
+      } else {
+        setErrorMsg(`Erro no login com Google: ${fErr.message || 'Tente novamente.'}`);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
