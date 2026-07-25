@@ -274,21 +274,11 @@ const getClientIp = (req: Request): string => {
 app.get('/api/services/prime-status', (req: Request, res: Response) => {
   try {
     const userIp = getClientIp(req);
-    let userId = '';
-    const token = req.cookies.token || (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.split(' ')[1] : null);
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET) as any;
-        userId = decoded.id;
-      } catch (e) {}
-    }
-
-    const check = db.checkPrimeGenerationLimit(userId, userIp);
     return res.json({
-      blocked: check.isBlocked,
-      reason: check.reason,
+      blocked: false,
+      reason: null,
       clientIp: userIp,
-      errorMessage: check.isBlocked ? '❌ BLOQUEADO: Você ou alguém da sua rede de internet (IP) já resgatou o acesso gratuito do Prime Video. Limite máximo atingido.' : null
+      errorMessage: null
     });
   } catch (err) {
     return res.status(500).json({ error: 'Erro ao verificar status.' });
@@ -300,16 +290,6 @@ app.post('/api/services/generate-prime', authenticateToken, (req: AuthenticatedR
   try {
     const user = req.user!;
     const userIp = getClientIp(req);
-
-    // Strict Security Lock: Check IP and User Account
-    const limitCheck = db.checkPrimeGenerationLimit(user.id, userIp);
-    if (limitCheck.isBlocked) {
-      return res.status(403).json({
-        success: false,
-        blocked: true,
-        error: '❌ BLOQUEADO: Você ou alguém da sua rede de internet (IP) já resgatou o acesso gratuito do Prime Video. Limite máximo atingido.'
-      });
-    }
 
     const primeCreds = db.getCredential('prime');
 
@@ -637,15 +617,6 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     const isExplicitGeneration = (lower.includes('gerar') && (lower.includes('senha') || lower.includes('acesso'))) || lower.includes('me da a senha') || lower.includes('medaasenha');
 
     if (isExplicitGeneration) {
-      // Check strict IP and account limit
-      const limitCheck = db.checkPrimeGenerationLimit(userId, userIp);
-
-      if (limitCheck.isBlocked) {
-        return res.json({
-          reply: "❌ Bloqueado! Você ou alguém da sua rede (IP) já resgatou o acesso gratuito do Prime Video. O limite é de apenas 1 resgate por pessoa/conexão."
-        });
-      }
-
       const primeCreds = db.getCredential('prime');
       const releasedCredentials = {
         email: primeCreds.email || 'primevideosouza368@gmail.com',
@@ -654,11 +625,10 @@ app.post('/api/chat', async (req: Request, res: Response) => {
         screen: 'Livre / Escolha qualquer perfil'
       };
 
-      // Record the access log immediately to block future attempts from this IP / User
       db.addAccessLog(userId || `chat_${userIp}`, userEmail, 'prime', releasedCredentials, userIp);
 
       return res.json({
-        reply: `🎉 **Acesso Prime Video VIP Liberado com Sucesso!**\n\n📧 **E-mail:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Instruções:** Acesse [primevideo.com](https://www.primevideo.com) e faça login.\n\n⚠️ *Aviso de Segurança: Este resgate foi vinculado e travado para a sua rede IP (${userIp}).*`
+        reply: `🎉 **Acesso Prime Video VIP Liberado com Sucesso!**\n\n📧 **E-mail:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Instruções:** Acesse [primevideo.com](https://www.primevideo.com) e faça login.`
       });
     }
 

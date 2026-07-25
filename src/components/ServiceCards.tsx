@@ -90,23 +90,13 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
               </li>
             </ul>
 
-            {/* Highlighted IP & Account Security Warning Notice */}
-            <div className="p-3.5 rounded-2xl bg-red-950/60 border border-red-500/50 text-red-300 text-[11px] sm:text-xs font-semibold leading-relaxed mb-4 flex items-start gap-2.5 shadow-lg">
-              <ShieldAlert className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+            {/* Info Badge */}
+            <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 text-cyan-200 text-[11px] sm:text-xs font-semibold leading-relaxed mb-4 flex items-start gap-2.5 shadow-lg">
+              <Sparkles className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
               <span>
-                <strong className="text-red-200">⚠️ ATENÇÃO:</strong> Limite de apenas 1 (uma) geração por pessoa/conexão IP. Tentativas duplicadas de outros dispositivos na mesma rede não serão permitidas.
+                <strong className="text-cyan-300">✨ ACESSO VIP LIBERADO:</strong> Clique no botão abaixo para gerar instantaneamente seu e-mail e senha do Prime Video 100% grátis.
               </span>
             </div>
-
-            {/* Blocked Red Error Banner (if limit reached) */}
-            {(primeBlocked || primeError) && (
-              <div className="p-3.5 rounded-2xl bg-red-600/20 border-2 border-red-500 text-red-200 text-xs font-bold leading-relaxed mb-4 flex items-start gap-2.5 animate-fadeIn shadow-xl">
-                <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                <span>
-                  {primeError || "❌ BLOQUEADO: Você ou alguém da sua rede de internet (IP) já resgatou o acesso gratuito do Prime Video. Limite máximo atingido."}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Action Button */}
@@ -118,13 +108,9 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
 
             <button
               onClick={onGeneratePrime}
-              className={`w-full py-3.5 px-6 rounded-2xl font-extrabold text-sm shadow-xl transition-all flex items-center justify-center gap-2 group/btn ${
-                primeBlocked
-                  ? 'bg-red-900/40 border border-red-500/40 text-red-300 hover:bg-red-900/60'
-                  : 'bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 hover:from-blue-500 hover:to-teal-400 text-white shadow-cyan-600/20 hover:shadow-cyan-600/40'
-              }`}
+              className="w-full py-3.5 px-6 rounded-2xl font-extrabold text-sm shadow-xl transition-all flex items-center justify-center gap-2 group/btn bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 hover:from-blue-500 hover:to-teal-400 text-white shadow-cyan-600/20 hover:shadow-cyan-600/40"
             >
-              <span>{primeBlocked ? 'Acesso Bloqueado (Limite Atingido)' : 'Gerar Acesso Prime Video'}</span>
+              <span>Gerar Acesso Prime Video Grátis</span>
               <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
             </button>
           </div>

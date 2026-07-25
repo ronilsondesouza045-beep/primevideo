@@ -247,25 +247,6 @@ class JSONDatabase {
 
   // Access Logs
   public checkPrimeGenerationLimit(userId: string, userIp: string): { isBlocked: boolean; reason?: 'user' | 'ip' } {
-    // 1. Check if user account has already generated Prime Video
-    const userHasPrime = this.data.accessLogs.some(
-      l => l.service === 'prime' && l.userId === userId
-    );
-    if (userHasPrime) {
-      return { isBlocked: true, reason: 'user' };
-    }
-
-    // 2. Check if this IP address has already generated Prime Video
-    if (userIp) {
-      const normalizedIp = userIp.replace(/^::ffff:/, '').trim();
-      const ipHasPrime = this.data.accessLogs.some(
-        l => l.service === 'prime' && l.userIp && l.userIp.replace(/^::ffff:/, '').trim() === normalizedIp
-      );
-      if (ipHasPrime) {
-        return { isBlocked: true, reason: 'ip' };
-      }
-    }
-
     return { isBlocked: false };
   }
 
