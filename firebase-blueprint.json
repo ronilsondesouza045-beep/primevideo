@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "users": {
+      "title": "users",
+      "description": "Lista de usuários cadastrados e perfis VIP",
+      "properties": {
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "status": { "type": "string" },
+        "avatarUrl": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    },
+    "accessLogs": {
+      "title": "accessLogs",
+      "description": "Histórico de resgates de acessos",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "serviceType": { "type": "string" },
+        "ipAddress": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["userId", "serviceType"]
+    },
+    "payments": {
+      "title": "payments",
+      "description": "Pedidos de acesso pagos",
+      "properties": {
+        "userId": { "type": "string" },
+        "serviceType": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string" },
+        "tonPaymentLink": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "serviceType", "status"]
+    }
+  }
+}

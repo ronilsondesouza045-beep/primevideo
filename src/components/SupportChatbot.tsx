@@ -1,0 +1,314 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { User, ChatMessage } from '../types';
+import { X, Send, User as UserIcon, Loader2, Sparkles, Volume2, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { StandingBotAvatar } from './StandingBotAvatar';
+
+interface SupportChatbotProps {
+  user?: User | null;
+}
+
+export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [greetedUserId, setGreetedUserId] = useState<string | null>(null);
+
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: 'init_1',
+      role: 'assistant',
+      content: 'Olá! Sou o **Robô de Atendimento VIP**! 🤖🍿\nSeja bem-vindo ao suporte inteligente do StreamHub. Como posso te ajudar hoje?',
+      timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    }
+  ]);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-greeting when user logs in via Chrome / Google / Email
+  useEffect(() => {
+    if (user && user.id !== greetedUserId) {
+      setGreetedUserId(user.id);
+      const firstName = user.name ? user.name.split(' ')[0] : 'Cliente VIP';
+
+      const welcomeText = `🎉 **Olá, ${user.name || user.email}!** Seja muito bem-vindo(a) ao **StreamHub VIP**!\n\nSou seu **assistente de suporte virtual**. Seu perfil já está ativo e sincronizado com nosso banco de dados em tempo real!\n\nComo posso te ajudar hoje, ${firstName}?`;
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `welcome_${Date.now()}`,
+          role: 'assistant',
+          content: welcomeText,
+          timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+
+      // Pop floating speech bubble notification over the standing bot
+      setShowToast(true);
+      const timer = setTimeout(() => {
+        setShowToast(false);
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, greetedUserId]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShowToast(false);
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isOpen]);
+
+  const handleSendMessage = async (textToSend?: string) => {
+    const query = (textToSend || input).trim();
+    if (!query) return;
+
+    const userMsg: ChatMessage = {
+      id: `usr_${Date.now()}`,
+      role: 'user',
+      content: query,
+      timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    if (!textToSend) setInput('');
+    setLoading(true);
+
+    try {
+      const historyPayload = messages.map((m) => ({ role: m.role, content: m.content }));
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: query, history: historyPayload })
+      });
+
+      const data = await res.json();
+
+      const botMsg: ChatMessage = {
+        id: `bot_${Date.now()}`,
+        role: 'assistant',
+        content: data.reply || 'Como posso te ajudar no StreamHub VIP?',
+        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot_err_${Date.now()}`,
+          role: 'assistant',
+          content: 'Desculpe, ocorreu um erro de conexão. Tente novamente em instantes!',
+          timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  // Speak welcome aloud using Web Speech Synthesis if available
+  const handleSpeakText = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const cleanText = text.replace(/[*_#`]/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'pt-BR';
+      utterance.rate = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
+      
+      {/* Floating Welcome Speech Bubble Toast (When closed) */}
+      {!isOpen && showToast && (
+        <div className="mb-3 max-w-xs bg-slate-900/95 border-2 border-red-500/80 rounded-2xl p-3 shadow-2xl shadow-red-900/50 backdrop-blur-md animate-fadeIn flex items-start gap-2.5 relative group cursor-pointer"
+             onClick={() => setIsOpen(true)}>
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping absolute -top-1 -left-1"></div>
+          <div className="flex-1">
+            <p className="text-[11px] font-bold text-slate-100 leading-tight">
+              👋 Olá <span className="text-red-400">{user?.name ? user.name.split(' ')[0] : 'Cliente VIP'}</span>!
+            </p>
+            <p className="text-[10px] text-slate-300 mt-1">
+              Seja bem-vindo(a) ao suporte online. Clique para ver sua conta!
+            </p>
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowToast(false);
+            }}
+            className="p-1 text-slate-400 hover:text-white"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Floating Standing Mascot Button (When Closed) */}
+      {!isOpen && (
+        <div className="relative flex flex-col items-center group">
+          {/* Badge Online */}
+          <div className="mb-1.5 px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-emerald-500/40 text-[9px] font-bold text-emerald-400 shadow-md flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            ATENDIMENTO ONLINE
+          </div>
+
+          <button
+            onClick={() => setIsOpen(true)}
+            className="relative group p-2 rounded-3xl bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-2 border-red-600/70 shadow-2xl shadow-red-600/40 hover:scale-105 transition-all flex items-center justify-center overflow-visible"
+            title="Abrir Atendimento com Bot Standing VIP"
+          >
+            <StandingBotAvatar size="md" isWaving={true} />
+
+            <span className="absolute -top-1 -right-1 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-slate-950"></span>
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="w-80 sm:w-96 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl shadow-slate-950 flex flex-col h-[520px] overflow-hidden animate-fadeIn">
+          
+          {/* Header with Standing Mascot & Live Status */}
+          <div className="p-3.5 bg-gradient-to-r from-slate-950 via-purple-950/80 to-slate-950 border-b border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-purple-500/30 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner">
+                <StandingBotAvatar size="sm" isWaving={true} />
+              </div>
+              <div>
+                <h4 className="text-xs font-black text-white flex items-center gap-1.5">
+                  Suporte StreamHub VIP
+                  <span className="px-1.5 py-0.5 text-[8px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full font-bold">
+                    24H
+                  </span>
+                </h4>
+                <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  {user ? `Logado como: ${user.name || user.email}` : 'Atendimento Humanizado'}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Quick Action Pills */}
+          <div className="px-3 py-2 bg-slate-950/80 border-b border-slate-800/80 flex gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
+            <button
+              onClick={() => handleSendMessage('Como resgatar meu Prime Video grátis?')}
+              className="px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 whitespace-nowrap hover:bg-cyan-500/20 transition-all font-medium"
+            >
+              🎬 Prime Video
+            </button>
+            <button
+              onClick={() => handleSendMessage('Quando a Netflix vai estar disponível?')}
+              className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 whitespace-nowrap hover:bg-amber-500/20 transition-all font-medium"
+            >
+              🍿 Netflix (Em Breve)
+            </button>
+            <button
+              onClick={() => handleSendMessage('Quero falar com a administração do sistema')}
+              className="px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/30 whitespace-nowrap hover:bg-purple-500/20 transition-all font-medium"
+            >
+              ✉️ Falar com Admin
+            </button>
+          </div>
+
+          {/* Messages Area */}
+          <div className="flex-1 p-3.5 overflow-y-auto space-y-3 bg-slate-950/50 text-xs">
+            {messages.map((m) => (
+              <div
+                key={m.id}
+                className={`flex gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                {m.role === 'assistant' && (
+                  <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-purple-600 to-red-600 text-white flex items-center justify-center flex-shrink-0 shadow-md">
+                    <StandingBotAvatar size="sm" isWaving={false} />
+                  </div>
+                )}
+
+                <div
+                  className={`max-w-[82%] p-3 rounded-2xl ${
+                    m.role === 'user'
+                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white font-medium rounded-tr-none shadow-md'
+                      : 'bg-slate-800/90 text-slate-200 rounded-tl-none border border-slate-700/80 shadow-md'
+                  }`}
+                >
+                  <p className="whitespace-pre-line leading-relaxed">{m.content}</p>
+                  
+                  <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-white/5 text-[9px] opacity-70">
+                    {m.role === 'assistant' && (
+                      <button
+                        onClick={() => handleSpeakText(m.content)}
+                        className="hover:text-cyan-300 flex items-center gap-1 transition-colors"
+                        title="Ouvir em Voz Alta"
+                      >
+                        <Volume2 className="w-3 h-3" />
+                        <span>Ouvir</span>
+                      </button>
+                    )}
+                    <span className="ml-auto">{m.timestamp}</span>
+                  </div>
+                </div>
+
+                {m.role === 'user' && (
+                  <div className="w-7 h-7 rounded-xl bg-red-600/30 text-red-400 flex items-center justify-center flex-shrink-0 border border-red-500/30">
+                    <UserIcon className="w-4 h-4" />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {loading && (
+              <div className="flex gap-2 items-center text-slate-400 text-xs bg-slate-900/60 p-2.5 rounded-xl border border-slate-800 w-fit">
+                <Loader2 className="w-4 h-4 animate-spin text-purple-400" />
+                <span>O Robô VIP está digitando sua resposta...</span>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Box */}
+          <div className="p-3 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder={user ? `Digite sua mensagem, ${user.name ? user.name.split(' ')[0] : 'Cliente'}...` : "Digite sua mensagem aqui..."}
+              className="flex-1 p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 placeholder:text-slate-500"
+            />
+            <button
+              onClick={() => handleSendMessage()}
+              disabled={loading || !input.trim()}
+              className="p-2.5 rounded-xl bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 text-white disabled:opacity-50 transition-all shadow-md"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
+
+        </div>
+      )}
+
+    </div>
+  );
+};
