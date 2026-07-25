@@ -634,9 +634,9 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     }
 
     const lower = message.toLowerCase();
-    const isPrimeQuery = lower.includes('prime') || lower.includes('gratis') || lower.includes('gratuito') || lower.includes('resgatar') || lower.includes('senha') || lower.includes('conta');
+    const isExplicitGeneration = (lower.includes('gerar') && (lower.includes('senha') || lower.includes('acesso'))) || lower.includes('me da a senha') || lower.includes('medaasenha');
 
-    if (isPrimeQuery) {
+    if (isExplicitGeneration) {
       // Check strict IP and account limit
       const limitCheck = db.checkPrimeGenerationLimit(userId, userIp);
 
@@ -646,23 +646,20 @@ app.post('/api/chat', async (req: Request, res: Response) => {
         });
       }
 
-      // If asking specifically for credentials / account / generation in the chatbot
-      if (lower.includes('gerar') || lower.includes('senha') || lower.includes('resgatar') || lower.includes('conta') || lower.includes('quero') || lower.includes('acesso')) {
-        const primeCreds = db.getCredential('prime');
-        const releasedCredentials = {
-          email: primeCreds.email || 'primevideosouza368@gmail.com',
-          password: primeCreds.password || 'roni141821',
-          pin: 'Sem PIN',
-          screen: 'Livre / Escolha qualquer perfil'
-        };
+      const primeCreds = db.getCredential('prime');
+      const releasedCredentials = {
+        email: primeCreds.email || 'primevideosouza368@gmail.com',
+        password: primeCreds.password || 'roni141821',
+        pin: 'Sem PIN',
+        screen: 'Livre / Escolha qualquer perfil'
+      };
 
-        // Record the access log immediately to block future attempts from this IP / User
-        db.addAccessLog(userId || `chat_${userIp}`, userEmail, 'prime', releasedCredentials, userIp);
+      // Record the access log immediately to block future attempts from this IP / User
+      db.addAccessLog(userId || `chat_${userIp}`, userEmail, 'prime', releasedCredentials, userIp);
 
-        return res.json({
-          reply: `🎉 **Acesso Prime Video VIP Liberado com Sucesso!**\n\n📧 **E-mail:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Instruções:** Acesse [primevideo.com](https://www.primevideo.com) e faça login.\n\n⚠️ *Aviso de Segurança: Este resgate foi vinculado e travado para a sua rede IP (${userIp}).*`
-        });
-      }
+      return res.json({
+        reply: `🎉 **Acesso Prime Video VIP Liberado com Sucesso!**\n\n📧 **E-mail:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Instruções:** Acesse [primevideo.com](https://www.primevideo.com) e faça login.\n\n⚠️ *Aviso de Segurança: Este resgate foi vinculado e travado para a sua rede IP (${userIp}).*`
+      });
     }
 
     // Gemini API initialization / Fallback

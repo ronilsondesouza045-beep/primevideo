@@ -198,6 +198,38 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
     }
   };
 
+  const renderFormattedContent = (content: string) => {
+    const lines = content.split('\n');
+    return (
+      <div className="space-y-1">
+        {lines.map((line, lineIdx) => {
+          const parts = line.split(/(\*\*.*?\*\*|`.*?`)/g);
+          return (
+            <p key={lineIdx} className="leading-relaxed min-h-[1.25rem]">
+              {parts.map((part, partIdx) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                  return (
+                    <strong key={partIdx} className="font-bold text-white">
+                      {part.slice(2, -2)}
+                    </strong>
+                  );
+                }
+                if (part.startsWith('`') && part.endsWith('`')) {
+                  return (
+                    <code key={partIdx} className="bg-slate-950 px-1.5 py-0.5 rounded text-amber-300 font-mono text-[11px] border border-slate-700/50">
+                      {part.slice(1, -1)}
+                    </code>
+                  );
+                }
+                return part;
+              })}
+            </p>
+          );
+        })}
+      </div>
+    );
+  };
+
   // Speak welcome aloud using Web Speech Synthesis if available
   const handleSpeakText = (text: string) => {
     if ('speechSynthesis' in window) {
@@ -335,7 +367,7 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
                       : 'bg-slate-800/90 text-slate-200 rounded-tl-none border border-slate-700/80 shadow-md'
                   }`}
                 >
-                  <p className="whitespace-pre-line leading-relaxed">{m.content}</p>
+                  {renderFormattedContent(m.content)}
                   
                   <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-white/5 text-[9px] opacity-70">
                     {m.role === 'assistant' && (
