@@ -23,7 +23,8 @@ import {
   Chrome,
   MessageSquare,
   Send,
-  UserCheck
+  UserCheck,
+  Tv
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -52,6 +53,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   // Credentials editing state
   const [primeEmail, setPrimeEmail] = useState('');
   const [primePassword, setPrimePassword] = useState('');
+  const [paramountEmail, setParamountEmail] = useState('');
+  const [paramountPassword, setParamountPassword] = useState('');
   const [netflixEmail, setNetflixEmail] = useState('');
   const [netflixPassword, setNetflixPassword] = useState('');
   const [netflixPin, setNetflixPin] = useState('');
@@ -143,6 +146,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         if (data.prime) {
           setPrimeEmail(data.prime.email || '');
           setPrimePassword(data.prime.password || '');
+        }
+        if (data.paramount) {
+          setParamountEmail(data.paramount.email || '');
+          setParamountPassword(data.paramount.password || '');
         }
         if (data.netflix) {
           setNetflixEmail(data.netflix.email || '');
@@ -277,20 +284,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     }
   };
 
-  const handleSaveCredentials = async (serviceId: 'prime' | 'netflix') => {
+  const handleSaveCredentials = async (serviceId: 'prime' | 'netflix' | 'paramount') => {
     try {
-      const payload = serviceId === 'prime' ? {
-        serviceId: 'prime',
-        email: primeEmail,
-        password: primePassword
-      } : {
-        serviceId: 'netflix',
-        email: netflixEmail,
-        password: netflixPassword,
-        pin: netflixPin,
-        screen: netflixScreen,
-        tonLink
-      };
+      let payload: any = {};
+      if (serviceId === 'prime') {
+        payload = { serviceId: 'prime', email: primeEmail, password: primePassword };
+      } else if (serviceId === 'paramount') {
+        payload = { serviceId: 'paramount', email: paramountEmail, password: paramountPassword };
+      } else {
+        payload = {
+          serviceId: 'netflix',
+          email: netflixEmail,
+          password: netflixPassword,
+          pin: netflixPin,
+          screen: netflixScreen,
+          tonLink
+        };
+      }
 
       const res = await fetch('/api/admin/credentials', {
         method: 'PUT',
@@ -522,6 +532,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                 {stats.primeAccessCount}
               </p>
               <span className="text-[11px] text-slate-500">Logins Liberados</span>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
+              <span className="text-[10px] font-bold text-slate-400 uppercase">Acessos Paramount+</span>
+              <p className="text-2xl sm:text-3xl font-black text-blue-400 mt-1">
+                {stats.paramountAccessCount || 0}
+              </p>
+              <span className="text-[11px] text-slate-500">Logins Gratuitos</span>
             </div>
 
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
@@ -1097,6 +1115,48 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               >
                 <Save className="w-4 h-4" />
                 <span>Salvar Credenciais Prime Video</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Paramount+ Config */}
+          <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4">
+            <div className="flex items-center gap-2">
+              <Tv className="w-5 h-5 text-blue-400" />
+              <h3 className="text-base font-bold text-white">Credencial Paramount+ (Grátis)</h3>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-slate-400 font-bold block mb-1">E-mail Paramount+</label>
+                <input
+                  type="text"
+                  value={paramountEmail}
+                  onChange={(e) => setParamountEmail(e.target.value)}
+                  className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-blue-300 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-400 font-bold block mb-1">Senha Paramount+</label>
+                <input
+                  type="text"
+                  value={paramountPassword}
+                  onChange={(e) => setParamountPassword(e.target.value)}
+                  className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-blue-300 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <p className="text-[11px] text-amber-400 font-semibold bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+                Aviso exibido ao cliente: Esta conta gratuita do Paramount+ pode ser alterada ou parar de funcionar a qualquer momento sem aviso prévio.
+              </p>
+
+              <button
+                onClick={() => handleSaveCredentials('paramount')}
+                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+              >
+                <Save className="w-4 h-4" />
+                <span>Salvar Credenciais Paramount+</span>
               </button>
             </div>
           </div>

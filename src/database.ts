@@ -16,7 +16,7 @@ export interface User {
 }
 
 export interface ServiceCredential {
-  serviceId: 'prime' | 'netflix';
+  serviceId: 'prime' | 'netflix' | 'paramount';
   email: string;
   password: string;
   pin?: string;
@@ -29,12 +29,13 @@ export interface AccessLog {
   userId: string;
   userEmail: string;
   userIp?: string;
-  service: 'prime' | 'netflix';
+  service: 'prime' | 'netflix' | 'paramount';
   credentials: {
     email: string;
     password: string;
     pin?: string;
     screen?: string;
+    warning?: string;
   };
   createdAt: string;
 }
@@ -187,6 +188,17 @@ class JSONDatabase {
       tonLink: ''
     };
 
+    // Paramount+ Default (100% Gratuito)
+    // Email: olivia8515@web-library.net
+    // Senha: 4400988
+    this.data.credentials['paramount'] = {
+      serviceId: 'paramount',
+      email: 'olivia8515@web-library.net',
+      password: '4400988',
+      screen: 'Perfil Livre / Gratuito',
+      tonLink: ''
+    };
+
     // Netflix Default (Paid R$ 10,00)
     this.data.credentials['netflix'] = {
       serviceId: 'netflix',
@@ -311,11 +323,15 @@ class JSONDatabase {
   }
 
   // Credentials Methods
-  public getCredential(serviceId: 'prime' | 'netflix'): ServiceCredential {
-    return this.data.credentials[serviceId];
+  public getCredential(serviceId: 'prime' | 'netflix' | 'paramount'): ServiceCredential {
+    return this.data.credentials[serviceId] || {
+      serviceId,
+      email: serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
+      password: serviceId === 'paramount' ? '4400988' : 'roni141821'
+    };
   }
 
-  public updateCredential(serviceId: 'prime' | 'netflix', cred: Partial<ServiceCredential>) {
+  public updateCredential(serviceId: 'prime' | 'netflix' | 'paramount', cred: Partial<ServiceCredential>) {
     this.data.credentials[serviceId] = {
       ...this.data.credentials[serviceId],
       ...cred
@@ -331,7 +347,7 @@ class JSONDatabase {
   public addAccessLog(
     userId: string,
     userEmail: string,
-    service: 'prime' | 'netflix',
+    service: 'prime' | 'netflix' | 'paramount',
     credentials: AccessLog['credentials'],
     userIp?: string
   ): AccessLog {
@@ -599,6 +615,7 @@ class JSONDatabase {
     const approvedPayments = this.data.payments.filter(p => p.status === 'APROVADO');
     const totalSales = approvedPayments.reduce((sum, p) => sum + p.amount, 0);
     const primeCount = this.data.accessLogs.filter(a => a.service === 'prime').length;
+    const paramountCount = this.data.accessLogs.filter(a => a.service === 'paramount').length;
     const netflixCount = approvedPayments.length;
     
     const visitorLogs = this.data.visitorLogs || [];
@@ -629,6 +646,7 @@ class JSONDatabase {
       totalSales,
       totalUsers: this.data.users.length,
       primeAccessCount: primeCount,
+      paramountAccessCount: paramountCount,
       netflixAccessCount: netflixCount,
       pendingPaymentsCount: this.data.payments.filter(p => p.status === 'PENDENTE').length,
       approvedPaymentsCount: approvedPayments.length,

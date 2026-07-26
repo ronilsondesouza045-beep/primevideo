@@ -457,6 +457,43 @@ app.post('/api/services/generate-prime', authenticateToken, (req: AuthenticatedR
   }
 });
 
+// Generate Free Paramount+ Access
+app.post('/api/services/generate-paramount', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const user = req.user!;
+    const userIp = getClientIp(req);
+
+    const paramCreds = db.getCredential('paramount');
+
+    const releasedCredentials = {
+      email: paramCreds.email || 'olivia8515@web-library.net',
+      password: paramCreds.password || '4400988',
+      screen: paramCreds.screen || 'Perfil Livre / Gratuito',
+      warning: 'Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.'
+    };
+
+    const accessLog = db.addAccessLog(user.id, user.email, 'paramount', releasedCredentials, userIp);
+
+    return res.json({
+      success: true,
+      message: 'Acesso Paramount+ gerado com sucesso!',
+      access: {
+        id: accessLog.id,
+        service: 'Paramount+ Gratuito',
+        credentials: releasedCredentials,
+        generatedAt: accessLog.createdAt,
+        instructions: [
+          'Acesse o site ou app oficial do Paramount+ (paramountplus.com).',
+          'Insira o e-mail e a senha fornecidos acima.',
+          'Atenção: A qualquer momento esta conta Paramount+ gratuita pode parar de funcionar.'
+        ]
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Erro ao liberar acesso ao Paramount+.' });
+  }
+});
+
 // Get User's Active Accesses History
 app.get('/api/services/user-accesses', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   try {

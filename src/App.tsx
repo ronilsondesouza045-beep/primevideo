@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ServiceCards } from './components/ServiceCards';
 import { PrimeModal } from './components/PrimeModal';
+import { ParamountModal } from './components/ParamountModal';
 import { NetflixModal } from './components/NetflixModal';
 import { UserAccesses } from './components/UserAccesses';
 import { AdminPanel } from './components/AdminPanel';
@@ -18,6 +19,7 @@ export default function App() {
 
   // Modals state
   const [primeCreds, setPrimeCreds] = useState<ServiceCredentials | null>(null);
+  const [paramountCreds, setParamountCreds] = useState<ServiceCredentials | null>(null);
 
   // Netflix Payment Modal state
   const [activePayment, setActivePayment] = useState<{
@@ -197,6 +199,54 @@ export default function App() {
     setPrimeBlocked(false);
   };
 
+  // Generate Free Paramount+ Access
+  const handleGenerateParamount = async () => {
+    if (!user) {
+      setIsAuthOpen(true);
+      return;
+    }
+
+    const defaultParamountCredentials = {
+      email: 'olivia8515@web-library.net',
+      password: '4400988',
+      screen: 'Perfil Livre / Gratuito',
+      warning: 'Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.'
+    };
+
+    // 1. Try server API
+    try {
+      const res = await fetch('/api/services/generate-paramount', { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.access) {
+          setParamountCreds(data.access.credentials);
+          loadUserHistory();
+          return;
+        }
+      }
+    } catch (err) {
+      console.log('Server API unreachable, executing client-side Paramount generation');
+    }
+
+    // 2. Client-side fallback
+    const userEmailKey = user.email.toLowerCase();
+
+    const newAccessLog: AccessLog = {
+      id: `acc_paramount_local_${Date.now()}`,
+      userId: user.id,
+      userEmail: user.email,
+      service: 'paramount',
+      credentials: defaultParamountCredentials,
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedLogs = [newAccessLog, ...userAccessLogs];
+    setUserAccessLogs(updatedLogs);
+    localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(updatedLogs));
+
+    setParamountCreds(defaultParamountCredentials);
+  };
+
   // Buy Netflix Access (R$ 10,00) - Temporarily blocked / Em Breve
   const handleBuyNetflix = () => {
     alert('🔒 Acessos da Netflix temporariamente em reabastecimento!\n\nEm breve teremos novos logins Netflix VIP disponíveis nesta plataforma.\n\nAproveite e resgate seu Prime Video 100% GRATUITO no momento!');
@@ -276,6 +326,7 @@ export default function App() {
             />
             <ServiceCards
               onGeneratePrime={handleGeneratePrime}
+              onGenerateParamount={handleGenerateParamount}
               onBuyNetflix={handleBuyNetflix}
               primeBlocked={primeBlocked}
               primeError={primeError}
@@ -332,6 +383,17 @@ export default function App() {
           onClose={() => setPrimeCreds(null)}
           onOpenChat={() => {
             setPrimeCreds(null);
+          }}
+        />
+      )}
+
+      {/* Paramount+ Released Credentials Modal */}
+      {paramountCreds && (
+        <ParamountModal
+          credentials={paramountCreds}
+          onClose={() => setParamountCreds(null)}
+          onOpenChat={() => {
+            setParamountCreds(null);
           }}
         />
       )}

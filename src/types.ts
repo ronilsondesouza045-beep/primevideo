@@ -15,6 +15,7 @@ export interface ServiceCredentials {
   password: string;
   pin?: string;
   screen?: string;
+  warning?: string;
 }
 
 export interface AccessLog {
@@ -22,7 +23,7 @@ export interface AccessLog {
   userId: string;
   userEmail: string;
   userIp?: string;
-  service: 'prime' | 'netflix';
+  service: 'prime' | 'netflix' | 'paramount';
   credentials: ServiceCredentials;
   createdAt: string;
 }
@@ -68,6 +69,7 @@ export interface AdminStats {
   totalSales: number;
   totalUsers: number;
   primeAccessCount: number;
+  paramountAccessCount?: number;
   netflixAccessCount: number;
   pendingPaymentsCount: number;
   approvedPaymentsCount: number;

@@ -35,7 +35,7 @@ export const Hero: React.FC<HeroProps> = ({ onGeneratePrime, onBuyNetflix }) => 
           </h1>
           <p className="text-sm sm:text-base text-slate-300 font-medium max-w-2xl mx-auto leading-relaxed">
             Liberação instantânea de acessos exclusivos de streaming. Aproveite nosso 
-            <strong className="text-cyan-400"> Prime Video 100% Gratuito</strong>! 
+            <strong className="text-cyan-400"> Prime Video</strong> e <strong className="text-blue-400">Paramount+</strong> 100% Gratuitos! 
             <span className="text-slate-400 block sm:inline sm:ml-1 font-semibold">(Netflix VIP estará disponível <strong className="text-amber-400">Em Breve</strong>)</span>.
           </p>
         </div>

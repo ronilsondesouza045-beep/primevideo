@@ -1,9 +1,10 @@
 import React from 'react';
-import { Play, Sparkles, CheckCircle2, ShieldAlert, ArrowRight, Zap, CreditCard, Lock, Star, XCircle } from 'lucide-react';
+import { Play, Sparkles, CheckCircle2, ShieldAlert, ArrowRight, Zap, CreditCard, Lock, Star, XCircle, Tv, AlertTriangle } from 'lucide-react';
 import { PrimeCountdown } from './PrimeCountdown';
 
 interface ServiceCardsProps {
   onGeneratePrime: () => void;
+  onGenerateParamount: () => void;
   onBuyNetflix: () => void;
   primeBlocked?: boolean;
   primeError?: string | null;
@@ -11,6 +12,7 @@ interface ServiceCardsProps {
 
 export const ServiceCards: React.FC<ServiceCardsProps> = ({
   onGeneratePrime,
+  onGenerateParamount,
   onBuyNetflix,
   primeBlocked = false,
   primeError = null,
@@ -28,7 +30,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+      <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
         
         {/* ======================================================== */}
         {/* CARD 1: PRIME VIDEO (100% GRATUITO) */}
@@ -124,7 +126,91 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         </div>
 
         {/* ======================================================== */}
-        {/* CARD 2: NETFLIX VIP (BLOQUEADO / EM BREVE) */}
+        {/* CARD 2: PARAMOUNT+ (100% GRATUITO) */}
+        {/* ======================================================== */}
+        <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-blue-500/50 p-6 sm:p-8 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-blue-950/50 group overflow-hidden">
+          
+          {/* Subtle Glow */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
+
+          <div>
+            {/* Header Badge */}
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <span className="px-3.5 py-1 rounded-full text-xs font-black tracking-wider text-blue-300 bg-blue-500/10 border border-blue-500/30 uppercase flex items-center gap-1.5 shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                100% GRATUITO
+              </span>
+              <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-md border border-emerald-500/20">
+                Acesso Imediato
+              </span>
+            </div>
+
+            {/* Service Title & Logo Branding */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-700 to-indigo-500 p-0.5 shadow-lg shadow-blue-500/20">
+                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                  <Tv className="w-6 h-6 text-blue-400" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-white">
+                  Paramount+
+                </h3>
+                <p className="text-xs text-slate-400 font-medium">
+                  Catálogo Paramount+ Oficial
+                </p>
+              </div>
+            </div>
+
+            <p className="text-slate-300 text-xs sm:text-sm mb-4 leading-relaxed">
+              Obtenha acesso <strong className="text-white">gratuito</strong> para assistir a filmes de Hollywood, séries exclusivas e esportes do Paramount+.
+            </p>
+
+            {/* Warning Notice */}
+            <div className="p-3 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-[11px] font-semibold leading-relaxed mb-4 flex items-start gap-2 shadow-sm">
+              <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <span>
+                <strong className="text-amber-300">AVISO:</strong> A qualquer momento esta conta Paramount+ gratuita pode ser alterada ou parar de funcionar.
+              </span>
+            </div>
+
+            {/* Benefits List */}
+            <ul className="space-y-2 mb-6 text-xs text-slate-300">
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                <span>E-mail e senha liberados na hora</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                <span>Qualidade Full HD e acervo completo</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                <span>Sem necessidade de cartão de crédito</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Action Button */}
+          <div>
+            <div className="p-3 mb-4 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between text-xs">
+              <span className="text-slate-400">Preço do Acesso:</span>
+              <span className="font-black text-blue-400 text-sm">R$ 0,00 (Grátis)</span>
+            </div>
+
+            <button
+              onClick={onGenerateParamount}
+              className="w-full py-3.5 px-6 rounded-2xl font-extrabold text-sm shadow-xl transition-all flex items-center justify-center gap-2 group/btn bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-500 hover:from-blue-600 hover:to-indigo-400 text-white shadow-blue-600/20 hover:shadow-blue-600/40"
+            >
+              <span>Gerar Paramount+ Grátis</span>
+              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+        </div>
+
+        {/* ======================================================== */}
+        {/* CARD 3: NETFLIX VIP (BLOQUEADO / EM BREVE) */}
         {/* ======================================================== */}
         <div className="relative rounded-3xl bg-slate-900/60 border border-slate-800 p-6 sm:p-8 flex flex-col justify-between transition-all group overflow-hidden opacity-90 hover:opacity-100">
           
