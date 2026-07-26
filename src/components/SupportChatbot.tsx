@@ -32,7 +32,7 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
       setGreetedUserId(user.id);
       const firstName = user.name ? user.name.split(' ')[0] : 'Cliente VIP';
 
-      const welcomeText = `🎉 **Olá, ${user.name || user.email}!** Seja muito bem-vindo(a) ao **StreamHub VIP**!\n\nSou seu **assistente de suporte virtual**. Seu perfil já está ativo e sincronizado com nosso banco de dados em tempo real!\n\nComo posso te ajudar hoje, ${firstName}?`;
+      const welcomeText = `🎉 **Olá, ${user.name || user.email}!** Seja muito bem-vindo(a) ao **StreamHub VIP**!\n\nSou seu **assistente de suporte virtual**. Seu perfil já está ativo e sincronizado em tempo real!\n\nComo posso te ajudar hoje, ${firstName}?`;
 
       setMessages((prev) => [
         ...prev,
@@ -52,6 +52,43 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
       return () => clearTimeout(timer);
     }
   }, [user, greetedUserId]);
+
+  // Poll for Admin Direct Messages/Replies every 5 seconds
+  useEffect(() => {
+    if (!isOpen && !user) return;
+    const pollHistory = async () => {
+      try {
+        const uParam = user?.id || user?.email || 'guest';
+        const res = await fetch(`/api/support/history?userId=${encodeURIComponent(uParam)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.messages && Array.isArray(data.messages)) {
+            // Find admin replies not yet in local messages
+            data.messages.forEach((m: any) => {
+              if (m.sender === 'admin') {
+                const exists = messages.some((localMsg) => localMsg.content.includes(m.text));
+                if (!exists) {
+                  setMessages((prev) => [
+                    ...prev,
+                    {
+                      id: m.id || `admin_reply_${Date.now()}`,
+                      role: 'assistant',
+                      content: `👨‍💻 **Resposta do Suporte Admin:**\n${m.text}`,
+                      timestamp: new Date(m.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                    }
+                  ]);
+                }
+              }
+            });
+          }
+        }
+      } catch (e) {}
+    };
+
+    pollHistory();
+    const interval = setInterval(pollHistory, 5000);
+    return () => clearInterval(interval);
+  }, [isOpen, user, messages]);
 
   useEffect(() => {
     if (isOpen) {
@@ -187,6 +224,20 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
     setMessages((prev) => [...prev, userMsg]);
     if (!textToSend) setInput('');
     setLoading(true);
+
+    // Save support message to server for Admin
+    try {
+      await fetch('/api/support/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: query,
+          userId: user?.id || 'guest',
+          userName: user?.name || 'Cliente VIP',
+          userEmail: user?.email || 'visitante@streamhub.com'
+        })
+      });
+    } catch (e) {}
 
     let replyText = '';
 

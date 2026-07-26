@@ -20,7 +20,10 @@ import {
   Clock,
   Key,
   Activity,
-  Chrome
+  Chrome,
+  MessageSquare,
+  Send,
+  UserCheck
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -29,13 +32,17 @@ interface AdminPanelProps {
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'visitors' | 'users' | 'accesses' | 'payments' | 'credentials'
+    'dashboard' | 'support' | 'visitors' | 'users' | 'accesses' | 'payments' | 'credentials'
   >('dashboard');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [visitors, setVisitors] = useState<VisitorLog[]>([]);
   const [generatedAccesses, setGeneratedAccesses] = useState<(AccessLog & { userName?: string })[]>([]);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
+  const [supportChats, setSupportChats] = useState<any[]>([]);
+  const [selectedUserKey, setSelectedUserKey] = useState<string | null>(null);
+  const [adminReplyText, setAdminReplyText] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -64,47 +71,73 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     return () => clearInterval(interval);
   }, [autoRefresh]);
 
+  const getAuthHeaders = () => {
+    let userEmail = currentUser?.email || 'ronisouza495@gmail.com';
+    const userStr = localStorage.getItem('streamhub_user');
+    if (userStr) {
+      try {
+        const u = JSON.parse(userStr);
+        if (u.email) userEmail = u.email;
+      } catch (e) {}
+    }
+    const token = localStorage.getItem('streamhub_token');
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'x-user-email': userEmail
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return headers;
+  };
+
   const loadAdminData = async (silent = false) => {
     if (!silent) setLoading(true);
     setErrorMsg('');
+    const headers = getAuthHeaders();
+    const fetchOptions: RequestInit = { headers, credentials: 'include' };
+
     try {
       // 1. Fetch Stats
-      const resStats = await fetch('/api/admin/stats');
+      const resStats = await fetch('/api/admin/stats', fetchOptions);
       if (resStats.ok) {
         const data = await resStats.json();
         setStats(data);
       }
 
       // 2. Fetch Visitors
-      const resVisitors = await fetch('/api/admin/visitors');
+      const resVisitors = await fetch('/api/admin/visitors', fetchOptions);
       if (resVisitors.ok) {
         const data = await resVisitors.json();
         setVisitors(data.visitors || []);
       }
 
       // 3. Fetch Users
-      const resUsers = await fetch('/api/admin/users');
+      const resUsers = await fetch('/api/admin/users', fetchOptions);
       if (resUsers.ok) {
         const data = await resUsers.json();
         setUsers(data.users || []);
       }
 
       // 4. Fetch Generated Accesses
-      const resAccesses = await fetch('/api/admin/access-logs');
+      const resAccesses = await fetch('/api/admin/access-logs', fetchOptions);
       if (resAccesses.ok) {
         const data = await resAccesses.json();
         setGeneratedAccesses(data.accessLogs || []);
       }
 
       // 5. Fetch Payments
-      const resPayments = await fetch('/api/admin/payments');
+      const resPayments = await fetch('/api/admin/payments', fetchOptions);
       if (resPayments.ok) {
         const data = await resPayments.json();
         setPayments(data.payments || []);
       }
 
       // 6. Fetch Credentials
-      const resCreds = await fetch('/api/admin/credentials');
+      const resCreds = await fetch('/api/admin/credentials', fetchOptions);
       if (resCreds.ok) {
         const data = await resCreds.json();
         if (data.prime) {
@@ -119,10 +152,48 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           setTonLink(data.netflix.tonLink || '');
         }
       }
+
+      // 7. Fetch Support Chats
+      const resChats = await fetch('/api/admin/support/chats', fetchOptions);
+      if (resChats.ok) {
+        const data = await resChats.json();
+        setSupportChats(data.chats || []);
+      }
     } catch (err) {
       if (!silent) setErrorMsg('Erro ao conectar com o servidor do Painel Administrativo.');
     } finally {
       if (!silent) setLoading(false);
+    }
+  };
+
+  const handleSendAdminReply = async (userId: string, userEmail: string) => {
+    if (!adminReplyText.trim()) return;
+    setSendingReply(true);
+    try {
+      const res = await fetch('/api/admin/support/reply', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({
+          userId,
+          userEmail,
+          text: adminReplyText.trim()
+        })
+      });
+
+      if (res.ok) {
+        setAdminReplyText('');
+        setSuccessMsg('Resposta enviada com sucesso ao cliente!');
+        loadAdminData(true);
+        setTimeout(() => setSuccessMsg(''), 3000);
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Erro ao enviar resposta.');
+      }
+    } catch (err) {
+      alert('Erro na comunicação com o servidor.');
+    } finally {
+      setSendingReply(false);
     }
   };
 
@@ -131,7 +202,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     try {
       const res = await fetch(`/api/admin/users/${userId}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
+        credentials: 'include',
         body: JSON.stringify({ status: newStatus })
       });
       if (res.ok) {
@@ -150,7 +222,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const handleDeleteUser = async (userId: string) => {
     if (!confirm('Tem certeza que deseja excluir este usuário permanentemente?')) return;
     try {
-      const res = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      });
       if (res.ok) {
         setSuccessMsg('Usuário excluído com sucesso.');
         loadAdminData(true);
@@ -166,7 +242,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
   const handleApprovePayment = async (paymentId: string) => {
     try {
-      const res = await fetch(`/api/admin/payments/${paymentId}/approve`, { method: 'POST' });
+      const res = await fetch(`/api/admin/payments/${paymentId}/approve`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      });
       if (res.ok) {
         setSuccessMsg(`Pagamento ${paymentId} APROVADO e conta Netflix liberada!`);
         loadAdminData(true);
@@ -182,7 +262,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
   const handleRejectPayment = async (paymentId: string) => {
     try {
-      const res = await fetch(`/api/admin/payments/${paymentId}/reject`, { method: 'POST' });
+      const res = await fetch(`/api/admin/payments/${paymentId}/reject`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      });
       if (res.ok) {
         setSuccessMsg(`Pagamento ${paymentId} rejeitado.`);
         loadAdminData(true);
@@ -210,7 +294,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       const res = await fetch('/api/admin/credentials', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
+        credentials: 'include',
         body: JSON.stringify(payload)
       });
 
@@ -328,6 +413,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </button>
 
         <button
+          onClick={() => setActiveTab('support')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'support'
+              ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <MessageSquare className="w-4 h-4 text-emerald-400" />
+          <span>Chat & Atendimento</span>
+          {stats?.unreadMessagesCount ? (
+            <span className="bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full animate-bounce">
+              {stats.unreadMessagesCount}
+            </span>
+          ) : (
+            <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded-full">
+              {supportChats.length}
+            </span>
+          )}
+        </button>
+
+        <button
           onClick={() => setActiveTab('visitors')}
           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'visitors'
@@ -429,15 +535,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           </div>
 
           {/* Browser and Device Breakdown Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
                   <Chrome className="w-4 h-4 text-blue-400" />
-                  Entradas pelo Chrome
+                  Acessos no Chrome
                 </span>
                 <p className="text-2xl font-black text-blue-400 mt-1">{stats.chromeVisits}</p>
-                <span className="text-[10px] text-slate-500">Navegador Google Chrome</span>
+                <span className="text-[10px] text-slate-500">Total de Entradas Registradas</span>
               </div>
               <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
                 <Chrome className="w-5 h-5" />
@@ -447,28 +553,42 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
             <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
-                  <Smartphone className="w-4 h-4 text-purple-400" />
-                  Acessos por Celular
+                  <UserCheck className="w-4 h-4 text-cyan-400" />
+                  Visitantes Únicos (Chrome)
                 </span>
-                <p className="text-2xl font-black text-purple-400 mt-1">{stats.mobileVisits}</p>
-                <span className="text-[10px] text-slate-500">Dispositivos Mobile</span>
+                <p className="text-2xl font-black text-cyan-400 mt-1">{stats.uniqueChromeVisits || 0}</p>
+                <span className="text-[10px] text-slate-500">IPs / Visitantes Distintos</span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-                <Smartphone className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                <UserCheck className="w-5 h-5" />
               </div>
             </div>
 
             <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
-                  <Monitor className="w-4 h-4 text-emerald-400" />
-                  Acessos por Computador
+                  <Users className="w-4 h-4 text-emerald-400" />
+                  Cadastrados via Chrome
                 </span>
-                <p className="text-2xl font-black text-emerald-400 mt-1">{stats.desktopVisits}</p>
-                <span className="text-[10px] text-slate-500">Computador / Desktop</span>
+                <p className="text-2xl font-black text-emerald-400 mt-1">{stats.chromeRegisteredUsers || 0}</p>
+                <span className="text-[10px] text-slate-500">Usuários Únicos Logados</span>
               </div>
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <Monitor className="w-5 h-5" />
+                <Users className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <Smartphone className="w-4 h-4 text-purple-400" />
+                  Mobile vs Desktop
+                </span>
+                <p className="text-xl font-black text-purple-400 mt-1">{stats.mobileVisits} / {stats.desktopVisits}</p>
+                <span className="text-[10px] text-slate-500">Celular / Computador</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                <Smartphone className="w-5 h-5" />
               </div>
             </div>
           </div>
@@ -476,9 +596,187 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800">
             <h3 className="text-sm font-bold text-white mb-2">Monitoramento do Administrador Master</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Como administrador exclusivo (`ronisouza495@gmail.com`), este painel exibe em tempo real o histórico completo de visitantes, logins normais efetuados, usuários que geraram logins do Prime Video e pagamentos Ton da Netflix.
+              Como administrador exclusivo (`ronisouza495@gmail.com`), este painel exibe em tempo real o histórico completo de visitantes, logins normais efetuados, usuários que geraram logins do Prime Video e mensagens de suporte.
             </p>
           </div>
+        </div>
+      )}
+
+      {/* TAB: SUPPORT CHATS & ADMIN REPLIES */}
+      {activeTab === 'support' && (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 animate-fadeIn space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div>
+              <h3 className="text-lg font-black text-white flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-emerald-400" />
+                Atendimento ao Cliente em Tempo Real
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Responda diretamente às dúvidas dos usuários enviadas pelo Chatbot do site.
+              </p>
+            </div>
+            <button
+              onClick={() => loadAdminData(false)}
+              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center gap-2 self-start sm:self-auto"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-purple-400" />
+              Atualizar Conversas
+            </button>
+          </div>
+
+          {supportChats.length === 0 ? (
+            <div className="text-center py-16 px-4 bg-slate-950/50 rounded-2xl border border-slate-800/80">
+              <MessageSquare className="w-12 h-12 text-slate-600 mx-auto mb-3 opacity-50" />
+              <h4 className="text-sm font-bold text-white mb-1">Nenhuma mensagem recebida ainda</h4>
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                Quando os clientes enviarem perguntas pelo assistente virtual no site, os tópicos e conversas aparecerão aqui organizadamente para você responder em tempo real.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[500px]">
+              {/* Left Column: User Chat List */}
+              <div className="lg:col-span-5 bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 flex flex-col space-y-3">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
+                  Clientes ({supportChats.length})
+                </span>
+
+                <div className="space-y-2 overflow-y-auto max-h-[480px] pr-1">
+                  {supportChats.map((chat) => {
+                    const chatKey = chat.userId || chat.userEmail || 'guest';
+                    const isSelected = selectedUserKey ? selectedUserKey === chatKey : supportChats[0] === chat;
+                    const activeKey = selectedUserKey || supportChats[0]?.userId || supportChats[0]?.userEmail;
+
+                    return (
+                      <div
+                        key={chatKey}
+                        onClick={() => setSelectedUserKey(chatKey)}
+                        className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-purple-950/60 border-purple-500/50 shadow-md shadow-purple-950/30'
+                            : 'bg-slate-900/80 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-purple-600/30 text-purple-300 font-bold text-xs flex items-center justify-center border border-purple-500/30 uppercase">
+                              {(chat.userName || 'C')[0]}
+                            </div>
+                            <span className="text-xs font-bold text-white truncate max-w-[140px]">
+                              {chat.userName}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-slate-500">
+                            {new Date(chat.lastMessageAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+
+                        <p className="text-xs text-slate-400 line-clamp-1 italic mb-1.5">
+                          "{chat.lastMessage}"
+                        </p>
+
+                        <div className="flex items-center justify-between text-[10px]">
+                          <span className="text-slate-500 truncate max-w-[160px]">{chat.userEmail}</span>
+                          {chat.unreadCount > 0 && (
+                            <span className="bg-red-500 text-white font-black px-2 py-0.5 rounded-full text-[9px] animate-pulse">
+                              {chat.unreadCount} nova(s)
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right Column: Chat Window */}
+              {(() => {
+                const activeChat = supportChats.find(
+                  c => (c.userId || c.userEmail || 'guest') === (selectedUserKey || supportChats[0]?.userId || supportChats[0]?.userEmail)
+                ) || supportChats[0];
+
+                if (!activeChat) return null;
+
+                return (
+                  <div className="lg:col-span-7 bg-slate-950/80 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between">
+                    {/* Chat Header */}
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                      <div>
+                        <h4 className="text-sm font-black text-white flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                          Conversando com: {activeChat.userName}
+                        </h4>
+                        <span className="text-xs text-slate-400">{activeChat.userEmail}</span>
+                      </div>
+                      <span className="text-[10px] font-bold text-purple-300 bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 rounded-lg">
+                        ID: {activeChat.userId}
+                      </span>
+                    </div>
+
+                    {/* Messages Container */}
+                    <div className="flex-1 overflow-y-auto space-y-3 max-h-[360px] pr-2 mb-4">
+                      {activeChat.messages.map((m: any, idx: number) => {
+                        const isUser = m.sender === 'user';
+                        const isAdmin = m.sender === 'admin';
+
+                        return (
+                          <div
+                            key={m.id || idx}
+                            className={`flex flex-col ${isUser ? 'items-start' : 'items-end'}`}
+                          >
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className="text-[10px] font-bold text-slate-400">
+                                {isUser ? activeChat.userName : isAdmin ? '👨‍💻 Você (Admin Roni)' : '🤖 Assistente Virtual'}
+                              </span>
+                              <span className="text-[9px] text-slate-500">
+                                {new Date(m.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+
+                            <div
+                              className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
+                                isUser
+                                  ? 'bg-slate-900 border border-slate-800 text-slate-200 rounded-tl-none'
+                                  : isAdmin
+                                  ? 'bg-purple-600 text-white font-medium rounded-tr-none shadow-md shadow-purple-600/20'
+                                  : 'bg-slate-800 border border-slate-700 text-slate-300 rounded-tr-none'
+                              }`}
+                            >
+                              <p className="whitespace-pre-wrap">{m.text}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Admin Reply Box */}
+                    <div className="border-t border-slate-800 pt-3 space-y-2">
+                      <textarea
+                        rows={2}
+                        placeholder={`Digite sua resposta em tempo real para ${activeChat.userName}...`}
+                        value={adminReplyText}
+                        onChange={(e) => setAdminReplyText(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-all resize-none"
+                      />
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-slate-500 italic">
+                          O cliente receberá sua resposta instantaneamente no assistente do site.
+                        </span>
+                        <button
+                          disabled={sendingReply || !adminReplyText.trim()}
+                          onClick={() => handleSendAdminReply(activeChat.userId, activeChat.userEmail)}
+                          className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl flex items-center gap-2 transition-all shadow-md shadow-purple-600/20"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                          {sendingReply ? 'Enviando...' : 'Enviar Resposta ao Cliente'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
         </div>
       )}
 

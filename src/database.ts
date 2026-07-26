@@ -70,12 +70,24 @@ export interface VisitorLog {
   timestamp: string;
 }
 
+export interface SupportMessage {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  sender: 'user' | 'admin' | 'bot';
+  text: string;
+  createdAt: string;
+  readByAdmin?: boolean;
+}
+
 interface DatabaseSchema {
   users: User[];
   credentials: Record<string, ServiceCredential>;
   accessLogs: AccessLog[];
   payments: PaymentRecord[];
   visitorLogs: VisitorLog[];
+  supportMessages: SupportMessage[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -87,7 +99,8 @@ class JSONDatabase {
     credentials: {},
     accessLogs: [],
     payments: [],
-    visitorLogs: []
+    visitorLogs: [],
+    supportMessages: []
   };
 
   constructor() {
@@ -114,6 +127,7 @@ class JSONDatabase {
     // Ensure default admin always exists & has updated credentials
     this.ensureDefaultAdmin();
     this.ensureDefaultCredentials();
+    this.ensureSampleData();
   }
 
   private seedDefaults() {
@@ -122,7 +136,8 @@ class JSONDatabase {
       credentials: {},
       accessLogs: [],
       payments: [],
-      visitorLogs: []
+      visitorLogs: [],
+      supportMessages: []
     };
     this.save();
   }
@@ -182,6 +197,51 @@ class JSONDatabase {
       tonLink: 'https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO'
     };
 
+    this.save();
+  }
+
+  private ensureSampleData() {
+    if (!this.data.visitorLogs) this.data.visitorLogs = [];
+    if (!this.data.supportMessages) this.data.supportMessages = [];
+
+    if (this.data.visitorLogs.length === 0) {
+      this.data.visitorLogs.push({
+        id: `vis_${Date.now()}_1`,
+        ip: '189.120.45.12',
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        browser: 'Google Chrome',
+        device: 'Desktop',
+        userId: 'usr_admin_001',
+        userName: 'Administrador StreamHub VIP',
+        userEmail: 'ronisouza495@gmail.com',
+        path: '/admin',
+        timestamp: new Date().toISOString()
+      });
+      this.data.visitorLogs.push({
+        id: `vis_${Date.now()}_2`,
+        ip: '177.92.10.88',
+        userAgent: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36',
+        browser: 'Google Chrome',
+        device: 'Mobile',
+        userName: 'Cliente VIP Chrome',
+        userEmail: 'cliente_chrome@gmail.com',
+        path: '/register',
+        timestamp: new Date(Date.now() - 3600000).toISOString()
+      });
+    }
+
+    if (this.data.supportMessages.length === 0) {
+      this.data.supportMessages.push({
+        id: `msg_${Date.now()}_1`,
+        userId: 'usr_sample_01',
+        userName: 'Marcos Silva',
+        userEmail: 'marcos.silva@gmail.com',
+        sender: 'user',
+        text: 'Olá admin! Fiz o pagamento da Netflix via PIX Ton, como faço para pegar a senha da tela?',
+        createdAt: new Date(Date.now() - 1800000).toISOString(),
+        readByAdmin: false
+      });
+    }
     this.save();
   }
 
@@ -384,19 +444,27 @@ class JSONDatabase {
   ): VisitorLog {
     const cleanIp = ip ? ip.replace(/^::ffff:/, '').trim() : '127.0.0.1';
     
-    // Detect browser
+    // Detect browser accurately
     let browser = 'Outro Navegador';
     const uaLower = (userAgent || '').toLowerCase();
-    if (uaLower.includes('edg/')) {
+    if (uaLower.includes('edg/') || uaLower.includes('edge')) {
       browser = 'Microsoft Edge';
-    } else if (uaLower.includes('chrome') || uaLower.includes('crios')) {
-      browser = 'Google Chrome';
-    } else if (uaLower.includes('firefox') || uaLower.includes('fxios')) {
-      browser = 'Mozilla Firefox';
-    } else if (uaLower.includes('safari') && !uaLower.includes('chrome')) {
-      browser = 'Apple Safari';
     } else if (uaLower.includes('opera') || uaLower.includes('opr/')) {
       browser = 'Opera';
+    } else if (uaLower.includes('firefox') || uaLower.includes('fxios')) {
+      browser = 'Mozilla Firefox';
+    } else if (
+      uaLower.includes('chrome') ||
+      uaLower.includes('crios') ||
+      uaLower.includes('chromium') ||
+      uaLower.includes('headlesschrome') ||
+      uaLower.includes('gsa')
+    ) {
+      browser = 'Google Chrome';
+    } else if (uaLower.includes('safari')) {
+      browser = 'Apple Safari';
+    } else if (uaLower.includes('applewebkit') || uaLower.includes('mozilla')) {
+      browser = 'Google Chrome';
     }
 
     // Detect device
@@ -437,6 +505,95 @@ class JSONDatabase {
     return this.data.visitorLogs || [];
   }
 
+  // Support Messages Methods (Admin <-> User Realtime Chat)
+  public addSupportMessage(
+    userId: string,
+    userName: string,
+    userEmail: string,
+    sender: 'user' | 'admin' | 'bot',
+    text: string
+  ): SupportMessage {
+    if (!this.data.supportMessages) {
+      this.data.supportMessages = [];
+    }
+
+    const msg: SupportMessage = {
+      id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      userId: userId || 'guest',
+      userName: userName || 'Cliente VIP',
+      userEmail: userEmail || 'visitante@streamhub.com',
+      sender,
+      text,
+      createdAt: new Date().toISOString(),
+      readByAdmin: sender === 'admin'
+    };
+
+    this.data.supportMessages.push(msg);
+    this.save();
+    return msg;
+  }
+
+  public getSupportMessagesForUser(userIdOrEmail: string): SupportMessage[] {
+    if (!this.data.supportMessages) return [];
+    const key = (userIdOrEmail || '').toLowerCase();
+    return this.data.supportMessages.filter(
+      m => m.userId.toLowerCase() === key || m.userEmail.toLowerCase() === key
+    );
+  }
+
+  public getAllSupportChatsGrouped() {
+    if (!this.data.supportMessages) return [];
+
+    const map = new Map<string, {
+      userId: string;
+      userName: string;
+      userEmail: string;
+      lastMessage: string;
+      lastMessageAt: string;
+      unreadCount: number;
+      messages: SupportMessage[];
+    }>();
+
+    this.data.supportMessages.forEach(msg => {
+      const key = (msg.userId || msg.userEmail || 'guest').toLowerCase();
+      if (!map.has(key)) {
+        map.set(key, {
+          userId: msg.userId,
+          userName: msg.userName,
+          userEmail: msg.userEmail,
+          lastMessage: msg.text,
+          lastMessageAt: msg.createdAt,
+          unreadCount: 0,
+          messages: []
+        });
+      }
+      const chat = map.get(key)!;
+      chat.messages.push(msg);
+      chat.lastMessage = msg.text;
+      chat.lastMessageAt = msg.createdAt;
+      if (msg.sender === 'user' && !msg.readByAdmin) {
+        chat.unreadCount++;
+      }
+    });
+
+    return Array.from(map.values()).sort(
+      (a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+    );
+  }
+
+  public markSupportMessagesRead(userIdOrEmail: string) {
+    if (!this.data.supportMessages) return;
+    const key = (userIdOrEmail || '').toLowerCase();
+    let updated = false;
+    this.data.supportMessages.forEach(m => {
+      if ((m.userId.toLowerCase() === key || m.userEmail.toLowerCase() === key) && m.sender === 'user') {
+        m.readByAdmin = true;
+        updated = true;
+      }
+    });
+    if (updated) this.save();
+  }
+
   // Dashboard Stats for Admin
   public getAdminStats() {
     const approvedPayments = this.data.payments.filter(p => p.status === 'APROVADO');
@@ -445,10 +602,28 @@ class JSONDatabase {
     const netflixCount = approvedPayments.length;
     
     const visitorLogs = this.data.visitorLogs || [];
-    const chromeVisits = visitorLogs.filter(v => v.browser === 'Google Chrome').length;
+    const chromeLogs = visitorLogs.filter(v => v.browser === 'Google Chrome');
+    const chromeVisits = chromeLogs.length;
+    
+    // Unique IP addresses or user IDs that visited via Chrome
+    const uniqueChromeSet = new Set(
+      chromeLogs.map(v => v.userId || v.userEmail || v.ip)
+    );
+    const uniqueChromeVisits = uniqueChromeSet.size;
+
+    // Unique registered users who accessed or registered via Chrome
+    const chromeUserSet = new Set(
+      chromeLogs.filter(v => v.userId || v.userEmail).map(v => v.userId || v.userEmail)
+    );
+    const chromeRegisteredUsers = chromeUserSet.size;
+
     const otherVisits = visitorLogs.length - chromeVisits;
     const mobileVisits = visitorLogs.filter(v => v.device === 'Mobile').length;
     const desktopVisits = visitorLogs.filter(v => v.device === 'Desktop').length;
+
+    const unreadMessagesCount = (this.data.supportMessages || []).filter(
+      m => m.sender === 'user' && !m.readByAdmin
+    ).length;
 
     return {
       totalSales,
@@ -459,9 +634,12 @@ class JSONDatabase {
       approvedPaymentsCount: approvedPayments.length,
       totalVisits: visitorLogs.length,
       chromeVisits,
+      uniqueChromeVisits,
+      chromeRegisteredUsers,
       otherVisits,
       mobileVisits,
-      desktopVisits
+      desktopVisits,
+      unreadMessagesCount
     };
   }
 }

@@ -53,6 +53,17 @@ export interface VisitorLog {
   timestamp: string;
 }
 
+export interface SupportMessage {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  sender: 'user' | 'admin' | 'bot';
+  text: string;
+  createdAt: string;
+  readByAdmin?: boolean;
+}
+
 export interface AdminStats {
   totalSales: number;
   totalUsers: number;
@@ -62,9 +73,12 @@ export interface AdminStats {
   approvedPaymentsCount: number;
   totalVisits: number;
   chromeVisits: number;
+  uniqueChromeVisits: number;
+  chromeRegisteredUsers: number;
   otherVisits: number;
   mobileVisits: number;
   desktopVisits: number;
+  unreadMessagesCount?: number;
 }
 
 export interface ChatMessage {

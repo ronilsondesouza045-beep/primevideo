@@ -120,6 +120,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
             if (data.user) {
               authenticatedUser = data.user;
             }
+            if (data.token) {
+              localStorage.setItem('streamhub_token', data.token);
+            }
           }
         } catch (serverErr) {
           console.log('Server sync bypassed, using verified Google Auth session');
@@ -165,6 +168,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
 
       if (res.ok) {
         const data = await res.json();
+        if (data.token) {
+          localStorage.setItem('streamhub_token', data.token);
+        }
         if (data.user) {
           localStorage.setItem('streamhub_user', JSON.stringify(data.user));
           onSuccess(data.user);
