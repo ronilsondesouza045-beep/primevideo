@@ -614,9 +614,9 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     }
 
     const lower = message.toLowerCase();
-    const isExplicitGeneration = (lower.includes('gerar') && (lower.includes('senha') || lower.includes('acesso'))) || lower.includes('me da a senha') || lower.includes('medaasenha');
+    const isPrimeQuery = lower.includes('prime') || lower.includes('gratis') || lower.includes('gratuito') || lower.includes('resgatar') || lower.includes('senha') || lower.includes('conta') || lower.includes('acesso');
 
-    if (isExplicitGeneration) {
+    if (isPrimeQuery) {
       const primeCreds = db.getCredential('prime');
       const releasedCredentials = {
         email: primeCreds.email || 'primevideosouza368@gmail.com',
@@ -628,7 +628,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       db.addAccessLog(userId || `chat_${userIp}`, userEmail, 'prime', releasedCredentials, userIp);
 
       return res.json({
-        reply: `🎉 **Acesso Prime Video VIP Liberado com Sucesso!**\n\n📧 **E-mail:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Instruções:** Acesse [primevideo.com](https://www.primevideo.com) e faça login.`
+        reply: `🎉 **Acesso Prime Video VIP Liberado com Sucesso!**\n\n📧 **E-mail:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Instruções:** Acesse [primevideo.com](https://www.primevideo.com) e faça login.\n\n💡 *Este acesso também fica salvo para você na seção "Meus Acessos Liberados" no menu do seu perfil!*`
       });
     }
 

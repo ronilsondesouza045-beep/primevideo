@@ -74,12 +74,11 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
       lower.includes('conta') ||
       lower.includes('acesso')
     ) {
-      return `🎬 **Como resgatar seu Prime Video 100% Grátis:**\n\n` +
-        `1️⃣ Entre na sua conta StreamHub VIP (já logado como ${firstName}).\n` +
-        `2️⃣ Na página principal, clique no card **"Prime Video"**.\n` +
-        `3️⃣ Clique no botão vermelho **"Gerar Acesso Grátis"**.\n` +
-        `4️⃣ O e-mail e a senha VIP serão liberados na hora!\n\n` +
-        `📌 **Dica:** Se você já gerou seu acesso anteriormente, ele fica salvo para você na seção **"Meus Acessos Liberados"** no menu do seu perfil!`;
+      return `🎉 **Acesso Prime Video VIP Liberado com Sucesso!**\n\n` +
+        `📧 **E-mail:** \`primevideosouza368@gmail.com\`\n` +
+        `🔑 **Senha:** \`roni141821\`\n\n` +
+        `📌 **Instruções:** Acesse [primevideo.com](https://www.primevideo.com) e faça login.\n\n` +
+        `💡 *Este acesso também fica salvo para você na seção "Meus Acessos Liberados" no menu do seu perfil!*`;
     }
 
     // 2. Netflix / Valor / Ton / Pix
