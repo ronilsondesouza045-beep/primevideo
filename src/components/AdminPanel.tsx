@@ -1,19 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { User, AdminStats, PaymentRecord } from '../types';
-import { ShieldCheck, Users, DollarSign, Play, Zap, CheckCircle2, XCircle, Trash2, Edit, Save, RefreshCw, AlertCircle, Lock } from 'lucide-react';
+import { User, AdminStats, PaymentRecord, VisitorLog, AccessLog } from '../types';
+import {
+  ShieldCheck,
+  Users,
+  DollarSign,
+  Play,
+  Zap,
+  CheckCircle2,
+  XCircle,
+  Trash2,
+  Save,
+  RefreshCw,
+  Lock,
+  Eye,
+  Monitor,
+  Smartphone,
+  Globe,
+  Search,
+  Clock,
+  Key,
+  Activity,
+  Chrome
+} from 'lucide-react';
 
 interface AdminPanelProps {
   currentUser: User | null;
 }
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'payments' | 'credentials'>('dashboard');
+  const [activeTab, setActiveTab] = useState<
+    'dashboard' | 'visitors' | 'users' | 'accesses' | 'payments' | 'credentials'
+  >('dashboard');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [visitors, setVisitors] = useState<VisitorLog[]>([]);
+  const [generatedAccesses, setGeneratedAccesses] = useState<(AccessLog & { userName?: string })[]>([]);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   // Credentials editing state
   const [primeEmail, setPrimeEmail] = useState('');
@@ -28,8 +55,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     loadAdminData();
   }, []);
 
-  const loadAdminData = async () => {
-    setLoading(true);
+  // Real-time polling every 10 seconds
+  useEffect(() => {
+    if (!autoRefresh) return;
+    const interval = setInterval(() => {
+      loadAdminData(true);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
+
+  const loadAdminData = async (silent = false) => {
+    if (!silent) setLoading(true);
     setErrorMsg('');
     try {
       // 1. Fetch Stats
@@ -39,21 +75,35 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         setStats(data);
       }
 
-      // 2. Fetch Users
+      // 2. Fetch Visitors
+      const resVisitors = await fetch('/api/admin/visitors');
+      if (resVisitors.ok) {
+        const data = await resVisitors.json();
+        setVisitors(data.visitors || []);
+      }
+
+      // 3. Fetch Users
       const resUsers = await fetch('/api/admin/users');
       if (resUsers.ok) {
         const data = await resUsers.json();
         setUsers(data.users || []);
       }
 
-      // 3. Fetch Payments
+      // 4. Fetch Generated Accesses
+      const resAccesses = await fetch('/api/admin/access-logs');
+      if (resAccesses.ok) {
+        const data = await resAccesses.json();
+        setGeneratedAccesses(data.accessLogs || []);
+      }
+
+      // 5. Fetch Payments
       const resPayments = await fetch('/api/admin/payments');
       if (resPayments.ok) {
         const data = await resPayments.json();
         setPayments(data.payments || []);
       }
 
-      // 4. Fetch Credentials
+      // 6. Fetch Credentials
       const resCreds = await fetch('/api/admin/credentials');
       if (resCreds.ok) {
         const data = await resCreds.json();
@@ -70,9 +120,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         }
       }
     } catch (err) {
-      setErrorMsg('Erro ao conectar com o servidor do Painel Administrativo.');
+      if (!silent) setErrorMsg('Erro ao conectar com o servidor do Painel Administrativo.');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -86,7 +136,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       });
       if (res.ok) {
         setSuccessMsg(`Status do usuário atualizado para ${newStatus}`);
-        loadAdminData();
+        loadAdminData(true);
         setTimeout(() => setSuccessMsg(''), 3000);
       } else {
         const data = await res.json();
@@ -103,7 +153,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       const res = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
       if (res.ok) {
         setSuccessMsg('Usuário excluído com sucesso.');
-        loadAdminData();
+        loadAdminData(true);
         setTimeout(() => setSuccessMsg(''), 3000);
       } else {
         const data = await res.json();
@@ -119,7 +169,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       const res = await fetch(`/api/admin/payments/${paymentId}/approve`, { method: 'POST' });
       if (res.ok) {
         setSuccessMsg(`Pagamento ${paymentId} APROVADO e conta Netflix liberada!`);
-        loadAdminData();
+        loadAdminData(true);
         setTimeout(() => setSuccessMsg(''), 3000);
       } else {
         const data = await res.json();
@@ -135,7 +185,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       const res = await fetch(`/api/admin/payments/${paymentId}/reject`, { method: 'POST' });
       if (res.ok) {
         setSuccessMsg(`Pagamento ${paymentId} rejeitado.`);
-        loadAdminData();
+        loadAdminData(true);
         setTimeout(() => setSuccessMsg(''), 3000);
       }
     } catch (err) {
@@ -175,11 +225,35 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     }
   };
 
+  // Filtered lists
+  const filteredVisitors = visitors.filter(v =>
+    v.ip.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    v.browser.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    v.device.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (v.userName && v.userName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (v.userEmail && v.userEmail.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (v.userId && v.userId.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  const filteredUsers = users.filter(u =>
+    u.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredAccesses = generatedAccesses.filter(a =>
+    a.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    a.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    a.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (a.userName && a.userName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    a.service.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
         <RefreshCw className="w-8 h-8 text-purple-500 animate-spin mx-auto mb-3" />
-        <p className="text-slate-300 font-bold text-sm">Carregando dados do Painel Admin...</p>
+        <p className="text-slate-300 font-bold text-sm">Carregando dados em Tempo Real do Painel Admin...</p>
       </div>
     );
   }
@@ -196,21 +270,40 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-black tracking-widest text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded uppercase border border-amber-500/30">
-                ADMINISTRAÇÃO MASTER
+                ADMINISTRAÇÃO MASTER (TEMPO REAL)
+              </span>
+              <span className="flex items-center gap-1 text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                AO VIVO
               </span>
             </div>
-            <h2 className="text-2xl font-black text-white mt-1">Painel Administrativo StreamHub VIP</h2>
+            <h2 className="text-2xl font-black text-white mt-1">Painel de Monitoramento StreamHub VIP</h2>
             <p className="text-xs text-slate-400">Administrador: ronisouza495@gmail.com</p>
           </div>
         </div>
 
-        <button
-          onClick={loadAdminData}
-          className="px-4 py-2.5 rounded-xl bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 text-xs font-bold border border-purple-500/30 transition-all flex items-center gap-2"
-        >
-          <RefreshCw className="w-4 h-4 text-purple-400" />
-          <span>Sincronizar Dados</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setAutoRefresh(!autoRefresh)}
+            className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${
+              autoRefresh
+                ? 'bg-emerald-950/50 text-emerald-400 border-emerald-500/40'
+                : 'bg-slate-800/80 text-slate-400 border-slate-700'
+            }`}
+            title="Atualizar em tempo real a cada 10s"
+          >
+            <Activity className={`w-3.5 h-3.5 ${autoRefresh ? 'animate-pulse text-emerald-400' : ''}`} />
+            <span>Tempo Real: {autoRefresh ? 'ON' : 'OFF'}</span>
+          </button>
+
+          <button
+            onClick={() => loadAdminData()}
+            className="px-4 py-2.5 rounded-xl bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 text-xs font-bold border border-purple-500/30 transition-all flex items-center gap-2 shadow-sm"
+          >
+            <RefreshCw className="w-4 h-4 text-purple-400" />
+            <span>Atualizar Agora</span>
+          </button>
+        </div>
       </div>
 
       {successMsg && (
@@ -224,43 +317,67 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       <div className="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('dashboard')}
-          className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'dashboard'
               ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
               : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
           }`}
         >
           <DollarSign className="w-4 h-4" />
-          Métricas e Visão Geral
+          Visão Geral & Métricas
+        </button>
+
+        <button
+          onClick={() => setActiveTab('visitors')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'visitors'
+              ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <Globe className="w-4 h-4 text-cyan-400" />
+          Visitas & Navegadores ({visitors.length})
         </button>
 
         <button
           onClick={() => setActiveTab('users')}
-          className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'users'
               ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
               : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
           }`}
         >
           <Users className="w-4 h-4" />
-          Gerenciar Usuários ({users.length})
+          Usuários Cadastrados ({users.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('accesses')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'accesses'
+              ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <Key className="w-4 h-4 text-amber-300" />
+          Logins Gerados ({generatedAccesses.length})
         </button>
 
         <button
           onClick={() => setActiveTab('payments')}
-          className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'payments'
               ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
               : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
           }`}
         >
           <Zap className="w-4 h-4 text-amber-300" />
-          Vendas Netflix (R$ 10,00) ({payments.length})
+          Vendas Netflix ({payments.length})
         </button>
 
         <button
           onClick={() => setActiveTab('credentials')}
-          className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'credentials'
               ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
               : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
@@ -274,6 +391,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       {/* TAB 1: METRICS DASHBOARD */}
       {activeTab === 'dashboard' && stats && (
         <div className="space-y-6 animate-fadeIn">
+          {/* Main Stat Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
@@ -289,7 +407,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               <p className="text-2xl sm:text-3xl font-black text-white mt-1">
                 {stats.totalUsers}
               </p>
-              <span className="text-[11px] text-slate-500">Base total de clientes</span>
+              <span className="text-[11px] text-slate-500">Clientes com Conta</span>
             </div>
 
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
@@ -297,53 +415,190 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               <p className="text-2xl sm:text-3xl font-black text-cyan-400 mt-1">
                 {stats.primeAccessCount}
               </p>
-              <span className="text-[11px] text-slate-500">Gerados Grátis</span>
+              <span className="text-[11px] text-slate-500">Logins Liberados</span>
             </div>
 
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase">Vendas Netflix VIP</span>
-              <p className="text-2xl sm:text-3xl font-black text-red-500 mt-1">
-                {stats.approvedPaymentsCount}
+              <span className="text-[10px] font-bold text-slate-400 uppercase">Total de Entradas no Site</span>
+              <p className="text-2xl sm:text-3xl font-black text-amber-400 mt-1">
+                {stats.totalVisits}
               </p>
-              <span className="text-[11px] text-slate-500">Pagamentos Aprovados</span>
+              <span className="text-[11px] text-slate-500">Acessos Registrados</span>
             </div>
 
           </div>
 
+          {/* Browser and Device Breakdown Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <Chrome className="w-4 h-4 text-blue-400" />
+                  Entradas pelo Chrome
+                </span>
+                <p className="text-2xl font-black text-blue-400 mt-1">{stats.chromeVisits}</p>
+                <span className="text-[10px] text-slate-500">Navegador Google Chrome</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                <Chrome className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <Smartphone className="w-4 h-4 text-purple-400" />
+                  Acessos por Celular
+                </span>
+                <p className="text-2xl font-black text-purple-400 mt-1">{stats.mobileVisits}</p>
+                <span className="text-[10px] text-slate-500">Dispositivos Mobile</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                <Smartphone className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <Monitor className="w-4 h-4 text-emerald-400" />
+                  Acessos por Computador
+                </span>
+                <p className="text-2xl font-black text-emerald-400 mt-1">{stats.desktopVisits}</p>
+                <span className="text-[10px] text-slate-500">Computador / Desktop</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <Monitor className="w-5 h-5" />
+              </div>
+            </div>
+          </div>
+
           <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800">
-            <h3 className="text-sm font-bold text-white mb-2">Instruções do Administrador Master</h3>
+            <h3 className="text-sm font-bold text-white mb-2">Monitoramento do Administrador Master</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Como administrador exclusivo (`ronisouza495@gmail.com`), você possui controle completo sobre todas as transações, aprovação de acessos Netflix, liberação de senhas do Prime Video e configuração do link oficial da Ton.
+              Como administrador exclusivo (`ronisouza495@gmail.com`), este painel exibe em tempo real o histórico completo de visitantes, logins normais efetuados, usuários que geraram logins do Prime Video e pagamentos Ton da Netflix.
             </p>
           </div>
         </div>
       )}
 
-      {/* TAB 2: USER MANAGEMENT */}
-      {activeTab === 'users' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 overflow-x-auto animate-fadeIn">
+      {/* SEARCH BAR FOR TABLES */}
+      {activeTab !== 'dashboard' && activeTab !== 'credentials' && (
+        <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-2xl">
+          <Search className="w-4 h-4 text-slate-400 ml-2" />
+          <input
+            type="text"
+            placeholder="Pesquisar por nome, e-mail, ID, IP ou navegador..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none font-medium"
+          />
+        </div>
+      )}
+
+      {/* TAB 2: VISITORS & BROWSER LOGS */}
+      {activeTab === 'visitors' && (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 overflow-x-auto animate-fadeIn space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+              <Globe className="w-4 h-4 text-cyan-400" />
+              Entradas no Site em Tempo Real ({filteredVisitors.length})
+            </h3>
+            <span className="text-[11px] text-slate-400">
+              Registra Chrome, Celular, IP e Usuários Logados
+            </span>
+          </div>
+
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 uppercase text-[10px]">
-                <th className="pb-3 px-3">E-mail</th>
-                <th className="pb-3 px-3">Nome</th>
-                <th className="pb-3 px-3">Função</th>
-                <th className="pb-3 px-3">Status</th>
-                <th className="pb-3 px-3 text-right">Ações</th>
+                <th className="pb-3 px-3">Data e Hora</th>
+                <th className="pb-3 px-3">IP do Visitante</th>
+                <th className="pb-3 px-3">Navegador</th>
+                <th className="pb-3 px-3">Dispositivo</th>
+                <th className="pb-3 px-3">Usuário Logado</th>
+                <th className="pb-3 px-3">Página</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
-              {users.map((u) => (
-                <tr key={u.id} className="hover:bg-slate-800/30">
-                  <td className="py-3.5 px-3 font-bold text-white">{u.email}</td>
-                  <td className="py-3.5 px-3 text-slate-300">{u.name}</td>
-                  <td className="py-3.5 px-3">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-black ${
-                      u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-slate-800 text-slate-300'
+              {filteredVisitors.map((v) => (
+                <tr key={v.id} className="hover:bg-slate-800/30">
+                  <td className="py-3 px-3 text-slate-300 font-mono text-[11px]">
+                    {new Date(v.timestamp).toLocaleString('pt-BR')}
+                  </td>
+                  <td className="py-3 px-3 font-mono font-bold text-cyan-300">{v.ip}</td>
+                  <td className="py-3 px-3">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-black inline-flex items-center gap-1 ${
+                      v.browser === 'Google Chrome'
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                        : 'bg-slate-800 text-slate-300'
                     }`}>
-                      {u.role.toUpperCase()}
+                      {v.browser === 'Google Chrome' && <Chrome className="w-3 h-3 text-blue-400" />}
+                      {v.browser}
                     </span>
                   </td>
+                  <td className="py-3 px-3">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800/80 text-slate-300">
+                      {v.device}
+                    </span>
+                  </td>
+                  <td className="py-3 px-3">
+                    {v.userEmail ? (
+                      <div>
+                        <strong className="block text-white">{v.userName || v.userEmail.split('@')[0]}</strong>
+                        <span className="text-[10px] text-cyan-400 font-mono">{v.userEmail}</span>
+                      </div>
+                    ) : (
+                      <span className="text-slate-500 italic">Visitante Não Logado</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-3 font-mono text-slate-400">{v.path}</td>
+                </tr>
+              ))}
+              {filteredVisitors.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-slate-500">
+                    Nenhuma entrada registrada no momento.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* TAB 3: USER MANAGEMENT */}
+      {activeTab === 'users' && (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 overflow-x-auto animate-fadeIn space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+              <Users className="w-4 h-4 text-purple-400" />
+              Usuários Cadastrados / Logados ({filteredUsers.length})
+            </h3>
+          </div>
+
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-slate-800 text-slate-400 uppercase text-[10px]">
+                <th className="pb-3 px-3">ID do Usuário</th>
+                <th className="pb-3 px-3">Nome</th>
+                <th className="pb-3 px-3">E-mail</th>
+                <th className="pb-3 px-3">Último Login</th>
+                <th className="pb-3 px-3">IP do Login</th>
+                <th className="pb-3 px-3">Status</th>
+                <th className="pb-3 px-3 text-right">Ações Admin</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60">
+              {filteredUsers.map((u) => (
+                <tr key={u.id} className="hover:bg-slate-800/30">
+                  <td className="py-3.5 px-3 font-mono font-bold text-amber-300 text-[11px]">{u.id}</td>
+                  <td className="py-3.5 px-3 text-white font-bold">{u.name}</td>
+                  <td className="py-3.5 px-3 font-mono text-cyan-300">{u.email}</td>
+                  <td className="py-3.5 px-3 text-slate-300 font-mono text-[11px]">
+                    {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString('pt-BR') : (u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-BR') : 'N/A')}
+                  </td>
+                  <td className="py-3.5 px-3 font-mono text-slate-400">{u.lastIp || '127.0.0.1'}</td>
                   <td className="py-3.5 px-3">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-black ${
                       u.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'
@@ -375,9 +630,83 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </div>
       )}
 
-      {/* TAB 3: NETFLIX PAYMENTS */}
+      {/* TAB 4: GENERATED LOGINS / ACCESS LOGS */}
+      {activeTab === 'accesses' && (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 overflow-x-auto animate-fadeIn space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+              <Key className="w-4 h-4 text-amber-300" />
+              Pessoas que Geraram Logins ({filteredAccesses.length})
+            </h3>
+            <span className="text-[11px] text-slate-400">
+              Histórico completo de senhas liberadas (Prime Video / Netflix)
+            </span>
+          </div>
+
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-slate-800 text-slate-400 uppercase text-[10px]">
+                <th className="pb-3 px-3">ID Acesso</th>
+                <th className="pb-3 px-3">ID Usuário</th>
+                <th className="pb-3 px-3">Nome / E-mail</th>
+                <th className="pb-3 px-3">Serviço</th>
+                <th className="pb-3 px-3">Credencial Liberada</th>
+                <th className="pb-3 px-3">IP</th>
+                <th className="pb-3 px-3">Data e Hora</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60">
+              {filteredAccesses.map((a) => (
+                <tr key={a.id} className="hover:bg-slate-800/30">
+                  <td className="py-3 px-3 font-mono font-bold text-purple-300 text-[11px]">{a.id}</td>
+                  <td className="py-3 px-3 font-mono text-amber-300 text-[11px]">{a.userId}</td>
+                  <td className="py-3 px-3">
+                    <strong className="block text-white">{a.userName || 'Cliente VIP'}</strong>
+                    <span className="text-[10px] text-cyan-400 font-mono">{a.userEmail}</span>
+                  </td>
+                  <td className="py-3 px-3">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                      a.service === 'prime'
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                        : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                    }`}>
+                      {a.service === 'prime' ? 'PRIME VIDEO' : 'NETFLIX VIP'}
+                    </span>
+                  </td>
+                  <td className="py-3 px-3 font-mono text-slate-300">
+                    <div>
+                      <span className="text-emerald-400 font-bold">{a.credentials.email}</span>
+                      <span className="text-slate-500 block text-[10px]">Senha: {a.credentials.password}</span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-3 font-mono text-slate-400">{a.userIp || '127.0.0.1'}</td>
+                  <td className="py-3 px-3 text-slate-300 font-mono text-[11px]">
+                    {new Date(a.createdAt).toLocaleString('pt-BR')}
+                  </td>
+                </tr>
+              ))}
+              {filteredAccesses.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="py-8 text-center text-slate-500">
+                    Nenhum acesso gerado até o momento.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* TAB 5: NETFLIX PAYMENTS */}
       {activeTab === 'payments' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 overflow-x-auto animate-fadeIn">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 overflow-x-auto animate-fadeIn space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-300" />
+              Pedidos de Vendas Netflix R$ 10,00 ({payments.length})
+            </h3>
+          </div>
+
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 uppercase text-[10px]">
@@ -432,7 +761,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </div>
       )}
 
-      {/* TAB 4: CREDENTIALS POOL & TON LINK MANAGER */}
+      {/* TAB 6: CREDENTIALS POOL & TON LINK MANAGER */}
       {activeTab === 'credentials' && (
         <div className="grid md:grid-cols-2 gap-8 animate-fadeIn">
           

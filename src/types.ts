@@ -6,6 +6,8 @@ export interface User {
   status: 'active' | 'blocked';
   avatarUrl?: string;
   createdAt?: string;
+  lastLoginAt?: string;
+  lastIp?: string;
 }
 
 export interface ServiceCredentials {
@@ -19,6 +21,7 @@ export interface AccessLog {
   id: string;
   userId: string;
   userEmail: string;
+  userIp?: string;
   service: 'prime' | 'netflix';
   credentials: ServiceCredentials;
   createdAt: string;
@@ -37,6 +40,19 @@ export interface PaymentRecord {
   credentials?: ServiceCredentials | null;
 }
 
+export interface VisitorLog {
+  id: string;
+  ip: string;
+  userAgent: string;
+  browser: string;
+  device: string;
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  path: string;
+  timestamp: string;
+}
+
 export interface AdminStats {
   totalSales: number;
   totalUsers: number;
@@ -44,6 +60,11 @@ export interface AdminStats {
   netflixAccessCount: number;
   pendingPaymentsCount: number;
   approvedPaymentsCount: number;
+  totalVisits: number;
+  chromeVisits: number;
+  otherVisits: number;
+  mobileVisits: number;
+  desktopVisits: number;
 }
 
 export interface ChatMessage {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AccessLog, PaymentRecord } from '../types';
 import { Sparkles, Copy, Check, Play, ShieldCheck, Zap, ExternalLink, Clock, RefreshCw } from 'lucide-react';
+import { PrimeCountdown } from './PrimeCountdown';
 
 interface UserAccessesProps {
   accessLogs: AccessLog[];
@@ -181,6 +182,9 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     </button>
                   </div>
                 </div>
+
+                {/* Real-time Countdown Timer */}
+                <PrimeCountdown createdAt={a.createdAt} />
               </div>
             ))}
           </div>

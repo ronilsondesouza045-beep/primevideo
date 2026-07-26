@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ServiceCredentials } from '../types';
 import { X, Copy, Check, Play, ShieldCheck, ExternalLink, Sparkles, HelpCircle } from 'lucide-react';
+import { PrimeCountdown } from './PrimeCountdown';
 
 interface PrimeModalProps {
   credentials: ServiceCredentials | null;
@@ -132,6 +133,11 @@ export const PrimeModal: React.FC<PrimeModalProps> = ({
             </div>
           </div>
 
+        </div>
+
+        {/* Real-time Countdown Timer */}
+        <div className="mb-6">
+          <PrimeCountdown />
         </div>
 
         {/* Instructions */}

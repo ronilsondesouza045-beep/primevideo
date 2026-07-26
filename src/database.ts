@@ -11,6 +11,8 @@ export interface User {
   status: 'active' | 'blocked';
   avatarUrl?: string;
   createdAt: string;
+  lastLoginAt?: string;
+  lastIp?: string;
 }
 
 export interface ServiceCredential {
@@ -55,11 +57,25 @@ export interface PaymentRecord {
   } | null;
 }
 
+export interface VisitorLog {
+  id: string;
+  ip: string;
+  userAgent: string;
+  browser: string;
+  device: string;
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  path: string;
+  timestamp: string;
+}
+
 interface DatabaseSchema {
   users: User[];
   credentials: Record<string, ServiceCredential>;
   accessLogs: AccessLog[];
   payments: PaymentRecord[];
+  visitorLogs: VisitorLog[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -70,7 +86,8 @@ class JSONDatabase {
     users: [],
     credentials: {},
     accessLogs: [],
-    payments: []
+    payments: [],
+    visitorLogs: []
   };
 
   constructor() {
@@ -104,7 +121,8 @@ class JSONDatabase {
       users: [],
       credentials: {},
       accessLogs: [],
-      payments: []
+      payments: [],
+      visitorLogs: []
     };
     this.save();
   }
@@ -346,12 +364,91 @@ class JSONDatabase {
     return payment;
   }
 
+  public recordUserLogin(userId: string, userIp?: string) {
+    const user = this.getUserById(userId);
+    if (user) {
+      user.lastLoginAt = new Date().toISOString();
+      if (userIp) {
+        user.lastIp = userIp.replace(/^::ffff:/, '').trim();
+      }
+      this.save();
+    }
+  }
+
+  // Visitor Tracking
+  public addVisitorLog(
+    ip: string,
+    userAgent: string,
+    path: string,
+    user?: { id: string; name: string; email: string }
+  ): VisitorLog {
+    const cleanIp = ip ? ip.replace(/^::ffff:/, '').trim() : '127.0.0.1';
+    
+    // Detect browser
+    let browser = 'Outro Navegador';
+    const uaLower = (userAgent || '').toLowerCase();
+    if (uaLower.includes('edg/')) {
+      browser = 'Microsoft Edge';
+    } else if (uaLower.includes('chrome') || uaLower.includes('crios')) {
+      browser = 'Google Chrome';
+    } else if (uaLower.includes('firefox') || uaLower.includes('fxios')) {
+      browser = 'Mozilla Firefox';
+    } else if (uaLower.includes('safari') && !uaLower.includes('chrome')) {
+      browser = 'Apple Safari';
+    } else if (uaLower.includes('opera') || uaLower.includes('opr/')) {
+      browser = 'Opera';
+    }
+
+    // Detect device
+    let device = 'Desktop';
+    if (uaLower.includes('mobile') || uaLower.includes('android') || uaLower.includes('iphone')) {
+      device = 'Mobile';
+    } else if (uaLower.includes('ipad') || uaLower.includes('tablet')) {
+      device = 'Tablet';
+    }
+
+    if (!this.data.visitorLogs) {
+      this.data.visitorLogs = [];
+    }
+
+    const log: VisitorLog = {
+      id: `vis_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      ip: cleanIp,
+      userAgent: userAgent || 'N/A',
+      browser,
+      device,
+      userId: user?.id,
+      userName: user?.name,
+      userEmail: user?.email,
+      path: path || '/',
+      timestamp: new Date().toISOString()
+    };
+
+    // Store log (limit max 1000 logs in memory/disk to keep light)
+    this.data.visitorLogs.unshift(log);
+    if (this.data.visitorLogs.length > 1000) {
+      this.data.visitorLogs = this.data.visitorLogs.slice(0, 1000);
+    }
+    this.save();
+    return log;
+  }
+
+  public getVisitorLogs(): VisitorLog[] {
+    return this.data.visitorLogs || [];
+  }
+
   // Dashboard Stats for Admin
   public getAdminStats() {
     const approvedPayments = this.data.payments.filter(p => p.status === 'APROVADO');
     const totalSales = approvedPayments.reduce((sum, p) => sum + p.amount, 0);
     const primeCount = this.data.accessLogs.filter(a => a.service === 'prime').length;
     const netflixCount = approvedPayments.length;
+    
+    const visitorLogs = this.data.visitorLogs || [];
+    const chromeVisits = visitorLogs.filter(v => v.browser === 'Google Chrome').length;
+    const otherVisits = visitorLogs.length - chromeVisits;
+    const mobileVisits = visitorLogs.filter(v => v.device === 'Mobile').length;
+    const desktopVisits = visitorLogs.filter(v => v.device === 'Desktop').length;
 
     return {
       totalSales,
@@ -359,7 +456,12 @@ class JSONDatabase {
       primeAccessCount: primeCount,
       netflixAccessCount: netflixCount,
       pendingPaymentsCount: this.data.payments.filter(p => p.status === 'PENDENTE').length,
-      approvedPaymentsCount: approvedPayments.length
+      approvedPaymentsCount: approvedPayments.length,
+      totalVisits: visitorLogs.length,
+      chromeVisits,
+      otherVisits,
+      mobileVisits,
+      desktopVisits
     };
   }
 }

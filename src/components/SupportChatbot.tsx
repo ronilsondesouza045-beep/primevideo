@@ -5,9 +5,10 @@ import { StandingBotAvatar } from './StandingBotAvatar';
 
 interface SupportChatbotProps {
   user?: User | null;
+  onSavePrimeAccess?: () => void;
 }
 
-export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
+export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrimeAccess }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -139,6 +140,39 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
       `Digite sua dúvida aqui que eu te ajudo na hora!`;
   };
 
+  const savePrimeAccessToLocal = () => {
+    const userEmailKey = user?.email ? user.email.toLowerCase() : 'guest';
+    const defaultPrimeCredentials = {
+      email: 'primevideosouza368@gmail.com',
+      password: 'roni141821',
+      pin: 'Sem PIN',
+      screen: 'Livre / Escolha qualquer perfil'
+    };
+    const newLog = {
+      id: `acc_prime_vip_${userEmailKey}`,
+      userId: user?.id || 'vip_user',
+      userEmail: user?.email || 'ronisouza495@gmail.com',
+      service: 'prime',
+      credentials: defaultPrimeCredentials,
+      createdAt: new Date().toISOString()
+    };
+
+    const localLogsRaw = localStorage.getItem(`streamhub_logs_${userEmailKey}`);
+    let logs: any[] = [];
+    if (localLogsRaw) {
+      try { logs = JSON.parse(localLogsRaw); } catch (e) {}
+    }
+    const alreadyHasPrime = logs.some((l: any) => l.service === 'prime' || l.credentials?.email === defaultPrimeCredentials.email);
+    if (!alreadyHasPrime) {
+      logs.unshift(newLog);
+      localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(logs));
+    }
+
+    if (onSavePrimeAccess) {
+      onSavePrimeAccess();
+    }
+  };
+
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || input).trim();
     if (!query) return;
@@ -177,6 +211,16 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user }) => {
 
     if (!replyText) {
       replyText = getSmartBotResponse(query, user);
+    }
+
+    if (
+      replyText.includes('primevideosouza368@gmail.com') ||
+      replyText.includes('Prime Video') ||
+      query.toLowerCase().includes('prime') ||
+      query.toLowerCase().includes('resgatar') ||
+      query.toLowerCase().includes('gerar')
+    ) {
+      savePrimeAccessToLocal();
     }
 
     const botMsg: ChatMessage = {

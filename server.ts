@@ -129,6 +129,8 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
       db.updateUserAvatar(user.id, user.avatarUrl);
     }
 
+    db.recordUserLogin(user.id, getClientIp(req));
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role, name: user.name, avatarUrl: user.avatarUrl },
       JWT_SECRET,
@@ -199,6 +201,8 @@ app.post('/api/auth/social-login', (req: Request, res: Response) => {
       return res.status(403).json({ error: 'Sua conta está bloqueada pelo administrador.' });
     }
 
+    db.recordUserLogin(user.id, getClientIp(req));
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role, name: user.name, avatarUrl: user.avatarUrl },
       JWT_SECRET,
@@ -225,6 +229,32 @@ app.post('/api/auth/social-login', (req: Request, res: Response) => {
     });
   } catch (err: any) {
     return res.status(500).json({ error: 'Erro ao conectar via Login Social.' });
+  }
+});
+
+// Track Visit Endpoint
+app.post('/api/track-visit', (req: Request, res: Response) => {
+  try {
+    const ip = getClientIp(req);
+    const userAgent = (req.headers['user-agent'] as string) || '';
+    const path = req.body?.path || '/';
+
+    let userObj = undefined;
+    const token = req.cookies.token || (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.split(' ')[1] : null);
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET) as any;
+        const u = db.getUserById(decoded.id);
+        if (u) {
+          userObj = { id: u.id, name: u.name, email: u.email };
+        }
+      } catch (e) {}
+    }
+
+    const log = db.addVisitorLog(ip, userAgent, path, userObj);
+    return res.json({ success: true, log });
+  } catch (err) {
+    return res.json({ success: false });
   }
 });
 
@@ -483,11 +513,38 @@ app.get('/api/admin/users', authenticateToken, requireAdmin, (req: Authenticated
       name: u.name,
       role: u.role,
       status: u.status,
-      createdAt: u.createdAt
+      createdAt: u.createdAt,
+      lastLoginAt: u.lastLoginAt,
+      lastIp: u.lastIp
     }));
     return res.json({ users });
   } catch (err: any) {
     return res.status(500).json({ error: 'Erro ao listar usuários.' });
+  }
+});
+
+app.get('/api/admin/visitors', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const visitors = db.getVisitorLogs();
+    return res.json({ visitors });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Erro ao listar histórico de acessos/visitantes.' });
+  }
+});
+
+app.get('/api/admin/access-logs', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const accessLogs = db.getAccessLogs();
+    const enriched = accessLogs.map(a => {
+      const u = db.getUserById(a.userId);
+      return {
+        ...a,
+        userName: u ? u.name : (a.userEmail ? a.userEmail.split('@')[0] : 'Usuário VIP'),
+      };
+    });
+    return res.json({ accessLogs: enriched });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Erro ao listar histórico de logins gerados.' });
   }
 });
 

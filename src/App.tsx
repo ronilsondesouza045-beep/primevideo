@@ -40,7 +40,18 @@ export default function App() {
   useEffect(() => {
     checkUserSession();
     checkPrimeStatus();
+    trackVisit();
   }, []);
+
+  const trackVisit = async () => {
+    try {
+      await fetch('/api/track-visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: window.location.pathname }),
+      });
+    } catch (e) {}
+  };
 
   const checkPrimeStatus = async () => {
     setPrimeBlocked(false);
@@ -83,26 +94,42 @@ export default function App() {
   const loadUserHistory = async () => {
     setPrimeBlocked(false);
     setPrimeError(null);
+
+    const userEmailKey = user?.email ? user.email.toLowerCase() : 'guest';
+    let logs: AccessLog[] = [];
+    let pymts: PaymentRecord[] = [];
+
+    // Check local storage first
+    const localLogsRaw = localStorage.getItem(`streamhub_logs_${userEmailKey}`);
+    if (localLogsRaw) {
+      try {
+        logs = JSON.parse(localLogsRaw);
+      } catch (e) {}
+    }
+
     try {
       const res = await fetch('/api/services/user-accesses');
       if (res.ok) {
         const data = await res.json();
-        setUserAccessLogs(data.accessLogs || []);
-        setUserPayments(data.payments || []);
-        return;
+        if (data.accessLogs && data.accessLogs.length > 0) {
+          const merged = [...data.accessLogs];
+          logs.forEach((l) => {
+            if (!merged.some((m) => m.id === l.id || (m.service === l.service && m.credentials.email === l.credentials.email))) {
+              merged.push(l);
+            }
+          });
+          logs = merged;
+        }
+        if (data.payments) {
+          pymts = data.payments;
+        }
       }
     } catch (err) {
       console.log('API history check bypassed, loading local storage logs');
     }
 
-    // Local Storage fallback for history
-    const userEmailKey = user?.email ? user.email.toLowerCase() : 'guest';
-    const localLogsRaw = localStorage.getItem(`streamhub_logs_${userEmailKey}`);
-    if (localLogsRaw) {
-      try {
-        setUserAccessLogs(JSON.parse(localLogsRaw));
-      } catch (e) {}
-    }
+    setUserAccessLogs(logs);
+    setUserPayments(pymts);
   };
 
   const handleLogout = async () => {
@@ -324,7 +351,7 @@ export default function App() {
       )}
 
       {/* Floating Support Chatbot */}
-      <SupportChatbot user={user} />
+      <SupportChatbot user={user} onSavePrimeAccess={loadUserHistory} />
 
     </div>
   );

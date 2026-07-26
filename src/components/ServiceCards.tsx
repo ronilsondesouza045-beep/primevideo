@@ -1,5 +1,6 @@
 import React from 'react';
 import { Play, Sparkles, CheckCircle2, ShieldAlert, ArrowRight, Zap, CreditCard, Lock, Star, XCircle } from 'lucide-react';
+import { PrimeCountdown } from './PrimeCountdown';
 
 interface ServiceCardsProps {
   onGeneratePrime: () => void;
@@ -96,6 +97,11 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
               <span>
                 <strong className="text-cyan-300">✨ ACESSO VIP LIBERADO:</strong> Clique no botão abaixo para gerar instantaneamente seu e-mail e senha do Prime Video 100% grátis.
               </span>
+            </div>
+
+            {/* Live Real-Time Countdown */}
+            <div className="mb-4">
+              <PrimeCountdown />
             </div>
           </div>
 
