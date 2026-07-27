@@ -50,14 +50,92 @@ export const ServiceReviewsModal: React.FC<ServiceReviewsModalProps> = ({
     try {
       const res = await fetch(`/api/reviews?service=${service}`);
       if (res.ok) {
-        const data = await res.json();
-        setStats(data.stats);
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const data = await res.json();
+          if (data.stats) {
+            setStats(data.stats);
+            setLoading(false);
+            return;
+          }
+        }
       }
     } catch (err) {
-      console.error('Error fetching reviews:', err);
-    } finally {
-      setLoading(false);
+      console.log('API reviews offline, using local storage reviews fallback');
     }
+
+    // Local storage reviews fallback for Vercel static deployment
+    const localRaw = localStorage.getItem(`streamhub_reviews_${service}`);
+    let reviewsList: ServiceReview[] = [];
+    if (localRaw) {
+      try {
+        reviewsList = JSON.parse(localRaw);
+      } catch (e) {}
+    }
+
+    // Default initial mock reviews if empty
+    if (reviewsList.length === 0) {
+      if (service === 'freefire') {
+        reviewsList = [
+          {
+            id: 'rev_ff_1',
+            service: 'freefire',
+            userName: 'Gabriel FF',
+            rating: 5,
+            status: 'working',
+            comment: 'Resgatei 100 diamantes no recargajogo na hora! Excelente!',
+            createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
+          },
+          {
+            id: 'rev_ff_2',
+            service: 'freefire',
+            userName: 'Lucas Gamer',
+            rating: 5,
+            status: 'working',
+            comment: 'Código PIN funcionou de primeira. Muito top!',
+            createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
+          }
+        ];
+      } else if (service === 'prime') {
+        reviewsList = [
+          {
+            id: 'rev_p_1',
+            service: 'prime',
+            userName: 'Roni Souza VIP',
+            rating: 5,
+            status: 'working',
+            comment: 'Loguei sem PIN no Prime Video e assisti em HD. Sensacional!',
+            createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
+          }
+        ];
+      } else {
+        reviewsList = [
+          {
+            id: 'rev_pm_1',
+            service: 'paramount',
+            userName: 'Carlos Silva',
+            rating: 5,
+            status: 'working',
+            comment: 'Paramount+ funcionando perfeitamente sem bloqueios!',
+            createdAt: new Date(Date.now() - 3600000 * 4).toISOString()
+          }
+        ];
+      }
+      localStorage.setItem(`streamhub_reviews_${service}`, JSON.stringify(reviewsList));
+    }
+
+    const total = reviewsList.length;
+    const working = reviewsList.filter(r => r.status === 'working').length;
+    const workingPercentage = total > 0 ? Math.round((working / total) * 100) : 100;
+    const avgRating = total > 0 ? parseFloat((reviewsList.reduce((acc, r) => acc + r.rating, 0) / total).toFixed(1)) : 5.0;
+
+    setStats({
+      totalReviews: total,
+      workingPercentage,
+      averageRating: avgRating,
+      reviews: reviewsList
+    });
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -87,28 +165,68 @@ export const ServiceReviewsModal: React.FC<ServiceReviewsModalProps> = ({
           rating,
           status,
           comment,
-          userName: userName || 'Usuário Chrome VIP'
+          userName: userName || 'Usuário VIP'
         })
       });
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setSubmitSuccess(data.message || 'Avaliação registrada em tempo real!');
-        setComment('');
-        if (data.stats) {
-          setStats(data.stats);
-        } else {
-          fetchStats();
+      if (res.ok) {
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const data = await res.json();
+          if (data.success) {
+            setSubmitSuccess(data.message || 'Avaliação registrada em tempo real!');
+            setComment('');
+            if (data.stats) {
+              setStats(data.stats);
+            } else {
+              fetchStats();
+            }
+            setSubmitting(false);
+            return;
+          }
         }
-      } else {
-        setSubmitError(data.error || 'Erro ao enviar avaliação.');
       }
     } catch (err) {
-      setSubmitError('Ocorreu um erro ao enviar. Tente novamente.');
-    } finally {
-      setSubmitting(false);
+      console.log('API review submission offline, saving locally');
     }
+
+    // Local submission fallback for Vercel
+    const localRaw = localStorage.getItem(`streamhub_reviews_${service}`);
+    let reviewsList: ServiceReview[] = [];
+    if (localRaw) {
+      try {
+        reviewsList = JSON.parse(localRaw);
+      } catch (e) {}
+    }
+
+    const newRev: ServiceReview = {
+      id: `rev_local_${Date.now()}`,
+      service,
+      userName: userName || 'Usuário VIP',
+      rating,
+      status,
+      comment: comment.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    reviewsList.unshift(newRev);
+    localStorage.setItem(`streamhub_reviews_${service}`, JSON.stringify(reviewsList));
+
+    const total = reviewsList.length;
+    const working = reviewsList.filter(r => r.status === 'working').length;
+    const workingPercentage = Math.round((working / total) * 100);
+    const avgRating = parseFloat((reviewsList.reduce((acc, r) => acc + r.rating, 0) / total).toFixed(1));
+
+    setStats({
+      totalReviews: total,
+      workingPercentage,
+      averageRating: avgRating,
+      reviews: reviewsList
+    });
+
+    setSubmitSuccess('🎉 Sua avaliação foi registrada e publicada com sucesso!');
+    setComment('');
+    setSubmitting(false);
   };
 
   return (

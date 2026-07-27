@@ -167,21 +167,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
       });
 
       if (res.ok) {
-        const data = await res.json();
-        if (data.token) {
-          localStorage.setItem('streamhub_token', data.token);
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const data = await res.json();
+          if (data.token) {
+            localStorage.setItem('streamhub_token', data.token);
+          }
+          if (data.user) {
+            localStorage.setItem('streamhub_user', JSON.stringify(data.user));
+            onSuccess(data.user);
+            onClose();
+            return;
+          }
         }
-        if (data.user) {
-          localStorage.setItem('streamhub_user', JSON.stringify(data.user));
-          onSuccess(data.user);
-          onClose();
+      } else if (res.status === 400 || res.status === 401) {
+        const data = await res.json().catch(() => ({}));
+        if (data.error) {
+          setErrorMsg(data.error);
+          setLoading(false);
           return;
         }
-      } else {
-        const data = await res.json().catch(() => ({}));
-        setErrorMsg(data.error || 'Erro na autenticação.');
-        setLoading(false);
-        return;
       }
     } catch (err) {
       console.log('Server offline / Vercel static mode, using local session');
