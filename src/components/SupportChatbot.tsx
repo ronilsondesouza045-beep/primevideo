@@ -101,7 +101,17 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
     const lower = query.toLowerCase();
     const firstName = currentUser?.name ? currentUser.name.split(' ')[0] : 'Cliente';
 
-    // 1. Prime Video
+    // 1. Paramount+
+    if (lower.includes('paramount')) {
+      return `🎉 **Acesso Paramount+ Gratuito Liberado!**\n\n` +
+        `📧 **E-mail:** \`olivia8515@web-library.net\`\n` +
+        `🔑 **Senha:** \`4400988\`\n\n` +
+        `⚠️ **Aviso:** A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.\n\n` +
+        `📌 **Instruções:** Acesse [paramountplus.com](https://www.paramountplus.com) e faça login.\n\n` +
+        `💡 *Este acesso também fica salvo para você na seção "Meus Acessos Liberados" no menu do seu perfil!*`;
+    }
+
+    // 2. Prime Video
     if (
       lower.includes('prime') ||
       lower.includes('gratis') ||
@@ -119,7 +129,7 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
         `💡 *Este acesso também fica salvo para você na seção "Meus Acessos Liberados" no menu do seu perfil!*`;
     }
 
-    // 2. Netflix / Valor / Ton / Pix
+    // 3. Netflix / Valor / Ton / Pix
     if (
       lower.includes('netflix') ||
       lower.includes('10') ||
@@ -133,10 +143,10 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
       return `🍿 **Netflix VIP (Em Breve):**\n\n` +
         `O serviço da Netflix está temporariamente indisponível para novos pedidos pois nosso estoque de contas VIP está em fase de reabastecimento.\n\n` +
         `Assim que reabastecido, estará disponível por apenas **R$ 10,00/mês** via Pix ou Cartão pelo nosso checkout oficial Ton.\n\n` +
-        `💡 Enquanto isso, aproveite o **Prime Video 100% GRATUITO** disponível na plataforma!`;
+        `💡 Enquanto isso, aproveite o **Prime Video** e **Paramount+** 100% GRATUITOS disponíveis na plataforma!`;
     }
 
-    // 3. Admin / Suporte / Contato / Roni
+    // 4. Admin / Suporte / Contato / Roni
     if (
       lower.includes('admin') ||
       lower.includes('administrador') ||
@@ -154,7 +164,7 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
         `Como posso te ajudar por aqui enquanto isso, ${firstName}?`;
     }
 
-    // 4. Saudações
+    // 5. Saudações
     if (
       lower.includes('ola') ||
       lower.includes('olá') ||
@@ -165,16 +175,50 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
       lower.includes('tudo bem') ||
       lower.includes('fala')
     ) {
-      return `👋 Olá, ${firstName}! Sou a **Assistente Virtual StreamHub VIP**! 🤖🍿\n\nComo posso te ajudar hoje? Você pode me perguntar sobre como resgatar o Prime Video grátis ou como falar com o suporte.`;
+      return `👋 Olá, ${firstName}! Sou a **Assistente Virtual StreamHub VIP**! 🤖🍿\n\nComo posso te ajudar hoje? Você pode me perguntar sobre como resgatar o Prime Video e Paramount+ grátis ou como falar com o suporte.`;
     }
 
-    // 5. Resposta Padrão de Suporte VIP
+    // 6. Resposta Padrão de Suporte VIP
     return `🤖 **Atendimento de Suporte StreamHub VIP**\n\n` +
       `Como posso ajudar você, ${firstName}?\n\n` +
-      `• 🎬 **Prime Video:** 100% Gratuito! Clique em "Prime Video" na tela inicial para resgatar.\n` +
+      `• 🎬 **Prime Video:** 100% Gratuito!\n` +
+      `• 📺 **Paramount+:** 100% Gratuito!\n` +
       `• 🍿 **Netflix VIP:** Em breve por R$ 10,00/mês.\n` +
       `• ✉️ **Suporte Admin:** Fale pelo e-mail \`ronisouza495@gmail.com\`.\n\n` +
       `Digite sua dúvida aqui que eu te ajudo na hora!`;
+  };
+
+  const saveParamountAccessToLocal = () => {
+    const userEmailKey = user?.email ? user.email.toLowerCase() : 'guest';
+    const defaultParamountCredentials = {
+      email: 'olivia8515@web-library.net',
+      password: '4400988',
+      screen: 'Perfil Livre / Gratuito',
+      warning: 'Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.'
+    };
+    const newLog = {
+      id: `acc_paramount_vip_${Date.now()}`,
+      userId: user?.id || 'vip_user',
+      userEmail: user?.email || 'ronisouza495@gmail.com',
+      service: 'paramount',
+      credentials: defaultParamountCredentials,
+      createdAt: new Date().toISOString()
+    };
+
+    const localLogsRaw = localStorage.getItem(`streamhub_logs_${userEmailKey}`);
+    let logs: any[] = [];
+    if (localLogsRaw) {
+      try { logs = JSON.parse(localLogsRaw); } catch (e) {}
+    }
+    const alreadyHasParamount = logs.some((l: any) => l.service === 'paramount' && l.credentials?.email === defaultParamountCredentials.email);
+    if (!alreadyHasParamount) {
+      logs.unshift(newLog);
+      localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(logs));
+    }
+
+    if (onSavePrimeAccess) {
+      onSavePrimeAccess();
+    }
   };
 
   const savePrimeAccessToLocal = () => {
@@ -265,6 +309,12 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
     }
 
     if (
+      replyText.includes('olivia8515@web-library.net') ||
+      replyText.includes('Paramount') ||
+      query.toLowerCase().includes('paramount')
+    ) {
+      saveParamountAccessToLocal();
+    } else if (
       replyText.includes('primevideosouza368@gmail.com') ||
       replyText.includes('Prime Video') ||
       query.toLowerCase().includes('prime') ||
@@ -421,6 +471,12 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
 
           {/* Quick Action Pills */}
           <div className="px-3 py-2 bg-slate-950/80 border-b border-slate-800/80 flex gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
+            <button
+              onClick={() => handleSendMessage('Como resgatar meu Paramount+ grátis?')}
+              className="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30 whitespace-nowrap hover:bg-blue-500/20 transition-all font-medium"
+            >
+              📺 Paramount+
+            </button>
             <button
               onClick={() => handleSendMessage('Como resgatar meu Prime Video grátis?')}
               className="px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 whitespace-nowrap hover:bg-cyan-500/20 transition-all font-medium"

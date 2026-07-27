@@ -29,7 +29,7 @@ export interface AccessLog {
   userId: string;
   userEmail: string;
   userIp?: string;
-  service: 'prime' | 'netflix' | 'paramount';
+  service: 'prime' | 'netflix' | 'paramount' | 'freefire';
   credentials: {
     email: string;
     password: string;
@@ -38,6 +38,17 @@ export interface AccessLog {
     warning?: string;
   };
   createdAt: string;
+}
+
+export interface FreeFirePin {
+  id: string;
+  title: string;
+  code: string;
+  isClaimed: boolean;
+  claimedByUserId?: string;
+  claimedByUserEmail?: string;
+  claimedByIp?: string;
+  claimedAt?: string;
 }
 
 export interface PaymentRecord {
@@ -89,6 +100,7 @@ interface DatabaseSchema {
   payments: PaymentRecord[];
   visitorLogs: VisitorLog[];
   supportMessages: SupportMessage[];
+  freeFirePins: FreeFirePin[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -101,7 +113,8 @@ class JSONDatabase {
     accessLogs: [],
     payments: [],
     visitorLogs: [],
-    supportMessages: []
+    supportMessages: [],
+    freeFirePins: []
   };
 
   constructor() {
@@ -117,6 +130,9 @@ class JSONDatabase {
       try {
         const raw = fs.readFileSync(DB_FILE, 'utf-8');
         this.data = JSON.parse(raw);
+        if (!this.data.freeFirePins) {
+          this.data.freeFirePins = [];
+        }
       } catch (err) {
         console.error('Error reading database file, re-initializing default data:', err);
         this.seedDefaults();
@@ -128,6 +144,7 @@ class JSONDatabase {
     // Ensure default admin always exists & has updated credentials
     this.ensureDefaultAdmin();
     this.ensureDefaultCredentials();
+    this.ensureDefaultFreeFirePins();
     this.ensureSampleData();
   }
 
@@ -138,7 +155,8 @@ class JSONDatabase {
       accessLogs: [],
       payments: [],
       visitorLogs: [],
-      supportMessages: []
+      supportMessages: [],
+      freeFirePins: []
     };
     this.save();
   }
@@ -208,6 +226,31 @@ class JSONDatabase {
       screen: 'Perfil VIP #1 (Rede Souza)',
       tonLink: 'https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO'
     };
+
+    this.save();
+  }
+
+  private ensureDefaultFreeFirePins() {
+    if (!this.data.freeFirePins) {
+      this.data.freeFirePins = [];
+    }
+
+    const defaultCodes = [
+      'C3323966-7B78-4169-A43B-E99D5CDC776E',
+      'DC1CEA85-1356-4D70-9FB5-A5DB9BEFDEBD'
+    ];
+
+    defaultCodes.forEach((code, idx) => {
+      const exists = this.data.freeFirePins.some(p => p.code === code);
+      if (!exists) {
+        this.data.freeFirePins.push({
+          id: `ff_pin_${idx + 1}`,
+          title: 'Free Fire - 100 Diamantes + 10% de Bônus',
+          code: code,
+          isClaimed: false
+        });
+      }
+    });
 
     this.save();
   }
@@ -347,7 +390,7 @@ class JSONDatabase {
   public addAccessLog(
     userId: string,
     userEmail: string,
-    service: 'prime' | 'netflix' | 'paramount',
+    service: 'prime' | 'netflix' | 'paramount' | 'freefire',
     credentials: AccessLog['credentials'],
     userIp?: string
   ): AccessLog {
@@ -363,6 +406,116 @@ class JSONDatabase {
     this.data.accessLogs.unshift(log);
     this.save();
     return log;
+  }
+
+  public claimFreeFirePin(userId: string, userEmail: string, userIp?: string): {
+    success: boolean;
+    reason?: 'already_claimed' | 'out_of_stock';
+    pin?: FreeFirePin;
+    error?: string;
+  } {
+    const cleanIp = userIp ? userIp.replace(/^::ffff:/, '').trim() : '127.0.0.1';
+    const emailKey = userEmail ? userEmail.toLowerCase().trim() : '';
+
+    if (!this.data.freeFirePins) {
+      this.data.freeFirePins = [];
+    }
+
+    // 1. Check if this IP or User ID or User Email has ALREADY claimed a Free Fire PIN
+    const existingClaim = this.data.freeFirePins.find(p =>
+      p.isClaimed && (
+        (cleanIp && cleanIp !== '127.0.0.1' && p.claimedByIp === cleanIp) ||
+        (userId && p.claimedByUserId === userId) ||
+        (emailKey && p.claimedByUserEmail?.toLowerCase() === emailKey)
+      )
+    );
+
+    if (existingClaim) {
+      return {
+        success: false,
+        reason: 'already_claimed',
+        pin: existingClaim,
+        error: `❌ Limite Atingido: Você já resgatou o seu Código Free Fire!\n\nSeu código resgatado: ${existingClaim.code}\n\nO limite é de apenas 1 PIN por pessoa / IP.`
+      };
+    }
+
+    // Also check in accessLogs
+    const existingAccessLog = this.data.accessLogs.find(a =>
+      a.service === 'freefire' && (
+        (cleanIp && cleanIp !== '127.0.0.1' && a.userIp === cleanIp) ||
+        (userId && a.userId === userId) ||
+        (emailKey && a.userEmail?.toLowerCase() === emailKey)
+      )
+    );
+
+    if (existingAccessLog) {
+      return {
+        success: false,
+        reason: 'already_claimed',
+        pin: {
+          id: existingAccessLog.id,
+          title: 'Free Fire - 100 Diamantes + 10% de Bônus',
+          code: existingAccessLog.credentials.password,
+          isClaimed: true,
+          claimedByUserId: existingAccessLog.userId,
+          claimedByUserEmail: existingAccessLog.userEmail,
+          claimedByIp: existingAccessLog.userIp,
+          claimedAt: existingAccessLog.createdAt
+        },
+        error: `❌ Limite Atingido: Você já resgatou o seu Código Free Fire!\n\nSeu código resgatado: ${existingAccessLog.credentials.password}\n\nO limite é de apenas 1 PIN por pessoa / IP.`
+      };
+    }
+
+    // 2. Find first unclaimed PIN
+    const availablePin = this.data.freeFirePins.find(p => !p.isClaimed);
+
+    if (!availablePin) {
+      return {
+        success: false,
+        reason: 'out_of_stock',
+        error: '⚠️ OS PINS ACABARAM! Estoque de Codiguins Free Fire esgotado no momento. Fique atento para o próximo lote!'
+      };
+    }
+
+    // 3. Mark pin as claimed
+    availablePin.isClaimed = true;
+    availablePin.claimedByUserId = userId;
+    availablePin.claimedByUserEmail = userEmail;
+    availablePin.claimedByIp = cleanIp;
+    availablePin.claimedAt = new Date().toISOString();
+
+    // 4. Record access log
+    this.addAccessLog(
+      userId,
+      userEmail,
+      'freefire',
+      {
+        email: 'CÓDIGO DIGITAL FREE FIRE (100 DIAMANTES)',
+        password: availablePin.code,
+        warning: 'Resgate o seu código no site oficial: recargajogo.com.br'
+      },
+      cleanIp
+    );
+
+    this.save();
+    return {
+      success: true,
+      pin: availablePin
+    };
+  }
+
+  public getFreeFirePinsStatus() {
+    if (!this.data.freeFirePins) this.data.freeFirePins = [];
+    const total = this.data.freeFirePins.length;
+    const claimed = this.data.freeFirePins.filter(p => p.isClaimed).length;
+    const available = total - claimed;
+    return {
+      total,
+      claimed,
+      available,
+      outOfStock: available <= 0,
+      pins: this.data.freeFirePins
+    };
   }
 
   public getAccessLogs(userId?: string): AccessLog[] {
@@ -616,6 +769,8 @@ class JSONDatabase {
     const totalSales = approvedPayments.reduce((sum, p) => sum + p.amount, 0);
     const primeCount = this.data.accessLogs.filter(a => a.service === 'prime').length;
     const paramountCount = this.data.accessLogs.filter(a => a.service === 'paramount').length;
+    const freeFireCount = (this.data.freeFirePins || []).filter(p => p.isClaimed).length;
+    const freeFireAvailable = (this.data.freeFirePins || []).filter(p => !p.isClaimed).length;
     const netflixCount = approvedPayments.length;
     
     const visitorLogs = this.data.visitorLogs || [];
@@ -647,6 +802,8 @@ class JSONDatabase {
       totalUsers: this.data.users.length,
       primeAccessCount: primeCount,
       paramountAccessCount: paramountCount,
+      freeFireAccessCount: freeFireCount,
+      freeFireAvailableCount: freeFireAvailable,
       netflixAccessCount: netflixCount,
       pendingPaymentsCount: this.data.payments.filter(p => p.status === 'PENDENTE').length,
       approvedPaymentsCount: approvedPayments.length,

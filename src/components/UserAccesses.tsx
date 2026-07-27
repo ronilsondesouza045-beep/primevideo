@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AccessLog, PaymentRecord } from '../types';
-import { Sparkles, Copy, Check, Play, ShieldCheck, Zap, ExternalLink, Clock, RefreshCw, Tv, AlertTriangle } from 'lucide-react';
+import { Sparkles, Copy, Check, Play, ShieldCheck, Zap, ExternalLink, Clock, RefreshCw, Tv, AlertTriangle, Flame } from 'lucide-react';
 import { PrimeCountdown } from './PrimeCountdown';
 
 interface UserAccessesProps {
@@ -122,37 +122,43 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
         )}
       </div>
 
-      {/* Grid Section 2: Free Accesses (Prime Video & Paramount+) */}
+      {/* Grid Section 2: Free Accesses & Claimed Codes */}
       <div className="space-y-4 pt-4">
         <div className="flex items-center gap-2">
           <Play className="w-5 h-5 text-cyan-400 fill-cyan-400" />
-          <h3 className="text-lg font-bold text-white">Meus Logins Gratuitos Liberados (Prime Video & Paramount+)</h3>
+          <h3 className="text-lg font-bold text-white">Meus Logins & Códigos Liberados (Prime, Paramount+ & Free Fire)</h3>
         </div>
 
         {accessLogs.length === 0 ? (
           <div className="p-8 rounded-2xl bg-slate-900/50 border border-slate-800 text-center text-slate-400 text-xs">
-            Você ainda não gerou nenhum acesso gratuito. Clique em "Gerar" na página principal para resgatar!
+            Você ainda não gerou nenhum acesso ou PIN gratuito. Clique em "Gerar" no catálogo principal para resgatar!
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {accessLogs.map((a) => {
               const isParamount = a.service === 'paramount';
+              const isFreeFire = a.service === 'freefire';
+
               return (
                 <div
                   key={a.id}
                   className={`p-5 rounded-2xl bg-slate-900 border transition-all space-y-3 ${
-                    isParamount
+                    isFreeFire
+                      ? 'border-slate-800 hover:border-amber-500/50'
+                      : isParamount
                       ? 'border-slate-800 hover:border-blue-500/40'
                       : 'border-slate-800 hover:border-cyan-500/40'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded border ${
-                      isParamount
+                      isFreeFire
+                        ? 'text-amber-300 bg-amber-950/60 border-amber-500/30'
+                        : isParamount
                         ? 'text-blue-400 bg-blue-950/60 border-blue-500/30'
                         : 'text-cyan-400 bg-cyan-950/60 border-cyan-500/30'
                     }`}>
-                      {isParamount ? 'PARAMOUNT+ GRÁTIS' : 'PRIME VIDEO GRÁTIS'}
+                      {isFreeFire ? 'FREE FIRE (100 DIAMANTES)' : isParamount ? 'PARAMOUNT+ GRÁTIS' : 'PRIME VIDEO GRÁTIS'}
                     </span>
                     <span className="text-[10px] text-slate-400 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -162,11 +168,15 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
 
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
-                      isParamount
+                      isFreeFire
+                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                        : isParamount
                         ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
                         : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
                     }`}>
-                      {isParamount ? (
+                      {isFreeFire ? (
+                        <Flame className="w-5 h-5 text-amber-400 fill-amber-400" />
+                      ) : isParamount ? (
                         <Tv className="w-5 h-5 text-blue-400" />
                       ) : (
                         <Play className="w-5 h-5 fill-cyan-400" />
@@ -174,46 +184,76 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-white">
-                        {isParamount ? 'Paramount+' : 'Prime Video VIP'}
+                        {isFreeFire ? 'Codiguin Free Fire' : isParamount ? 'Paramount+' : 'Prime Video VIP'}
                       </h4>
-                      <span className="text-xs text-slate-400">Acesso Gratuito</span>
+                      <span className="text-xs text-slate-400">
+                        {isFreeFire ? '100 Diamantes + 10% Bônus' : 'Acesso Gratuito'}
+                      </span>
                     </div>
                   </div>
 
-                  {isParamount && (
-                    <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11px] text-amber-300 font-medium">
-                      ⚠️ A qualquer momento essa conta pode parar de funcionar.
+                  {isFreeFire ? (
+                    <div className="p-3 bg-slate-950 rounded-xl border border-amber-500/30 text-xs space-y-2">
+                      <div className="text-[10px] uppercase font-bold text-amber-400">CÓDIGO DIGITAL (PIN):</div>
+                      <div className="flex justify-between items-center">
+                        <span className="font-mono text-sm font-black text-amber-300 break-all select-all">
+                          {a.credentials.password}
+                        </span>
+                        <button
+                          onClick={() => copyText(`${a.id}_code`, a.credentials.password)}
+                          className="p-1.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 shrink-0"
+                        >
+                          {copiedId === `${a.id}_code` ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <a
+                        href="https://recargajogo.com.br"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 w-full py-2 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/20 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Resgatar no Recarga Jogo
+                      </a>
                     </div>
+                  ) : (
+                    <>
+                      {isParamount && (
+                        <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11px] text-amber-300 font-medium">
+                          ⚠️ A qualquer momento essa conta pode parar de funcionar.
+                        </div>
+                      )}
+
+                      <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">E-mail:</span>
+                          <button
+                            onClick={() => copyText(`${a.id}_email`, a.credentials.email)}
+                            className={`font-mono font-bold hover:underline flex items-center gap-1 ${
+                              isParamount ? 'text-blue-300' : 'text-cyan-300'
+                            }`}
+                          >
+                            {a.credentials.email}
+                            {copiedId === `${a.id}_email` ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">Senha:</span>
+                          <button
+                            onClick={() => copyText(`${a.id}_pwd`, a.credentials.password)}
+                            className={`font-mono font-bold hover:underline flex items-center gap-1 ${
+                              isParamount ? 'text-blue-300' : 'text-cyan-300'
+                            }`}
+                          >
+                            {a.credentials.password}
+                            {copiedId === `${a.id}_pwd` ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {!isParamount && <PrimeCountdown createdAt={a.createdAt} />}
+                    </>
                   )}
-
-                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-400">E-mail:</span>
-                      <button
-                        onClick={() => copyText(`${a.id}_email`, a.credentials.email)}
-                        className={`font-mono font-bold hover:underline flex items-center gap-1 ${
-                          isParamount ? 'text-blue-300' : 'text-cyan-300'
-                        }`}
-                      >
-                        {a.credentials.email}
-                        {copiedId === `${a.id}_email` ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                      </button>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-400">Senha:</span>
-                      <button
-                        onClick={() => copyText(`${a.id}_pwd`, a.credentials.password)}
-                        className={`font-mono font-bold hover:underline flex items-center gap-1 ${
-                          isParamount ? 'text-blue-300' : 'text-cyan-300'
-                        }`}
-                      >
-                        {a.credentials.password}
-                        {copiedId === `${a.id}_pwd` ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {!isParamount && <PrimeCountdown createdAt={a.createdAt} />}
                 </div>
               );
             })}

@@ -494,6 +494,49 @@ app.post('/api/services/generate-paramount', authenticateToken, (req: Authentica
   }
 });
 
+// Generate Free Fire PIN / Codiguin
+app.post('/api/services/generate-freefire', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const user = req.user!;
+    const userIp = getClientIp(req);
+
+    const result = db.claimFreeFirePin(user.id, user.email, userIp);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        reason: result.reason,
+        error: result.error,
+        pin: result.pin
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: '🎉 Código Digital Free Fire resgatado com sucesso!',
+      pin: result.pin,
+      instructions: [
+        'Acesse o site oficial da Garena: recargajogo.com.br',
+        'Faça login com a sua conta Free Fire (ID do jogador ou Facebook/Google).',
+        'Escolha a opção de resgate "E-Prepag" ou "Código Digital".',
+        'Insira o PIN fornecido e confirme o resgate dos seus 100 Diamantes + 10% de Bônus!'
+      ]
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Erro ao resgatar PIN do Free Fire.' });
+  }
+});
+
+// Get Free Fire PINs Stock / Status
+app.get('/api/services/freefire-status', (req: Request, res: Response) => {
+  try {
+    const status = db.getFreeFirePinsStatus();
+    return res.json(status);
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao buscar status dos PINs.' });
+  }
+});
+
 // Get User's Active Accesses History
 app.get('/api/services/user-accesses', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -806,8 +849,9 @@ app.post('/api/admin/payments/:paymentId/reject', authenticateToken, requireAdmi
 app.get('/api/admin/credentials', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
   try {
     const prime = db.getCredential('prime');
+    const paramount = db.getCredential('paramount');
     const netflix = db.getCredential('netflix');
-    return res.json({ prime, netflix });
+    return res.json({ prime, paramount, netflix });
   } catch (err: any) {
     return res.status(500).json({ error: 'Erro ao buscar credenciais.' });
   }
@@ -816,8 +860,8 @@ app.get('/api/admin/credentials', authenticateToken, requireAdmin, (req: Authent
 app.put('/api/admin/credentials', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { serviceId, email, password, pin, screen, tonLink } = req.body;
-    if (serviceId !== 'prime' && serviceId !== 'netflix') {
-      return res.status(400).json({ error: 'serviceId inválido. Use prime ou netflix.' });
+    if (serviceId !== 'prime' && serviceId !== 'netflix' && serviceId !== 'paramount') {
+      return res.status(400).json({ error: 'serviceId inválido. Use prime, paramount ou netflix.' });
     }
 
     db.updateCredential(serviceId, {
@@ -859,7 +903,26 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     }
 
     const lower = message.toLowerCase();
-    const isPrimeQuery = lower.includes('prime') || lower.includes('gratis') || lower.includes('gratuito') || lower.includes('resgatar') || lower.includes('senha') || lower.includes('conta') || lower.includes('acesso');
+    const isFreeFireQuery = lower.includes('freefire') || lower.includes('free fire') || lower.includes('codiguin') || lower.includes('diamante') || lower.includes('ff');
+    const isPrimeQuery = lower.includes('prime') || (lower.includes('resgatar') && lower.includes('prime'));
+    const isParamountQuery = lower.includes('paramount') || (lower.includes('resgatar') && lower.includes('paramount'));
+
+    if (isFreeFireQuery) {
+      const claimResult = db.claimFreeFirePin(userId || `chat_${userIp}`, userEmail, userIp);
+      if (claimResult.success && claimResult.pin) {
+        return res.json({
+          reply: `🔥 **CÓDIGO DIGITAL FREE FIRE (100 DIAMANTES + 10% BÔNUS) LIBERADO!**\n\n🎁 **Produto:** Free Fire - 100 Diamantes + 10% de Bônus\n🔑 **Código Digital:** \`${claimResult.pin.code}\`\n\n📌 **Como Resgatar:**\n1. Acesse o site oficial: [recargajogo.com.br](https://recargajogo.com.br)\n2. Faça login com seu ID do Free Fire ou conta vinculada\n3. Escolha a opção de pagamento 'E-Prepag' ou 'Código Digital'\n4. Insira o código acima e confirme para receber seus diamantes!\n\n💡 *Este código também fica salvo para você na seção "Meus Acessos Liberados"!*`
+        });
+      } else if (claimResult.reason === 'already_claimed' && claimResult.pin) {
+        return res.json({
+          reply: `❌ **Limite Atingido!**\n\nVocê ou alguém da sua conexão (IP: \`${userIp}\`) já resgatou 1 código Free Fire.\n\n🔑 **Seu Código Resgatado Anteriormente:** \`${claimResult.pin.code}\`\n\n📌 **Resgate em:** [recargajogo.com.br](https://recargajogo.com.br)\n\n*Nota: O limite é de apenas 1 PIN por pessoa/conexão IP.*`
+        });
+      } else {
+        return res.json({
+          reply: `⚠️ **OS PINS ACABARAM!**\n\nInfelizmente todos os Codiguins do Free Fire (100 Diamantes + 10% Bônus) já foram resgatados por outros usuários no momento.\n\nFique atento para as próximas atualizações de estoque!`
+        });
+      }
+    }
 
     if (isPrimeQuery) {
       const primeCreds = db.getCredential('prime');
@@ -877,14 +940,32 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       });
     }
 
+    if (isParamountQuery) {
+      const paramCreds = db.getCredential('paramount');
+      const releasedCredentials = {
+        email: paramCreds.email || 'olivia8515@web-library.net',
+        password: paramCreds.password || '4400988',
+        screen: 'Perfil Livre / Gratuito',
+        warning: 'Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.'
+      };
+
+      db.addAccessLog(userId || `chat_${userIp}`, userEmail, 'paramount', releasedCredentials, userIp);
+
+      return res.json({
+        reply: `🎉 **Acesso Paramount+ Gratuito Liberado!**\n\n📧 **E-mail:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n⚠️ **Aviso:** A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.\n\n📌 **Instruções:** Acesse [paramountplus.com](https://www.paramountplus.com) e faça login.\n\n💡 *Este acesso também fica salvo para você na seção "Meus Acessos Liberados" no menu do seu perfil!*`
+      });
+    }
+
     // Gemini API initialization / Fallback
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       let answer = "Olá! Sou o assistente oficial do **StreamHub VIP**. Como posso ajudar você hoje?";
 
-      if (lower.includes('netflix') || lower.includes('10') || lower.includes('pagar') || lower.includes('comprar')) {
-        answer = "A **Netflix VIP** está em fase de reabastecimento e estará disponível **Em Breve** nesta plataforma! No momento, aproveite nosso **Prime Video 100% GRATUITO** com liberação instantânea de e-mail e senha.";
+      if (lower.includes('paramount')) {
+        answer = "O **Paramount+** está 100% GRATUITO! E-mail: `olivia8515@web-library.net` | Senha: `4400988`. (Aviso: Pode parar de funcionar a qualquer momento).";
+      } else if (lower.includes('netflix') || lower.includes('10') || lower.includes('pagar') || lower.includes('comprar')) {
+        answer = "A **Netflix VIP** está em fase de reabastecimento e estará disponível **Em Breve** nesta plataforma! No momento, aproveite nosso **Prime Video** e **Paramount+** 100% GRATUITOS com liberação instantânea.";
       } else if (lower.includes('pix') || lower.includes('link') || lower.includes('ton')) {
         answer = "Nosso link de pagamento oficial Ton é seguro e aceita Pix ou Cartão de Crédito. Acesse diretamente: https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO";
       } else if (lower.includes('admin') || lower.includes('suporte') || lower.includes('roni')) {
@@ -914,11 +995,12 @@ REGRAS RÍGIDAS DE SEGURANÇA QUE VOCÊ DEVE SEGUIR:
    - O cliente atual está ${limitCheck.isBlocked ? 'BLOQUEADO (já resgatou ou alguém da mesma rede IP já resgatou o Prime Video)' : 'LIBERADO (pode resgatar o Prime Video 1 vez)'}.
    - SE O CLIENTE PEDIR A SENHA OU RESGATE DO PRIME VIDEO E ESTIVER BLOQUEADO, você DEVE responder EXATAMENTE:
      "❌ Bloqueado! Você ou alguém da sua rede (IP) já resgatou o acesso gratuito do Prime Video. O limite é de apenas 1 resgate por pessoa/conexão."
-   - NUNCA forneça senhas se a pessoa estiver bloqueada.
+   - NUNCA forneça senhas de Prime Video se a pessoa estiver bloqueada.
 
 2. INFORMAÇÕES DA PLATAFORMA:
+   - PARAMOUNT+: 100% GRATUITO. E-mail: olivia8515@web-library.net | Senha: 4400988. Sempre informe que a qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar.
+   - PRIME VIDEO: É um serviço 100% GRATUITO ativo no momento (limite de 1 resgate por pessoa/IP). E-mail: primevideosouza368@gmail.com | Senha: roni141821.
    - NETFLIX VIP: O serviço da Netflix está BLOQUEADO e TEMPORARIAMENTE INDISPONÍVEL (EM BREVE). NÃO há vendas ou liberações de Netflix no momento, pois o estoque está em reabastecimento. Se o cliente perguntar sobre a Netflix, diga educadamente que está bloqueada/indisponível temporariamente e estará disponível em breve!
-   - PRIME VIDEO: É o ÚNICO serviço ativo no momento, sendo 100% GRATUITO (limite rígido de 1 resgate por pessoa/IP).
    - Suporte / Admin: ronisouza495@gmail.com
 `;
 

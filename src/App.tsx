@@ -6,6 +6,7 @@ import { ServiceCards } from './components/ServiceCards';
 import { PrimeModal } from './components/PrimeModal';
 import { ParamountModal } from './components/ParamountModal';
 import { NetflixModal } from './components/NetflixModal';
+import { FreeFireModal } from './components/FreeFireModal';
 import { UserAccesses } from './components/UserAccesses';
 import { AdminPanel } from './components/AdminPanel';
 import { AuthModal } from './components/AuthModal';
@@ -20,6 +21,22 @@ export default function App() {
   // Modals state
   const [primeCreds, setPrimeCreds] = useState<ServiceCredentials | null>(null);
   const [paramountCreds, setParamountCreds] = useState<ServiceCredentials | null>(null);
+
+  // Free Fire Modal & Stock State
+  const [freeFireResult, setFreeFireResult] = useState<{
+    code?: string;
+    message: string;
+    success: boolean;
+    outOfStock?: boolean;
+    alreadyClaimed?: boolean;
+  } | null>(null);
+
+  const [freeFireStock, setFreeFireStock] = useState<{
+    total: number;
+    available: number;
+    claimed: number;
+    outOfStock: boolean;
+  }>({ total: 2, available: 2, claimed: 0, outOfStock: false });
 
   // Netflix Payment Modal state
   const [activePayment, setActivePayment] = useState<{
@@ -38,12 +55,25 @@ export default function App() {
   const [primeBlocked, setPrimeBlocked] = useState(false);
   const [primeError, setPrimeError] = useState<string | null>(null);
 
-  // Check Session & Prime Status on Mount
+  // Check Session & Statuses on Mount
   useEffect(() => {
     checkUserSession();
     checkPrimeStatus();
+    checkFreeFireStatus();
     trackVisit();
   }, []);
+
+  const checkFreeFireStatus = async () => {
+    try {
+      const res = await fetch('/api/services/freefire-status');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.stock) {
+          setFreeFireStock(data.stock);
+        }
+      }
+    } catch (e) {}
+  };
 
   const trackVisit = async () => {
     try {
@@ -247,6 +277,36 @@ export default function App() {
     setParamountCreds(defaultParamountCredentials);
   };
 
+  // Generate Free Fire Codiguin PIN
+  const handleGenerateFreeFire = async () => {
+    if (!user) {
+      setIsAuthOpen(true);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/services/generate-freefire', { method: 'POST' });
+      const data = await res.json();
+
+      setFreeFireResult({
+        code: data.code,
+        message: data.message,
+        success: data.success,
+        outOfStock: data.outOfStock,
+        alreadyClaimed: data.alreadyClaimed
+      });
+
+      checkFreeFireStatus();
+      loadUserHistory();
+    } catch (err) {
+      console.error('Erro ao gerar código do Free Fire:', err);
+      setFreeFireResult({
+        message: 'Ocorreu um erro ao conectar ao servidor. Tente novamente em instantes.',
+        success: false
+      });
+    }
+  };
+
   // Buy Netflix Access (R$ 10,00) - Temporarily blocked / Em Breve
   const handleBuyNetflix = () => {
     alert('🔒 Acessos da Netflix temporariamente em reabastecimento!\n\nEm breve teremos novos logins Netflix VIP disponíveis nesta plataforma.\n\nAproveite e resgate seu Prime Video 100% GRATUITO no momento!');
@@ -327,9 +387,11 @@ export default function App() {
             <ServiceCards
               onGeneratePrime={handleGeneratePrime}
               onGenerateParamount={handleGenerateParamount}
+              onGenerateFreeFire={handleGenerateFreeFire}
               onBuyNetflix={handleBuyNetflix}
               primeBlocked={primeBlocked}
               primeError={primeError}
+              freeFireStock={freeFireStock}
             />
           </>
         )}
@@ -395,6 +457,14 @@ export default function App() {
           onOpenChat={() => {
             setParamountCreds(null);
           }}
+        />
+      )}
+
+      {/* Free Fire Codiguin PIN Modal */}
+      {freeFireResult && (
+        <FreeFireModal
+          result={freeFireResult}
+          onClose={() => setFreeFireResult(null)}
         />
       )}
 

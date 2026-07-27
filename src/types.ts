@@ -23,9 +23,20 @@ export interface AccessLog {
   userId: string;
   userEmail: string;
   userIp?: string;
-  service: 'prime' | 'netflix' | 'paramount';
+  service: 'prime' | 'netflix' | 'paramount' | 'freefire';
   credentials: ServiceCredentials;
   createdAt: string;
+}
+
+export interface FreeFirePin {
+  id: string;
+  title: string;
+  code: string;
+  isClaimed: boolean;
+  claimedByUserId?: string;
+  claimedByUserEmail?: string;
+  claimedByIp?: string;
+  claimedAt?: string;
 }
 
 export interface PaymentRecord {
@@ -70,6 +81,8 @@ export interface AdminStats {
   totalUsers: number;
   primeAccessCount: number;
   paramountAccessCount?: number;
+  freeFireAccessCount?: number;
+  freeFireAvailableCount?: number;
   netflixAccessCount: number;
   pendingPaymentsCount: number;
   approvedPaymentsCount: number;
