@@ -51,6 +51,20 @@ export interface FreeFirePin {
   claimedAt?: string;
 }
 
+export interface ServiceReview {
+  id: string;
+  service: 'prime' | 'paramount' | 'freefire';
+  userId?: string;
+  userName: string;
+  userEmail?: string;
+  userIp?: string;
+  browser?: string;
+  rating: number;
+  status: 'working' | 'not_working';
+  comment: string;
+  createdAt: string;
+}
+
 export interface PaymentRecord {
   id: string;
   userId: string;
@@ -101,6 +115,7 @@ interface DatabaseSchema {
   visitorLogs: VisitorLog[];
   supportMessages: SupportMessage[];
   freeFirePins: FreeFirePin[];
+  reviews: ServiceReview[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -114,7 +129,8 @@ class JSONDatabase {
     payments: [],
     visitorLogs: [],
     supportMessages: [],
-    freeFirePins: []
+    freeFirePins: [],
+    reviews: []
   };
 
   constructor() {
@@ -133,6 +149,9 @@ class JSONDatabase {
         if (!this.data.freeFirePins) {
           this.data.freeFirePins = [];
         }
+        if (!this.data.reviews) {
+          this.data.reviews = [];
+        }
       } catch (err) {
         console.error('Error reading database file, re-initializing default data:', err);
         this.seedDefaults();
@@ -145,6 +164,7 @@ class JSONDatabase {
     this.ensureDefaultAdmin();
     this.ensureDefaultCredentials();
     this.ensureDefaultFreeFirePins();
+    this.ensureDefaultReviews();
     this.ensureSampleData();
   }
 
@@ -156,7 +176,8 @@ class JSONDatabase {
       payments: [],
       visitorLogs: [],
       supportMessages: [],
-      freeFirePins: []
+      freeFirePins: [],
+      reviews: []
     };
     this.save();
   }
@@ -253,6 +274,89 @@ class JSONDatabase {
     });
 
     this.save();
+  }
+
+  private ensureDefaultReviews() {
+    if (!this.data.reviews) {
+      this.data.reviews = [];
+    }
+
+    if (this.data.reviews.length === 0) {
+      const sampleReviews: Omit<ServiceReview, 'id'>[] = [
+        {
+          service: 'prime',
+          userName: 'Carlos Eduardo (Chrome)',
+          browser: 'Google Chrome',
+          rating: 5,
+          status: 'working',
+          comment: 'Consegui entrar de primeira no Prime Video! Login liberado na hora.',
+          createdAt: new Date(Date.now() - 300000).toISOString()
+        },
+        {
+          service: 'prime',
+          userName: 'Juliana Lima',
+          browser: 'Google Chrome',
+          rating: 5,
+          status: 'working',
+          comment: 'Excelente! Filmes e séries rodando em Full HD sem travar.',
+          createdAt: new Date(Date.now() - 1200000).toISOString()
+        },
+        {
+          service: 'prime',
+          userName: 'Felipe Santos',
+          browser: 'Google Chrome',
+          rating: 5,
+          status: 'working',
+          comment: '100% gratuito de verdade. Recomendo muito esse catálogo!',
+          createdAt: new Date(Date.now() - 3600000).toISOString()
+        },
+        {
+          service: 'paramount',
+          userName: 'Matheus Oliveira (Chrome)',
+          browser: 'Google Chrome',
+          rating: 5,
+          status: 'working',
+          comment: 'Consegui logar no Paramount+ direto no Chrome! Assistindo filmes top.',
+          createdAt: new Date(Date.now() - 600000).toISOString()
+        },
+        {
+          service: 'paramount',
+          userName: 'Amanda Costa',
+          browser: 'Google Chrome',
+          rating: 5,
+          status: 'working',
+          comment: 'Acesso Paramount liberado na hora. Muito prático!',
+          createdAt: new Date(Date.now() - 2400000).toISOString()
+        },
+        {
+          service: 'freefire',
+          userName: 'Bruno FF (Chrome Mobile)',
+          browser: 'Google Chrome',
+          rating: 5,
+          status: 'working',
+          comment: 'Resgatei o Codiguin no Recarga Jogo! 100 Diamantes + 10% Bônus caíram direto na conta FF!',
+          createdAt: new Date(Date.now() - 180000).toISOString()
+        },
+        {
+          service: 'freefire',
+          userName: 'Gabriel ProPlayer',
+          browser: 'Google Chrome',
+          rating: 5,
+          status: 'working',
+          comment: 'Top demais! Código Digital Free Fire válido e funcionando de primeira no site oficial.',
+          createdAt: new Date(Date.now() - 900000).toISOString()
+        }
+      ];
+
+      sampleReviews.forEach((rev, idx) => {
+        this.data.reviews.push({
+          id: `rev_${Date.now()}_${idx + 1}`,
+          ...rev
+        });
+      });
+
+      this.save();
+    }
   }
 
   private ensureSampleData() {
@@ -517,6 +621,79 @@ class JSONDatabase {
       pins: this.data.freeFirePins
     };
   }
+
+  public addServiceReview(
+    service: 'prime' | 'paramount' | 'freefire',
+    rating: number,
+    status: 'working' | 'not_working',
+    comment: string,
+    userName?: string,
+    userEmail?: string,
+    userIp?: string,
+    browser?: string,
+    userId?: string
+  ): ServiceReview {
+    if (!this.data.reviews) {
+      this.data.reviews = [];
+    }
+
+    const cleanIp = userIp ? userIp.replace(/^::ffff:/, '').trim() : '127.0.0.1';
+
+    const newReview: ServiceReview = {
+      id: `rev_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      service,
+      rating: Math.min(5, Math.max(1, rating || 5)),
+      status,
+      comment: comment && comment.trim().length > 0
+        ? comment.trim()
+        : (status === 'working' ? 'Consegui acessar e funcionou perfeitamente!' : 'Tive dificuldade ao acessar.'),
+      userName: userName?.trim() || (userEmail ? userEmail.split('@')[0] : (browser?.includes('Chrome') ? 'Usuário Chrome VIP' : 'Usuário VIP')),
+      userEmail,
+      userIp: cleanIp,
+      browser: browser || 'Google Chrome',
+      userId,
+      createdAt: new Date().toISOString()
+    };
+
+    this.data.reviews.unshift(newReview);
+    this.save();
+    return newReview;
+  }
+
+  public getServiceReviewStats(service?: 'prime' | 'paramount' | 'freefire') {
+    if (!this.data.reviews) this.data.reviews = [];
+
+    const calculateForService = (srv: 'prime' | 'paramount' | 'freefire') => {
+      const list = this.data.reviews.filter(r => r.service === srv);
+      const total = list.length;
+      const workingCount = list.filter(r => r.status === 'working').length;
+      const notWorkingCount = total - workingCount;
+      const successRate = total > 0 ? Math.round((workingCount / total) * 100) : 100;
+      const sumRating = list.reduce((acc, r) => acc + (r.rating || 5), 0);
+      const averageRating = total > 0 ? Number((sumRating / total).toFixed(1)) : 5.0;
+
+      return {
+        service: srv,
+        totalReviews: total,
+        workingCount,
+        notWorkingCount,
+        successRate,
+        averageRating,
+        recentReviews: list.slice(0, 15)
+      };
+    };
+
+    if (service) {
+      return calculateForService(service);
+    }
+
+    return {
+      prime: calculateForService('prime'),
+      paramount: calculateForService('paramount'),
+      freefire: calculateForService('freefire')
+    };
+  }
+
 
   public getAccessLogs(userId?: string): AccessLog[] {
     if (userId) {

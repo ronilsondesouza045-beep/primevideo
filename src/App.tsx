@@ -7,6 +7,7 @@ import { PrimeModal } from './components/PrimeModal';
 import { ParamountModal } from './components/ParamountModal';
 import { NetflixModal } from './components/NetflixModal';
 import { FreeFireModal } from './components/FreeFireModal';
+import { ServiceReviewsModal } from './components/ServiceReviewsModal';
 import { UserAccesses } from './components/UserAccesses';
 import { AdminPanel } from './components/AdminPanel';
 import { AuthModal } from './components/AuthModal';
@@ -21,6 +22,7 @@ export default function App() {
   // Modals state
   const [primeCreds, setPrimeCreds] = useState<ServiceCredentials | null>(null);
   const [paramountCreds, setParamountCreds] = useState<ServiceCredentials | null>(null);
+  const [selectedReviewService, setSelectedReviewService] = useState<'prime' | 'paramount' | 'freefire' | null>(null);
 
   // Free Fire Modal & Stock State
   const [freeFireResult, setFreeFireResult] = useState<{
@@ -93,9 +95,20 @@ export default function App() {
     } catch (err) {}
   };
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('streamhub_token');
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+  };
+
   const checkUserSession = async () => {
     try {
-      const res = await fetch('/api/auth/me');
+      const res = await fetch('/api/auth/me', { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
@@ -140,7 +153,7 @@ export default function App() {
     }
 
     try {
-      const res = await fetch('/api/services/user-accesses');
+      const res = await fetch('/api/services/user-accesses', { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         if (data.accessLogs && data.accessLogs.length > 0) {
@@ -166,9 +179,10 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { method: 'POST', headers: getAuthHeaders() });
     } catch (e) {}
     localStorage.removeItem('streamhub_user');
+    localStorage.removeItem('streamhub_token');
     setUser(null);
     setActiveTab('home');
     setUserAccessLogs([]);
@@ -195,7 +209,10 @@ export default function App() {
 
     // 1. Try server API
     try {
-      const res = await fetch('/api/services/generate-prime', { method: 'POST' });
+      const res = await fetch('/api/services/generate-prime', {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.access) {
@@ -245,7 +262,10 @@ export default function App() {
 
     // 1. Try server API
     try {
-      const res = await fetch('/api/services/generate-paramount', { method: 'POST' });
+      const res = await fetch('/api/services/generate-paramount', {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.access) {
@@ -285,16 +305,27 @@ export default function App() {
     }
 
     try {
-      const res = await fetch('/api/services/generate-freefire', { method: 'POST' });
+      const res = await fetch('/api/services/generate-freefire', {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
       const data = await res.json();
 
-      setFreeFireResult({
-        code: data.code,
-        message: data.message,
-        success: data.success,
-        outOfStock: data.outOfStock,
-        alreadyClaimed: data.alreadyClaimed
-      });
+      if (res.ok && data.success) {
+        setFreeFireResult({
+          pin: data.pin,
+          code: data.pin?.code || data.code,
+          message: data.message || '🎉 Código Digital Free Fire resgatado com sucesso!',
+          success: true
+        });
+      } else {
+        setFreeFireResult({
+          message: data.error || data.message || 'Não há código do Free Fire disponível no momento ou você já atingiu o limite de resgates.',
+          success: false,
+          outOfStock: data.reason === 'out_of_stock',
+          alreadyClaimed: data.reason === 'already_claimed'
+        });
+      }
 
       checkFreeFireStatus();
       loadUserHistory();
@@ -389,6 +420,7 @@ export default function App() {
               onGenerateParamount={handleGenerateParamount}
               onGenerateFreeFire={handleGenerateFreeFire}
               onBuyNetflix={handleBuyNetflix}
+              onOpenReviews={(srv) => setSelectedReviewService(srv)}
               primeBlocked={primeBlocked}
               primeError={primeError}
               freeFireStock={freeFireStock}
@@ -465,6 +497,15 @@ export default function App() {
         <FreeFireModal
           result={freeFireResult}
           onClose={() => setFreeFireResult(null)}
+        />
+      )}
+
+      {/* Real-time Service Reviews Modal */}
+      {selectedReviewService && (
+        <ServiceReviewsModal
+          service={selectedReviewService}
+          currentUser={user}
+          onClose={() => setSelectedReviewService(null)}
         />
       )}
 

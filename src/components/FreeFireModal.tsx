@@ -2,24 +2,39 @@ import React, { useState } from 'react';
 import { Flame, Copy, Check, ExternalLink, ShieldCheck, AlertCircle, X, Sparkles } from 'lucide-react';
 import { FreeFirePin } from '../types';
 
+interface FreeFireModalResult {
+  code?: string;
+  message?: string;
+  success?: boolean;
+  outOfStock?: boolean;
+  alreadyClaimed?: boolean;
+  pin?: FreeFirePin;
+}
+
 interface FreeFireModalProps {
-  pin: FreeFirePin | null;
+  pin?: FreeFirePin | null;
   errorMsg?: string | null;
+  result?: FreeFireModalResult | null;
   onClose: () => void;
-  onOpenChat: () => void;
+  onOpenChat?: () => void;
 }
 
 export const FreeFireModal: React.FC<FreeFireModalProps> = ({
   pin,
   errorMsg,
+  result,
   onClose,
   onOpenChat
 }) => {
   const [copied, setCopied] = useState(false);
 
+  const activePinCode = result?.pin?.code || result?.code || pin?.code;
+  const isSuccess = Boolean(activePinCode && (result?.success !== false));
+  const activeError = result && !result.success ? (result.message || 'Não foi possível resgatar o código.') : errorMsg;
+
   const handleCopy = () => {
-    if (pin?.code) {
-      navigator.clipboard.writeText(pin.code);
+    if (activePinCode) {
+      navigator.clipboard.writeText(activePinCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
     }
@@ -53,7 +68,7 @@ export const FreeFireModal: React.FC<FreeFireModalProps> = ({
           </p>
         </div>
 
-        {errorMsg ? (
+        {activeError ? (
           /* Error / Out of Stock / Already Claimed State */
           <div className="space-y-4">
             <div className="p-4 rounded-2xl bg-amber-950/50 border border-amber-500/40 text-amber-200 text-sm space-y-2">
@@ -62,7 +77,7 @@ export const FreeFireModal: React.FC<FreeFireModalProps> = ({
                 <span>Aviso do Sistema</span>
               </div>
               <p className="whitespace-pre-line leading-relaxed text-xs sm:text-sm">
-                {errorMsg}
+                {activeError}
               </p>
             </div>
 
@@ -75,7 +90,7 @@ export const FreeFireModal: React.FC<FreeFireModalProps> = ({
               </button>
             </div>
           </div>
-        ) : pin ? (
+        ) : isSuccess ? (
           /* Success State - Display Code */
           <div className="space-y-5">
             <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center gap-2 text-xs text-emerald-300">
@@ -89,7 +104,7 @@ export const FreeFireModal: React.FC<FreeFireModalProps> = ({
                 CÓDIGO DIGITAL (PIN)
               </span>
               <div className="font-mono text-lg sm:text-xl font-bold text-amber-300 select-all tracking-wider break-all bg-slate-900/90 py-3 px-2 rounded-xl border border-slate-800">
-                {pin.code}
+                {activePinCode}
               </div>
               <button
                 onClick={handleCopy}
@@ -146,7 +161,19 @@ export const FreeFireModal: React.FC<FreeFireModalProps> = ({
               </button>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="space-y-4 text-center">
+            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-300 text-xs leading-relaxed">
+              {result?.message || 'Não há código do Free Fire disponível no momento ou você já atingiu o limite de resgates.'}
+            </div>
+            <button
+              onClick={onClose}
+              className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs"
+            >
+              Fechar
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

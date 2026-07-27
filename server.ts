@@ -537,6 +537,90 @@ app.get('/api/services/freefire-status', (req: Request, res: Response) => {
   }
 });
 
+// ==============================================
+// REAL-TIME REVIEWS & EVALUATIONS ENDPOINTS
+// ==============================================
+
+// GET Reviews and Stats for Services
+app.get('/api/reviews', (req: Request, res: Response) => {
+  try {
+    const service = req.query.service as 'prime' | 'paramount' | 'freefire' | undefined;
+    const stats = db.getServiceReviewStats(service);
+    return res.json({ stats });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao carregar avaliações.' });
+  }
+});
+
+// POST Submit a New Service Review
+app.post('/api/reviews', (req: Request, res: Response) => {
+  try {
+    const { service, rating, status, comment, userName } = req.body;
+
+    if (!service || !['prime', 'paramount', 'freefire'].includes(service)) {
+      return res.status(400).json({ error: 'Serviço inválido para avaliação.' });
+    }
+
+    if (!status || !['working', 'not_working'].includes(status)) {
+      return res.status(400).json({ error: 'Status da avaliação é obrigatório (Consegui / Não consegui).' });
+    }
+
+    const userIp = getClientIp(req);
+    const userAgent = req.headers['user-agent'] || '';
+    
+    // Detect browser
+    let browser = 'Outro Navegador';
+    if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) {
+      browser = 'Google Chrome';
+    } else if (userAgent.includes('Edg')) {
+      browser = 'Microsoft Edge';
+    } else if (userAgent.includes('Firefox')) {
+      browser = 'Mozilla Firefox';
+    } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
+      browser = 'Apple Safari';
+    }
+
+    // Identify user if logged in token present
+    let userId: string | undefined = undefined;
+    let userEmail: string | undefined = undefined;
+    
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        const decoded = jwt.verify(token, JWT_SECRET) as any;
+        userId = decoded.id;
+        userEmail = decoded.email;
+      } catch (e) {
+        // Optional auth
+      }
+    }
+
+    const review = db.addServiceReview(
+      service,
+      Number(rating) || 5,
+      status,
+      comment || '',
+      userName,
+      userEmail,
+      userIp,
+      browser,
+      userId
+    );
+
+    const updatedStats = db.getServiceReviewStats(service);
+
+    return res.json({
+      success: true,
+      message: '⭐ Sua avaliação foi registrada em tempo real com sucesso! Obrigado pelo feedback.',
+      review,
+      stats: updatedStats
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao registrar avaliação.' });
+  }
+});
+
 // Get User's Active Accesses History
 app.get('/api/services/user-accesses', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   try {

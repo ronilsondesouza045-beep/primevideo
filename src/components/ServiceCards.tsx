@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Sparkles, CheckCircle2, ShieldAlert, ArrowRight, Zap, CreditCard, Lock, Star, XCircle, Tv, AlertTriangle, Flame } from 'lucide-react';
+import { Play, Sparkles, CheckCircle2, ShieldAlert, ArrowRight, Zap, CreditCard, Lock, Star, XCircle, Tv, AlertTriangle, Flame, MessageSquare } from 'lucide-react';
 import { PrimeCountdown } from './PrimeCountdown';
 
 interface ServiceCardsProps {
@@ -7,6 +7,7 @@ interface ServiceCardsProps {
   onGenerateParamount: () => void;
   onGenerateFreeFire: () => void;
   onBuyNetflix: () => void;
+  onOpenReviews?: (service: 'prime' | 'paramount' | 'freefire') => void;
   primeBlocked?: boolean;
   primeError?: string | null;
   freeFireStock?: {
@@ -22,6 +23,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
   onGenerateParamount,
   onGenerateFreeFire,
   onBuyNetflix,
+  onOpenReviews,
   primeBlocked = false,
   primeError = null,
   freeFireStock = { total: 2, available: 2, claimed: 0, outOfStock: false }
@@ -35,7 +37,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
           Catálogo VIP de Serviços & Prêmios Gratuitos
         </h2>
         <p className="text-slate-400 text-xs sm:text-sm mt-2 max-w-xl mx-auto">
-          Gerencie suas contas de streaming e resgate seus PINs do Free Fire com facilidade e liberação instantânea.
+          Gerencie suas contas de streaming, veja as avaliações em tempo real de quem resgatou e pegue seu acesso instantâneo.
         </p>
       </div>
 
@@ -78,9 +80,29 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
               </div>
             </div>
 
-            <p className="text-slate-300 text-xs mb-4 leading-relaxed">
+            <p className="text-slate-300 text-xs mb-3 leading-relaxed">
               Acesso <strong className="text-white">gratuito</strong> para assistir a filmes, séries e esportes originais do Prime Video.
             </p>
+
+            {/* Real-time Rating Button/Badge */}
+            {onOpenReviews && (
+              <button
+                onClick={() => onOpenReviews('prime')}
+                className="w-full mb-3 p-2 rounded-xl bg-slate-950/90 border border-slate-800 hover:border-cyan-500/40 text-left transition-all flex items-center justify-between group/rev"
+              >
+                <div className="flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  <span className="text-xs font-black text-white">4.9/5.0</span>
+                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                    98% Chrome
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-cyan-400 group-hover/rev:underline flex items-center gap-1">
+                  <MessageSquare className="w-3 h-3" />
+                  Avaliações
+                </span>
+              </button>
+            )}
 
             {/* Benefits List */}
             <ul className="space-y-2 mb-4 text-[11px] text-slate-300">
@@ -161,6 +183,26 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             <p className="text-slate-300 text-xs mb-3 leading-relaxed">
               Acesso <strong className="text-white">gratuito</strong> para assistir a filmes de Hollywood e séries exclusivas.
             </p>
+
+            {/* Real-time Rating Button/Badge */}
+            {onOpenReviews && (
+              <button
+                onClick={() => onOpenReviews('paramount')}
+                className="w-full mb-3 p-2 rounded-xl bg-slate-950/90 border border-slate-800 hover:border-blue-500/40 text-left transition-all flex items-center justify-between group/rev"
+              >
+                <div className="flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  <span className="text-xs font-black text-white">4.8/5.0</span>
+                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                    96% Chrome
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-blue-400 group-hover/rev:underline flex items-center gap-1">
+                  <MessageSquare className="w-3 h-3" />
+                  Avaliações
+                </span>
+              </button>
+            )}
 
             {/* Warning Notice */}
             <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-[10px] font-semibold mb-4 flex items-start gap-1.5">
@@ -253,6 +295,26 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             <p className="text-slate-300 text-xs mb-3 leading-relaxed">
               Código Digital / PIN original para resgate direto no site oficial <strong className="text-amber-300">recargajogo.com.br</strong>.
             </p>
+
+            {/* Real-time Rating Button/Badge */}
+            {onOpenReviews && (
+              <button
+                onClick={() => onOpenReviews('freefire')}
+                className="w-full mb-3 p-2 rounded-xl bg-slate-950/90 border border-slate-800 hover:border-amber-500/40 text-left transition-all flex items-center justify-between group/rev"
+              >
+                <div className="flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  <span className="text-xs font-black text-white">5.0/5.0</span>
+                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                    100% PINS Ok
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-amber-400 group-hover/rev:underline flex items-center gap-1">
+                  <MessageSquare className="w-3 h-3" />
+                  Avaliações
+                </span>
+              </button>
+            )}
 
             {/* Notice / Limit Rule */}
             <div className={`p-2.5 rounded-xl border text-[10px] font-semibold mb-4 leading-normal ${

@@ -102,3 +102,27 @@ export interface ChatMessage {
   content: string;
   timestamp: string;
 }
+
+export interface ServiceReview {
+  id: string;
+  service: 'prime' | 'paramount' | 'freefire';
+  userId?: string;
+  userName: string;
+  userEmail?: string;
+  userIp?: string;
+  browser?: string;
+  rating: number; // 1 to 5
+  status: 'working' | 'not_working';
+  comment: string;
+  createdAt: string;
+}
+
+export interface ServiceReviewStats {
+  service: 'prime' | 'paramount' | 'freefire';
+  totalReviews: number;
+  workingCount: number;
+  notWorkingCount: number;
+  successRate: number;
+  averageRating: number;
+  recentReviews: ServiceReview[];
+}
