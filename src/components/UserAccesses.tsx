@@ -207,13 +207,13 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                         </button>
                       </div>
                       <a
-                        href="https://recargajogo.com.br"
+                        href="https://www.portaldoscreditos.com.br/redeem"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="mt-2 w-full py-2 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/20 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
-                        Resgatar no Recarga Jogo
+                        Resgatar no Portal dos Créditos
                       </a>
                     </div>
                   ) : (

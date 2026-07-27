@@ -516,9 +516,8 @@ app.post('/api/services/generate-freefire', authenticateToken, (req: Authenticat
       message: '🎉 Código Digital Free Fire resgatado com sucesso!',
       pin: result.pin,
       instructions: [
-        'Acesse o site oficial da Garena: recargajogo.com.br',
-        'Faça login com a sua conta Free Fire (ID do jogador ou Facebook/Google).',
-        'Escolha a opção de resgate "E-Prepag" ou "Código Digital".',
+        'Acesse o site oficial de resgate: portaldoscreditos.com.br/redeem',
+        'Selecione Free Fire ou a opção de PIN/Gift Card.',
         'Insira o PIN fornecido e confirme o resgate dos seus 100 Diamantes + 10% de Bônus!'
       ]
     });

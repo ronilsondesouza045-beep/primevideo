@@ -83,7 +83,7 @@ export const ServiceReviewsModal: React.FC<ServiceReviewsModalProps> = ({
             userName: 'Gabriel FF',
             rating: 5,
             status: 'working',
-            comment: 'Resgatei 100 diamantes no recargajogo na hora! Excelente!',
+            comment: 'Resgatei 100 diamantes no portal dos créditos na hora! Excelente!',
             createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
           },
           {

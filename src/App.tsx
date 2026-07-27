@@ -428,7 +428,7 @@ export default function App() {
           email: user.email,
           password: 'N/A',
           pin: availableCode,
-          screen: 'Resgate em recargajogo.com.br'
+          screen: 'Resgate em portaldoscreditos.com.br/redeem'
         },
         createdAt: new Date().toISOString()
       };
@@ -445,7 +445,7 @@ export default function App() {
           isClaimed: true
         },
         code: availableCode,
-        message: '🎉 Código Digital Free Fire resgatado com sucesso! Resgate agora em recargajogo.com.br',
+        message: '🎉 Código Digital Free Fire resgatado com sucesso! Resgate agora em portaldoscreditos.com.br/redeem',
         success: true
       });
 

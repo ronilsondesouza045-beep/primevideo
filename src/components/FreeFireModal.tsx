@@ -135,20 +135,19 @@ export const FreeFireModal: React.FC<FreeFireModalProps> = ({
                 Como Resgatar Seus Diamantes:
               </h4>
               <ol className="list-decimal list-inside space-y-1.5 text-slate-300 text-[11px] leading-relaxed">
-                <li>Acesse o site oficial da Garena: <strong className="text-amber-300">recargajogo.com.br</strong></li>
-                <li>Selecione o jogo <strong className="text-amber-300">Free Fire</strong> e faça login com seu ID ou conta.</li>
-                <li>Escolha a forma de pagamento <strong className="text-amber-300">E-Prepag / Código Digital</strong>.</li>
-                <li>Cole o código acima e confirme o resgate!</li>
+                <li>Acesse o site oficial de resgate: <strong className="text-amber-300">portaldoscreditos.com.br/redeem</strong></li>
+                <li>Selecione o produto/jogo <strong className="text-amber-300">Free Fire</strong> e insira os dados da sua conta ou PIN.</li>
+                <li>Cole o código PIN gerado acima e confirme o resgate!</li>
               </ol>
 
               <a
-                href="https://recargajogo.com.br"
+                href="https://www.portaldoscreditos.com.br/redeem"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/20 font-bold text-xs flex items-center justify-center gap-2 transition-all"
               >
                 <ExternalLink className="w-4 h-4 text-amber-400" />
-                Ir para o Recarga Jogo (recargajogo.com.br)
+                Ir para o Portal dos Créditos (portaldoscreditos.com.br/redeem)
               </a>
             </div>
 

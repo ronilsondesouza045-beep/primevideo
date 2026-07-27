@@ -293,7 +293,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             </div>
 
             <p className="text-slate-300 text-xs mb-3 leading-relaxed">
-              Código Digital / PIN original para resgate direto no site oficial <strong className="text-amber-300">recargajogo.com.br</strong>.
+              Código Digital / PIN original para resgate direto no site oficial <strong className="text-amber-300">portaldoscreditos.com.br/redeem</strong>.
             </p>
 
             {/* Real-time Rating Button/Badge */}
@@ -343,7 +343,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
               </li>
               <li className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>Resgate Oficial Garena (Recarga Jogo)</span>
+                <span>Resgate Oficial (Portal dos Créditos)</span>
               </li>
             </ul>
           </div>
