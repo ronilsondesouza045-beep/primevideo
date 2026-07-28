@@ -152,6 +152,7 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {uniqueAccessLogs.map((a) => {
                 const isParamount = a.service === 'paramount';
+                const isCrunchyroll = a.service === 'crunchyroll';
                 const isFreeFire = a.service === 'freefire';
 
                 return (
@@ -160,6 +161,8 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                   className={`p-5 rounded-2xl bg-slate-900 border transition-all space-y-3 ${
                     isFreeFire
                       ? 'border-slate-800 hover:border-amber-500/50'
+                      : isCrunchyroll
+                      ? 'border-slate-800 hover:border-orange-500/50'
                       : isParamount
                       ? 'border-slate-800 hover:border-blue-500/40'
                       : 'border-slate-800 hover:border-cyan-500/40'
@@ -169,11 +172,13 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded border ${
                       isFreeFire
                         ? 'text-amber-300 bg-amber-950/60 border-amber-500/30'
+                        : isCrunchyroll
+                        ? 'text-orange-300 bg-orange-950/60 border-orange-500/30'
                         : isParamount
                         ? 'text-blue-400 bg-blue-950/60 border-blue-500/30'
                         : 'text-cyan-400 bg-cyan-950/60 border-cyan-500/30'
                     }`}>
-                      {isFreeFire ? 'FREE FIRE (100 DIAMANTES)' : isParamount ? 'PARAMOUNT+ GRÁTIS' : 'PRIME VIDEO GRÁTIS'}
+                      {isFreeFire ? 'FREE FIRE (100 DIAMANTES)' : isCrunchyroll ? 'CRUNCHYROLL GRÁTIS' : isParamount ? 'PARAMOUNT+ GRÁTIS' : 'PRIME VIDEO GRÁTIS'}
                     </span>
                     <span className="text-[10px] text-slate-400 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -185,12 +190,16 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
                       isFreeFire
                         ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                        : isCrunchyroll
+                        ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
                         : isParamount
                         ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
                         : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
                     }`}>
                       {isFreeFire ? (
                         <Flame className="w-5 h-5 text-amber-400 fill-amber-400" />
+                      ) : isCrunchyroll ? (
+                        <Tv className="w-5 h-5 text-orange-400" />
                       ) : isParamount ? (
                         <Tv className="w-5 h-5 text-blue-400" />
                       ) : (
@@ -199,10 +208,10 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-white">
-                        {isFreeFire ? 'Codiguin Free Fire' : isParamount ? 'Paramount+' : 'Prime Video VIP'}
+                        {isFreeFire ? 'Codiguin Free Fire' : isCrunchyroll ? 'Crunchyroll VIP' : isParamount ? 'Paramount+' : 'Prime Video VIP'}
                       </h4>
                       <span className="text-xs text-slate-400">
-                        {isFreeFire ? '100 Diamantes + 10% Bônus' : 'Acesso Gratuito'}
+                        {isFreeFire ? '100 Diamantes + 10% Bônus' : isCrunchyroll ? 'Animes, Desenhos & Filmes' : 'Acesso Gratuito'}
                       </span>
                     </div>
                   </div>
@@ -233,9 +242,9 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     </div>
                   ) : (
                     <>
-                      {isParamount && (
+                      {(isParamount || isCrunchyroll) && (
                         <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11px] text-amber-300 font-medium">
-                          ⚠️ A qualquer momento essa conta pode parar de funcionar.
+                          ⚠️ A qualquer momento o e-mail e a senha podem ser alterados.
                         </div>
                       )}
 
@@ -245,7 +254,7 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                           <button
                             onClick={() => copyText(`${a.id}_email`, a.credentials.email)}
                             className={`font-mono font-bold hover:underline flex items-center gap-1 ${
-                              isParamount ? 'text-blue-300' : 'text-cyan-300'
+                              isCrunchyroll ? 'text-orange-300' : isParamount ? 'text-blue-300' : 'text-cyan-300'
                             }`}
                           >
                             {a.credentials.email}
@@ -257,7 +266,7 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                           <button
                             onClick={() => copyText(`${a.id}_pwd`, a.credentials.password)}
                             className={`font-mono font-bold hover:underline flex items-center gap-1 ${
-                              isParamount ? 'text-blue-300' : 'text-cyan-300'
+                              isCrunchyroll ? 'text-orange-300' : isParamount ? 'text-blue-300' : 'text-cyan-300'
                             }`}
                           >
                             {a.credentials.password}
@@ -266,7 +275,7 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                         </div>
                       </div>
 
-                      {!isParamount && <PrimeCountdown createdAt={a.createdAt} />}
+                      {!isParamount && !isCrunchyroll && <PrimeCountdown createdAt={a.createdAt} />}
                     </>
                   )}
                 </div>

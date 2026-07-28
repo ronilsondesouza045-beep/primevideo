@@ -505,6 +505,12 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({
           {/* Quick Action Pills */}
           <div className="px-3 py-2 bg-slate-950/80 border-b border-slate-800/80 flex gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
             <button
+              onClick={() => handleSendMessage('Como resgatar meu Crunchyroll VIP com animes e desenhos?')}
+              className="px-2.5 py-1 rounded-full bg-orange-500/10 text-orange-300 border border-orange-500/30 whitespace-nowrap hover:bg-orange-500/20 transition-all font-medium"
+            >
+              🎌 Crunchyroll VIP
+            </button>
+            <button
               onClick={() => handleSendMessage('Como resgatar meu Paramount+ grátis?')}
               className="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30 whitespace-nowrap hover:bg-blue-500/20 transition-all font-medium"
             >

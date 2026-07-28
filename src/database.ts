@@ -16,7 +16,7 @@ export interface User {
 }
 
 export interface ServiceCredential {
-  serviceId: 'prime' | 'netflix' | 'paramount';
+  serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll';
   email: string;
   password: string;
   pin?: string;
@@ -29,7 +29,7 @@ export interface AccessLog {
   userId: string;
   userEmail: string;
   userIp?: string;
-  service: 'prime' | 'netflix' | 'paramount' | 'freefire';
+  service: 'prime' | 'netflix' | 'paramount' | 'freefire' | 'crunchyroll';
   credentials: {
     email: string;
     password: string;
@@ -53,7 +53,7 @@ export interface FreeFirePin {
 
 export interface ServiceReview {
   id: string;
-  service: 'prime' | 'paramount' | 'freefire';
+  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll';
   userId?: string;
   userName: string;
   userEmail?: string;
@@ -234,6 +234,17 @@ class JSONDatabase {
       serviceId: 'paramount',
       email: 'olivia8515@web-library.net',
       password: '4400988',
+      screen: 'Perfil Livre / Gratuito',
+      tonLink: ''
+    };
+
+    // Crunchyroll VIP Default (100% Gratuito)
+    // Email: skeespq11@hotmail.com
+    // Senha: 12344321
+    this.data.credentials['crunchyroll'] = {
+      serviceId: 'crunchyroll',
+      email: 'skeespq11@hotmail.com',
+      password: '12344321',
       screen: 'Perfil Livre / Gratuito',
       tonLink: ''
     };
@@ -470,15 +481,15 @@ class JSONDatabase {
   }
 
   // Credentials Methods
-  public getCredential(serviceId: 'prime' | 'netflix' | 'paramount'): ServiceCredential {
+  public getCredential(serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll'): ServiceCredential {
     return this.data.credentials[serviceId] || {
       serviceId,
-      email: serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
-      password: serviceId === 'paramount' ? '4400988' : 'roni141821'
+      email: serviceId === 'crunchyroll' ? 'skeespq11@hotmail.com' : serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
+      password: serviceId === 'crunchyroll' ? '12344321' : serviceId === 'paramount' ? '4400988' : 'roni141821'
     };
   }
 
-  public updateCredential(serviceId: 'prime' | 'netflix' | 'paramount', cred: Partial<ServiceCredential>) {
+  public updateCredential(serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll', cred: Partial<ServiceCredential>) {
     this.data.credentials[serviceId] = {
       ...this.data.credentials[serviceId],
       ...cred
@@ -494,7 +505,7 @@ class JSONDatabase {
   public addAccessLog(
     userId: string,
     userEmail: string,
-    service: 'prime' | 'netflix' | 'paramount' | 'freefire',
+    service: 'prime' | 'netflix' | 'paramount' | 'freefire' | 'crunchyroll',
     credentials: AccessLog['credentials'],
     userIp?: string
   ): AccessLog {

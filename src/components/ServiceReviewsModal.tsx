@@ -3,7 +3,7 @@ import { X, Star, ThumbsUp, ThumbsDown, MessageSquare, CheckCircle2, AlertTriang
 import { ServiceReview, ServiceReviewStats, User } from '../types';
 
 interface ServiceReviewsModalProps {
-  service: 'prime' | 'paramount' | 'freefire';
+  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll';
   currentUser?: User | null;
   onClose: () => void;
 }
@@ -30,18 +30,21 @@ export const ServiceReviewsModal: React.FC<ServiceReviewsModalProps> = ({
   const serviceNames = {
     prime: 'Prime Video VIP',
     paramount: 'Paramount+',
+    crunchyroll: 'Crunchyroll VIP (Animes)',
     freefire: 'Free Fire (100 Diamantes + Bônus)'
   };
 
   const serviceIcons = {
     prime: <Play className="w-5 h-5 text-cyan-400 fill-cyan-400" />,
     paramount: <Tv className="w-5 h-5 text-blue-400" />,
+    crunchyroll: <Tv className="w-5 h-5 text-orange-400" />,
     freefire: <Flame className="w-5 h-5 text-amber-400 fill-amber-400" />
   };
 
   const serviceColors = {
     prime: 'from-blue-600 to-cyan-500 text-cyan-400 border-cyan-500/30 bg-cyan-950/40',
     paramount: 'from-blue-700 to-indigo-600 text-blue-400 border-blue-500/30 bg-blue-950/40',
+    crunchyroll: 'from-orange-600 via-amber-600 to-yellow-500 text-orange-400 border-orange-500/30 bg-orange-950/40',
     freefire: 'from-amber-500 to-orange-600 text-amber-400 border-amber-500/30 bg-amber-950/40'
   };
 

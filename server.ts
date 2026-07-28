@@ -494,6 +494,44 @@ app.post('/api/services/generate-paramount', authenticateToken, (req: Authentica
   }
 });
 
+// Generate Free Crunchyroll Access
+app.post('/api/services/generate-crunchyroll', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const user = req.user!;
+    const userIp = getClientIp(req);
+
+    const crunchyCreds = db.getCredential('crunchyroll');
+
+    const releasedCredentials = {
+      email: crunchyCreds.email || 'skeespq11@hotmail.com',
+      password: crunchyCreds.password || '12344321',
+      screen: crunchyCreds.screen || 'Perfil Livre / Gratuito',
+      warning: 'Aviso: A qualquer momento o e-mail e a senha do Crunchyroll podem ser alterados ou parar de funcionar sem aviso prévio.'
+    };
+
+    const accessLog = db.addAccessLog(user.id, user.email, 'crunchyroll', releasedCredentials, userIp);
+
+    return res.json({
+      success: true,
+      message: 'Acesso Crunchyroll VIP gerado com sucesso!',
+      access: {
+        id: accessLog.id,
+        service: 'Crunchyroll VIP',
+        credentials: releasedCredentials,
+        generatedAt: accessLog.createdAt,
+        instructions: [
+          'Acesse o site ou app oficial do Crunchyroll (crunchyroll.com).',
+          'Insira o e-mail e a senha fornecidos acima.',
+          'Aproveite o catálogo organizado com Animes, Desenhos Animados e Filmes de Anime.',
+          'Atenção: A qualquer momento o e-mail e a senha podem ser alterados ou parar de funcionar.'
+        ]
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Erro ao liberar acesso ao Crunchyroll.' });
+  }
+});
+
 // Generate Free Fire PIN / Codiguin
 app.post('/api/services/generate-freefire', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   return res.status(400).json({
@@ -535,7 +573,7 @@ app.post('/api/reviews', (req: Request, res: Response) => {
   try {
     const { service, rating, status, comment, userName } = req.body;
 
-    if (!service || !['prime', 'paramount', 'freefire'].includes(service)) {
+    if (!service || !['prime', 'paramount', 'freefire', 'crunchyroll'].includes(service)) {
       return res.status(400).json({ error: 'Serviço inválido para avaliação.' });
     }
 
@@ -1060,6 +1098,7 @@ REGRAS RÍGIDAS DE SEGURANÇA QUE VOCÊ DEVE SEGUIR:
    - NUNCA forneça senhas de Prime Video se a pessoa estiver bloqueada.
 
 2. INFORMAÇÕES DA PLATAFORMA:
+   - CRUNCHYROLL VIP: 100% GRATUITO. E-mail: skeespq11@hotmail.com | Senha: 12344321. Catálogo organizado com Animes, Desenhos Animados e Filmes de Anime. AVISO IMPORTANTE: A qualquer momento o e-mail e a senha podem ser alterados ou parar de funcionar sem aviso prévio!
    - PARAMOUNT+: 100% GRATUITO. E-mail: olivia8515@web-library.net | Senha: 4400988. Sempre informe que a qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar.
    - PRIME VIDEO: É um serviço 100% GRATUITO ativo no momento (limite de 1 resgate por pessoa/IP). E-mail: primevideosouza368@gmail.com | Senha: roni141821.
    - FREE FIRE (100 DIAMANTES + 10% BÔNUS): O serviço de resgate automático de Codiguins/PINs está em MANUTENÇÃO TEMPORÁRIA para atualizações de estoque. Resgate feito em recargajogo.com.br.

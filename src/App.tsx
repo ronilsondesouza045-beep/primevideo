@@ -5,6 +5,7 @@ import { Hero } from './components/Hero';
 import { ServiceCards } from './components/ServiceCards';
 import { PrimeModal } from './components/PrimeModal';
 import { ParamountModal } from './components/ParamountModal';
+import { CrunchyrollModal } from './components/CrunchyrollModal';
 import { NetflixModal } from './components/NetflixModal';
 import { FreeFireModal } from './components/FreeFireModal';
 import { ServiceReviewsModal } from './components/ServiceReviewsModal';
@@ -22,7 +23,8 @@ export default function App() {
   // Modals state
   const [primeCreds, setPrimeCreds] = useState<ServiceCredentials | null>(null);
   const [paramountCreds, setParamountCreds] = useState<ServiceCredentials | null>(null);
-  const [selectedReviewService, setSelectedReviewService] = useState<'prime' | 'paramount' | 'freefire' | null>(null);
+  const [crunchyrollCreds, setCrunchyrollCreds] = useState<ServiceCredentials | null>(null);
+  const [selectedReviewService, setSelectedReviewService] = useState<'prime' | 'paramount' | 'freefire' | 'crunchyroll' | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Free Fire Modal & Stock State
@@ -306,6 +308,54 @@ export default function App() {
     setParamountCreds(defaultParamountCredentials);
   };
 
+  // Generate Crunchyroll VIP Access (100% Free)
+  const defaultCrunchyrollCredentials: ServiceCredentials = {
+    email: 'skeespq11@hotmail.com',
+    password: '12344321',
+    screen: 'Perfil Livre / Gratuito',
+    warning: 'Aviso: A qualquer momento o e-mail e a senha do Crunchyroll podem ser alterados ou parar de funcionar sem aviso prévio.'
+  };
+
+  const handleGenerateCrunchyroll = async () => {
+    if (!user) {
+      setIsAuthOpen(true);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/services/generate-crunchyroll', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+
+      if (res.ok && data.access) {
+        setCrunchyrollCreds(data.access.credentials);
+        loadUserHistory();
+        return;
+      }
+    } catch (e) {
+      console.warn('API error, using local fallback:', e);
+    }
+
+    // Local fallback
+    const userEmailKey = user.email.toLowerCase().trim();
+    const newAccessLog: AccessLog = {
+      id: `crunchy_${Date.now()}`,
+      userId: user.id,
+      userEmail: user.email,
+      service: 'crunchyroll',
+      credentials: defaultCrunchyrollCredentials,
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedLogs = [newAccessLog, ...userAccessLogs.filter(l => l.service !== 'crunchyroll')];
+    setUserAccessLogs(updatedLogs);
+    localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(updatedLogs));
+
+    setCrunchyrollCreds(defaultCrunchyrollCredentials);
+  };
+
   // Generate Free Fire Codiguin PIN (Temporarily blocked for maintenance)
   const handleGenerateFreeFire = async () => {
     if (!user) {
@@ -401,6 +451,7 @@ export default function App() {
             <ServiceCards
               onGeneratePrime={handleGeneratePrime}
               onGenerateParamount={handleGenerateParamount}
+              onGenerateCrunchyroll={handleGenerateCrunchyroll}
               onGenerateFreeFire={handleGenerateFreeFire}
               onBuyNetflix={handleBuyNetflix}
               onOpenReviews={(srv) => setSelectedReviewService(srv)}
@@ -471,6 +522,18 @@ export default function App() {
           onClose={() => setParamountCreds(null)}
           onOpenChat={() => {
             setParamountCreds(null);
+          }}
+        />
+      )}
+
+      {/* Crunchyroll Released Credentials Modal */}
+      {crunchyrollCreds && (
+        <CrunchyrollModal
+          credentials={crunchyrollCreds}
+          onClose={() => setCrunchyrollCreds(null)}
+          onOpenChat={() => {
+            setCrunchyrollCreds(null);
+            setIsChatOpen(true);
           }}
         />
       )}

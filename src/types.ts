@@ -23,7 +23,7 @@ export interface AccessLog {
   userId: string;
   userEmail: string;
   userIp?: string;
-  service: 'prime' | 'netflix' | 'paramount' | 'freefire';
+  service: 'prime' | 'netflix' | 'paramount' | 'freefire' | 'crunchyroll';
   credentials: ServiceCredentials;
   createdAt: string;
 }
@@ -105,7 +105,7 @@ export interface ChatMessage {
 
 export interface ServiceReview {
   id: string;
-  service: 'prime' | 'paramount' | 'freefire';
+  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll';
   userId?: string;
   userName: string;
   userEmail?: string;
@@ -118,7 +118,7 @@ export interface ServiceReview {
 }
 
 export interface ServiceReviewStats {
-  service: 'prime' | 'paramount' | 'freefire';
+  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll';
   totalReviews: number;
   workingCount: number;
   notWorkingCount: number;
