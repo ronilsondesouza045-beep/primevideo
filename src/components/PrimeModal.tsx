@@ -46,7 +46,7 @@ export const PrimeModal: React.FC<PrimeModalProps> = ({
         </button>
 
         {/* Modal Title */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
             <Play className="w-6 h-6 fill-cyan-400" />
           </div>
@@ -57,6 +57,25 @@ export const PrimeModal: React.FC<PrimeModalProps> = ({
             <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
               Prime Video VIP
             </h3>
+          </div>
+        </div>
+
+        {/* Catalog Banner Image */}
+        <div className="relative mb-5 rounded-2xl overflow-hidden border border-cyan-500/30 bg-slate-950 shadow-lg">
+          <img
+            src="https://www.estadao.com.br/resizer/v2/R7LIQKAH2VAPXH5FZC3WR4CBO4.jpg?auth=7bbc99ce8d477bc5ca0bf74b850e698ffc80c46235b29c3a71bda5629a0378cd"
+            alt="Catálogo Prime Video"
+            referrerPolicy="no-referrer"
+            className="w-full h-32 sm:h-36 object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+          <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[11px] font-bold text-cyan-200">
+            <span className="bg-slate-950/85 px-2.5 py-0.5 rounded-md border border-cyan-500/30 backdrop-blur-sm">
+              Filmes & Séries Exclusivas
+            </span>
+            <span className="bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded-md border border-cyan-500/40 backdrop-blur-sm">
+              4K Ultra HD
+            </span>
           </div>
         </div>
 

@@ -83,7 +83,7 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-2xl bg-red-600/20 border border-red-500/40 flex items-center justify-center font-black text-red-500 text-2xl">
             N
           </div>
@@ -95,6 +95,25 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
             <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
               {status === 'APROVADO' ? '🎉 Acesso Liberado!' : 'Pagamento de R$ 10,00'}
             </h3>
+          </div>
+        </div>
+
+        {/* Catalog Banner Image */}
+        <div className="relative mb-5 rounded-2xl overflow-hidden border border-red-500/30 bg-slate-950 shadow-lg">
+          <img
+            src="https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp"
+            alt="Catálogo Netflix VIP"
+            referrerPolicy="no-referrer"
+            className="w-full h-32 sm:h-36 object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+          <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[11px] font-bold text-red-200">
+            <span className="bg-slate-950/85 px-2.5 py-0.5 rounded-md border border-red-500/30 backdrop-blur-sm">
+              Filmes & Séries Exclusivas
+            </span>
+            <span className="bg-red-500/20 text-red-300 px-2.5 py-0.5 rounded-md border border-red-500/40 backdrop-blur-sm">
+              4K Ultra HD
+            </span>
           </div>
         </div>
 

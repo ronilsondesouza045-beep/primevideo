@@ -68,6 +68,25 @@ export const FreeFireModal: React.FC<FreeFireModalProps> = ({
           </p>
         </div>
 
+        {/* Catalog Banner Image */}
+        <div className="relative rounded-2xl overflow-hidden border border-amber-500/30 bg-slate-950 shadow-lg">
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10"
+            alt="Catálogo Free Fire"
+            referrerPolicy="no-referrer"
+            className="w-full h-32 sm:h-36 object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+          <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[11px] font-bold text-amber-200">
+            <span className="bg-slate-950/85 px-2.5 py-0.5 rounded-md border border-amber-500/30 backdrop-blur-sm">
+              Free Fire - Codiguin & PINs
+            </span>
+            <span className="bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-md border border-amber-500/40 backdrop-blur-sm">
+              100 Diamantes
+            </span>
+          </div>
+        </div>
+
         {activeError ? (
           /* Error / Out of Stock / Already Claimed State */
           <div className="space-y-4">

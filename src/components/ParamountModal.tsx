@@ -45,7 +45,7 @@ export const ParamountModal: React.FC<ParamountModalProps> = ({
         </button>
 
         {/* Modal Title */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
             <Tv className="w-6 h-6" />
           </div>
@@ -56,6 +56,25 @@ export const ParamountModal: React.FC<ParamountModalProps> = ({
             <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
               Paramount+ Oficial
             </h3>
+          </div>
+        </div>
+
+        {/* Catalog Banner Image */}
+        <div className="relative mb-5 rounded-2xl overflow-hidden border border-blue-500/30 bg-slate-950 shadow-lg">
+          <img
+            src="https://t2.tudocdn.net/703654?w=1200&h=1200"
+            alt="Catálogo Paramount+"
+            referrerPolicy="no-referrer"
+            className="w-full h-32 sm:h-36 object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+          <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[11px] font-bold text-blue-200">
+            <span className="bg-slate-950/85 px-2.5 py-0.5 rounded-md border border-blue-500/30 backdrop-blur-sm">
+              Filmes & Séries Exclusivas
+            </span>
+            <span className="bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-md border border-blue-500/40 backdrop-blur-sm">
+              Paramount+
+            </span>
           </div>
         </div>
 

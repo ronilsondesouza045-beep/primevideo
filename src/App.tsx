@@ -66,43 +66,11 @@ export default function App() {
   }, []);
 
   const checkFreeFireStatus = async () => {
-    try {
-      const res = await fetch('/api/services/freefire-status');
-      if (res.ok) {
-        const contentType = res.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          const data = await res.json();
-          if (data.stock) {
-            setFreeFireStock(data.stock);
-            return;
-          }
-        }
-      }
-    } catch (e) {}
-
-    // Local storage fallback for Vercel / static hosting
-    const rawClaimed = localStorage.getItem('streamhub_claimed_ff_pins');
-    let claimedList: { email: string; code: string }[] = [];
-    if (rawClaimed) {
-      try {
-        const parsed = JSON.parse(rawClaimed);
-        if (Array.isArray(parsed)) claimedList = parsed;
-      } catch (e) {}
-    }
-
-    const defaultCodes = [
-      'C3323966-7B78-4169-A43B-E99D5CDC776E',
-      'DC1CEA85-1356-4D70-9FB5-A5DB9BEFDEBD'
-    ];
-
-    const claimedCount = claimedList.length;
-    const available = Math.max(0, defaultCodes.length - claimedCount);
-
     setFreeFireStock({
-      total: defaultCodes.length,
-      available,
-      claimed: claimedCount,
-      outOfStock: available === 0
+      total: 0,
+      available: 0,
+      claimed: 0,
+      outOfStock: true
     });
   };
 
@@ -326,137 +294,18 @@ export default function App() {
     setParamountCreds(defaultParamountCredentials);
   };
 
-  // Generate Free Fire Codiguin PIN
+  // Generate Free Fire Codiguin PIN (Temporarily blocked for maintenance)
   const handleGenerateFreeFire = async () => {
     if (!user) {
       setIsAuthOpen(true);
       return;
     }
 
-    // 1. Try server API
-    try {
-      const res = await fetch('/api/services/generate-freefire', {
-        method: 'POST',
-        headers: getAuthHeaders()
-      });
-
-      if (res.ok) {
-        const contentType = res.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          const data = await res.json();
-          if (data.success) {
-            setFreeFireResult({
-              pin: data.pin,
-              code: data.pin?.code || data.code,
-              message: data.message || '🎉 Código Digital Free Fire resgatado com sucesso!',
-              success: true
-            });
-            checkFreeFireStatus();
-            loadUserHistory();
-            return;
-          } else {
-            setFreeFireResult({
-              message: data.error || data.message || 'Não há código do Free Fire disponível no momento ou você já atingiu o limite de resgates.',
-              success: false,
-              outOfStock: data.reason === 'out_of_stock',
-              alreadyClaimed: data.reason === 'already_claimed'
-            });
-            return;
-          }
-        }
-      }
-    } catch (err) {
-      console.log('Server API unreachable / Vercel static mode for Free Fire generation');
-    }
-
-    // 2. Client-side fallback (Guarantees instant generation on Vercel static sites)
-    const userEmailKey = user.email.toLowerCase();
-
-    // Check localStorage claimed PINs list
-    const rawClaimed = localStorage.getItem('streamhub_claimed_ff_pins');
-    let claimedList: { email: string; code: string; claimedAt: string }[] = [];
-    if (rawClaimed) {
-      try {
-        const parsed = JSON.parse(rawClaimed);
-        if (Array.isArray(parsed)) claimedList = parsed;
-      } catch (e) {}
-    }
-
-    // Check if user has already claimed a PIN
-    const existingClaim = claimedList.find(p => p.email.toLowerCase() === userEmailKey);
-    if (existingClaim) {
-      setFreeFireResult({
-        pin: {
-          id: `ff_pin_user_${user.id}`,
-          title: 'Free Fire - 100 Diamantes + 10% de Bônus',
-          code: existingClaim.code,
-          isClaimed: true
-        },
-        code: existingClaim.code,
-        message: '⚠️ Você já resgatou seu Código Digital do Free Fire! Veja seu PIN abaixo:',
-        success: true,
-        alreadyClaimed: true
-      });
-      return;
-    }
-
-    const defaultCodes = [
-      'C3323966-7B78-4169-A43B-E99D5CDC776E',
-      'DC1CEA85-1356-4D70-9FB5-A5DB9BEFDEBD'
-    ];
-
-    // Find available unclaimed PIN
-    const availableCode = defaultCodes.find(code => !claimedList.some(p => p.code === code));
-
-    if (availableCode) {
-      // Mark as claimed
-      const newClaim = {
-        email: userEmailKey,
-        code: availableCode,
-        claimedAt: new Date().toISOString()
-      };
-      claimedList.push(newClaim);
-      localStorage.setItem('streamhub_claimed_ff_pins', JSON.stringify(claimedList));
-
-      // Add to user access logs
-      const newAccessLog: AccessLog = {
-        id: `acc_ff_local_${Date.now()}`,
-        userId: user.id,
-        userEmail: user.email,
-        service: 'freefire',
-        credentials: {
-          email: user.email,
-          password: 'N/A',
-          pin: availableCode,
-          screen: 'Resgate em portaldoscreditos.com.br/redeem'
-        },
-        createdAt: new Date().toISOString()
-      };
-
-      const updatedLogs = [newAccessLog, ...userAccessLogs];
-      setUserAccessLogs(updatedLogs);
-      localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(updatedLogs));
-
-      setFreeFireResult({
-        pin: {
-          id: `ff_pin_${Date.now()}`,
-          title: 'Free Fire - 100 Diamantes + 10% de Bônus',
-          code: availableCode,
-          isClaimed: true
-        },
-        code: availableCode,
-        message: '🎉 Código Digital Free Fire resgatado com sucesso! Resgate agora em portaldoscreditos.com.br/redeem',
-        success: true
-      });
-
-      checkFreeFireStatus();
-    } else {
-      setFreeFireResult({
-        message: '⚠️ O estoque de PINs do Free Fire está temporariamente esgotado para novas contas. Novos códigos serão adicionados em breve!',
-        success: false,
-        outOfStock: true
-      });
-    }
+    setFreeFireResult({
+      message: '⚠️ O resgate de códigos do Free Fire está temporariamente suspenso para manutenção e atualização do sistema. Por favor, tente novamente em breve!',
+      success: false,
+      outOfStock: true
+    });
   };
 
   // Buy Netflix Access (R$ 10,00) - Temporarily blocked / Em Breve

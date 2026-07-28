@@ -496,44 +496,23 @@ app.post('/api/services/generate-paramount', authenticateToken, (req: Authentica
 
 // Generate Free Fire PIN / Codiguin
 app.post('/api/services/generate-freefire', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const user = req.user!;
-    const userIp = getClientIp(req);
-
-    const result = db.claimFreeFirePin(user.id, user.email, userIp);
-
-    if (!result.success) {
-      return res.status(400).json({
-        success: false,
-        reason: result.reason,
-        error: result.error,
-        pin: result.pin
-      });
-    }
-
-    return res.json({
-      success: true,
-      message: '🎉 Código Digital Free Fire resgatado com sucesso!',
-      pin: result.pin,
-      instructions: [
-        'Acesse o site oficial de resgate: portaldoscreditos.com.br/redeem',
-        'Selecione Free Fire ou a opção de PIN/Gift Card.',
-        'Insira o PIN fornecido e confirme o resgate dos seus 100 Diamantes + 10% de Bônus!'
-      ]
-    });
-  } catch (err: any) {
-    return res.status(500).json({ error: 'Erro ao resgatar PIN do Free Fire.' });
-  }
+  return res.status(400).json({
+    success: false,
+    reason: 'maintenance',
+    error: '⚠️ O resgate de códigos do Free Fire está temporariamente suspenso para manutenção e atualização do sistema. Por favor, tente novamente mais tarde!'
+  });
 });
 
 // Get Free Fire PINs Stock / Status
 app.get('/api/services/freefire-status', (req: Request, res: Response) => {
-  try {
-    const status = db.getFreeFirePinsStatus();
-    return res.json(status);
-  } catch (err) {
-    return res.status(500).json({ error: 'Erro ao buscar status dos PINs.' });
-  }
+  return res.json({
+    total: 0,
+    available: 0,
+    claimed: 0,
+    outOfStock: true,
+    isMaintenance: true,
+    message: 'Serviço em manutenção temporária'
+  });
 });
 
 // ==============================================
