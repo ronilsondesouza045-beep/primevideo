@@ -129,19 +129,34 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
           <h3 className="text-lg font-bold text-white">Meus Logins & Códigos Liberados (Prime, Paramount+ & Free Fire)</h3>
         </div>
 
-        {accessLogs.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-slate-900/50 border border-slate-800 text-center text-slate-400 text-xs">
-            Você ainda não gerou nenhum acesso ou PIN gratuito. Clique em "Gerar" no catálogo principal para resgatar!
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {accessLogs.map((a) => {
-              const isParamount = a.service === 'paramount';
-              const isFreeFire = a.service === 'freefire';
+        {(() => {
+          // Deduplicate logs strictly by service (1 card per service)
+          const uniqueAccessLogs: AccessLog[] = [];
+          const seenServices = new Set<string>();
+          for (const log of accessLogs) {
+            if (!seenServices.has(log.service)) {
+              seenServices.add(log.service);
+              uniqueAccessLogs.push(log);
+            }
+          }
 
-              return (
-                <div
-                  key={a.id}
+          if (uniqueAccessLogs.length === 0) {
+            return (
+              <div className="p-8 rounded-2xl bg-slate-900/50 border border-slate-800 text-center text-slate-400 text-xs">
+                Você ainda não gerou nenhum acesso ou PIN gratuito. Clique em "Gerar" no catálogo principal para resgatar!
+              </div>
+            );
+          }
+
+          return (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {uniqueAccessLogs.map((a) => {
+                const isParamount = a.service === 'paramount';
+                const isFreeFire = a.service === 'freefire';
+
+                return (
+                  <div
+                    key={a.id}
                   className={`p-5 rounded-2xl bg-slate-900 border transition-all space-y-3 ${
                     isFreeFire
                       ? 'border-slate-800 hover:border-amber-500/50'
@@ -258,7 +273,8 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
               );
             })}
           </div>
-        )}
+        );
+      })()}
       </div>
 
     </div>

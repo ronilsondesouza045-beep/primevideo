@@ -30,8 +30,8 @@ export const ParamountModal: React.FC<ParamountModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-blue-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-blue-950/60 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
+      <div className="relative w-full max-w-lg my-auto bg-slate-900 border border-blue-500/30 rounded-3xl p-5 sm:p-8 shadow-2xl shadow-blue-950/60 overflow-hidden max-h-[90vh] overflow-y-auto">
         
         {/* Glow Header */}
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-700 via-indigo-500 to-blue-400" />

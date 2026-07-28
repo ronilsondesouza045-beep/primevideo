@@ -23,6 +23,7 @@ export default function App() {
   const [primeCreds, setPrimeCreds] = useState<ServiceCredentials | null>(null);
   const [paramountCreds, setParamountCreds] = useState<ServiceCredentials | null>(null);
   const [selectedReviewService, setSelectedReviewService] = useState<'prime' | 'paramount' | 'freefire' | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Free Fire Modal & Stock State
   const [freeFireResult, setFreeFireResult] = useState<{
@@ -156,7 +157,7 @@ export default function App() {
         if (data.accessLogs && data.accessLogs.length > 0) {
           const merged = [...data.accessLogs];
           logs.forEach((l) => {
-            if (!merged.some((m) => m.id === l.id || (m.service === l.service && m.credentials.email === l.credentials.email))) {
+            if (!merged.some((m) => m.id === l.id || m.service === l.service)) {
               merged.push(l);
             }
           });
@@ -170,7 +171,18 @@ export default function App() {
       console.log('API history check bypassed, loading local storage logs');
     }
 
-    setUserAccessLogs(logs);
+    // Deduplicate logs strictly by service (1 card per service type)
+    const uniqueLogs: AccessLog[] = [];
+    const seenServices = new Set<string>();
+    for (const log of logs) {
+      if (!seenServices.has(log.service)) {
+        seenServices.add(log.service);
+        uniqueLogs.push(log);
+      }
+    }
+
+    localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(uniqueLogs));
+    setUserAccessLogs(uniqueLogs);
     setUserPayments(pymts);
   };
 
@@ -235,7 +247,7 @@ export default function App() {
       createdAt: new Date().toISOString()
     };
 
-    const updatedLogs = [newAccessLog, ...userAccessLogs];
+    const updatedLogs = [newAccessLog, ...userAccessLogs.filter(l => l.service !== 'prime')];
     setUserAccessLogs(updatedLogs);
     localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(updatedLogs));
 
@@ -287,7 +299,7 @@ export default function App() {
       createdAt: new Date().toISOString()
     };
 
-    const updatedLogs = [newAccessLog, ...userAccessLogs];
+    const updatedLogs = [newAccessLog, ...userAccessLogs.filter(l => l.service !== 'paramount')];
     setUserAccessLogs(updatedLogs);
     localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(updatedLogs));
 
@@ -375,10 +387,11 @@ export default function App() {
         setActiveTab={setActiveTab}
         onOpenAuth={() => setIsAuthOpen(true)}
         onLogout={handleLogout}
+        onOpenChat={() => setIsChatOpen(true)}
       />
 
       {/* Main Content Body */}
-      <main className="flex-1">
+      <main className="flex-1 pb-16 md:pb-0">
         {activeTab === 'home' && (
           <>
             <Hero
@@ -494,7 +507,12 @@ export default function App() {
       )}
 
       {/* Floating Support Chatbot */}
-      <SupportChatbot user={user} onSavePrimeAccess={loadUserHistory} />
+      <SupportChatbot 
+        user={user} 
+        onSavePrimeAccess={loadUserHistory} 
+        isOpenExternal={isChatOpen}
+        onToggleExternal={setIsChatOpen}
+      />
 
     </div>
   );

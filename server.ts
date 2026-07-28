@@ -1062,6 +1062,7 @@ REGRAS RÍGIDAS DE SEGURANÇA QUE VOCÊ DEVE SEGUIR:
 2. INFORMAÇÕES DA PLATAFORMA:
    - PARAMOUNT+: 100% GRATUITO. E-mail: olivia8515@web-library.net | Senha: 4400988. Sempre informe que a qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar.
    - PRIME VIDEO: É um serviço 100% GRATUITO ativo no momento (limite de 1 resgate por pessoa/IP). E-mail: primevideosouza368@gmail.com | Senha: roni141821.
+   - FREE FIRE (100 DIAMANTES + 10% BÔNUS): O serviço de resgate automático de Codiguins/PINs está em MANUTENÇÃO TEMPORÁRIA para atualizações de estoque. Resgate feito em recargajogo.com.br.
    - NETFLIX VIP: O serviço da Netflix está BLOQUEADO e TEMPORARIAMENTE INDISPONÍVEL (EM BREVE). NÃO há vendas ou liberações de Netflix no momento, pois o estoque está em reabastecimento. Se o cliente perguntar sobre a Netflix, diga educadamente que está bloqueada/indisponível temporariamente e estará disponível em breve!
    - Suporte / Admin: ronisouza495@gmail.com
 `;

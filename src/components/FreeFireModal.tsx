@@ -41,8 +41,8 @@ export const FreeFireModal: React.FC<FreeFireModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-amber-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-amber-950/50 space-y-6 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
+      <div className="relative w-full max-w-lg my-auto bg-slate-900 border border-amber-500/30 rounded-3xl p-5 sm:p-8 shadow-2xl shadow-amber-950/50 space-y-6 overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Glow overlay */}
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-orange-600/20 rounded-full blur-3xl pointer-events-none" />

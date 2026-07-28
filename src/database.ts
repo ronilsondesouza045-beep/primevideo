@@ -498,11 +498,29 @@ class JSONDatabase {
     credentials: AccessLog['credentials'],
     userIp?: string
   ): AccessLog {
+    const cleanIp = userIp ? userIp.replace(/^::ffff:/, '').trim() : '127.0.0.1';
+    const emailKey = userEmail ? userEmail.toLowerCase().trim() : '';
+
+    // Check if an access log for this user & service already exists
+    const existing = this.data.accessLogs.find(
+      l => l.service === service && (
+        (userId && l.userId === userId) ||
+        (emailKey && l.userEmail?.toLowerCase() === emailKey)
+      )
+    );
+
+    if (existing) {
+      existing.credentials = credentials;
+      existing.userIp = cleanIp;
+      this.save();
+      return existing;
+    }
+
     const log: AccessLog = {
       id: `acc_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       userId,
       userEmail,
-      userIp: userIp ? userIp.replace(/^::ffff:/, '').trim() : '127.0.0.1',
+      userIp: cleanIp,
       service,
       credentials,
       createdAt: new Date().toISOString()
@@ -696,10 +714,20 @@ class JSONDatabase {
 
 
   public getAccessLogs(userId?: string): AccessLog[] {
+    let list = this.data.accessLogs;
     if (userId) {
-      return this.data.accessLogs.filter(l => l.userId === userId);
+      list = list.filter(l => l.userId === userId);
     }
-    return this.data.accessLogs;
+    const seen = new Set<string>();
+    const deduplicated: AccessLog[] = [];
+    for (const log of list) {
+      const key = `${log.userId || log.userEmail?.toLowerCase() || ''}_${log.service}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        deduplicated.push(log);
+      }
+    }
+    return deduplicated;
   }
 
   // Payments Methods

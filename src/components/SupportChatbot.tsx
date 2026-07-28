@@ -6,10 +6,25 @@ import { StandingBotAvatar } from './StandingBotAvatar';
 interface SupportChatbotProps {
   user?: User | null;
   onSavePrimeAccess?: () => void;
+  isOpenExternal?: boolean;
+  onToggleExternal?: (open: boolean) => void;
 }
 
-export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrimeAccess }) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const SupportChatbot: React.FC<SupportChatbotProps> = ({ 
+  user, 
+  onSavePrimeAccess,
+  isOpenExternal,
+  onToggleExternal 
+}) => {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  
+  const isOpen = isOpenExternal !== undefined ? isOpenExternal : internalIsOpen;
+  const setIsOpen = (open: boolean) => {
+    setInternalIsOpen(open);
+    if (onToggleExternal) {
+      onToggleExternal(open);
+    }
+  };
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -111,7 +126,25 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
         `💡 *Este acesso também fica salvo para você na seção "Meus Acessos Liberados" no menu do seu perfil!*`;
     }
 
-    // 2. Prime Video
+    // 2. Free Fire / Codiguin / PIN / Diamantes
+    if (
+      lower.includes('freefire') ||
+      lower.includes('free fire') ||
+      lower.includes('codiguin') ||
+      lower.includes('diamante') ||
+      lower.includes('ff') ||
+      lower.includes('pin')
+    ) {
+      return `🔥 **Codiguin Free Fire (100 Diamantes + 10% Bônus):**\n\n` +
+        `⚠️ **Status do Serviço:** O resgate de Códigos Digitais / PINs do Free Fire está em **manutenção temporária** para atualizações e reabastecimento de estoque.\n\n` +
+        `📌 **Como Funciona o Resgate:**\n` +
+        `1. Acesse o portal oficial [recargajogo.com.br](https://recargajogo.com.br)\n` +
+        `2. Faça login com seu ID do Free Fire\n` +
+        `3. Insira o código digital PIN e confirme para receber seus diamantes na conta!\n\n` +
+        `💡 *Fique atento! Novos códigos serão adicionados ao catálogo principal assim que a manutenção for concluída.*`;
+    }
+
+    // 3. Prime Video
     if (
       lower.includes('prime') ||
       lower.includes('gratis') ||
@@ -386,11 +419,11 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
+    <div className="fixed bottom-16 md:bottom-6 right-2 md:right-6 z-50 flex flex-col items-end max-w-full">
       
       {/* Floating Welcome Speech Bubble Toast (When closed) */}
       {!isOpen && showToast && (
-        <div className="mb-3 max-w-xs bg-slate-900/95 border-2 border-red-500/80 rounded-2xl p-3 shadow-2xl shadow-red-900/50 backdrop-blur-md animate-fadeIn flex items-start gap-2.5 relative group cursor-pointer"
+        <div className="mb-2 max-w-xs bg-slate-900/95 border-2 border-red-500/80 rounded-2xl p-3 shadow-2xl shadow-red-900/50 backdrop-blur-md animate-fadeIn flex items-start gap-2.5 relative group cursor-pointer"
              onClick={() => setIsOpen(true)}>
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping absolute -top-1 -left-1"></div>
           <div className="flex-1">
@@ -424,7 +457,7 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
 
           <button
             onClick={() => setIsOpen(true)}
-            className="relative group p-2 rounded-3xl bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-2 border-red-600/70 shadow-2xl shadow-red-600/40 hover:scale-105 transition-all flex items-center justify-center overflow-visible"
+            className="relative group p-2 rounded-3xl bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-2 border-red-600/70 shadow-2xl shadow-red-600/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center overflow-visible"
             title="Abrir Atendimento com Bot Standing VIP"
           >
             <StandingBotAvatar size="md" isWaving={true} />
@@ -439,7 +472,7 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="w-80 sm:w-96 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl shadow-slate-950 flex flex-col h-[520px] overflow-hidden animate-fadeIn">
+        <div className="w-[calc(100vw-16px)] sm:w-96 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl shadow-slate-950 flex flex-col h-[78vh] sm:h-[520px] max-h-[560px] overflow-hidden animate-fadeIn">
           
           {/* Header with Standing Mascot & Live Status */}
           <div className="p-3.5 bg-gradient-to-r from-slate-950 via-purple-950/80 to-slate-950 border-b border-slate-800 flex items-center justify-between">
@@ -484,8 +517,14 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({ user, onSavePrim
               🎬 Prime Video
             </button>
             <button
-              onClick={() => handleSendMessage('Quando a Netflix vai estar disponível?')}
+              onClick={() => handleSendMessage('Como resgatar os diamantes do Free Fire?')}
               className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 whitespace-nowrap hover:bg-amber-500/20 transition-all font-medium"
+            >
+              🔥 Free Fire
+            </button>
+            <button
+              onClick={() => handleSendMessage('Quando a Netflix vai estar disponível?')}
+              className="px-2.5 py-1 rounded-full bg-red-500/10 text-red-300 border border-red-500/30 whitespace-nowrap hover:bg-red-500/20 transition-all font-medium"
             >
               🍿 Netflix (Em Breve)
             </button>

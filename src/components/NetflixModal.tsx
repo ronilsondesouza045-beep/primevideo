@@ -68,8 +68,8 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-red-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-red-950/80 overflow-hidden max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
+      <div className="relative w-full max-w-lg my-auto bg-slate-900 border border-red-500/40 rounded-3xl p-5 sm:p-8 shadow-2xl shadow-red-950/80 overflow-hidden max-h-[90vh] overflow-y-auto">
         
         {/* Glow Header */}
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-600 via-rose-500 to-purple-600" />
