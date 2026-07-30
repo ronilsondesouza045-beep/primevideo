@@ -10,9 +10,19 @@ export interface User {
   role: 'admin' | 'user';
   status: 'active' | 'blocked';
   avatarUrl?: string;
+  walletBalance?: number;
   createdAt: string;
   lastLoginAt?: string;
   lastIp?: string;
+}
+
+export interface FreeTrialClaim {
+  id: string;
+  userId: string;
+  userEmail: string;
+  ip: string;
+  type: 'followers' | 'likes';
+  claimedAt: string;
 }
 
 export interface ServiceCredential {
@@ -107,6 +117,67 @@ export interface SupportMessage {
   readByAdmin?: boolean;
 }
 
+export interface SmmService {
+  id: string;
+  serviceId: number;
+  name: string;
+  category: string;
+  originalRate: number;
+  rate: number;
+  min: number;
+  max: number;
+  refill: boolean;
+  cancel?: boolean;
+  type?: string;
+  description?: string;
+  enabled: boolean;
+}
+
+export interface SmmOrder {
+  id: string;
+  userId: string;
+  userEmail: string;
+  serviceId: number;
+  serviceName: string;
+  category: string;
+  link: string;
+  quantity: number;
+  cost: number;
+  supplierOrderId?: string | number;
+  refillId?: string | number;
+  status: 'PENDENTE_APROVACAO' | 'PENDENTE' | 'PROCESSANDO' | 'EM_ANDAMENTO' | 'CONCLUIDO' | 'PARCIAL' | 'CANCELADO';
+  isFreeTrial?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SmmConfig {
+  apiUrl: string;
+  apiKey: string;
+  profitMargin: number;
+  currencyRate: number;
+  autoSync: boolean;
+  enabled: boolean;
+  testMode: boolean;
+  cooldownHours: number;
+  freeTrialQty: number;
+  disabledServices?: number[];
+  disabledCategories?: string[];
+  bannedIps: string[];
+  lastSyncAt?: string;
+  lastApiStatus?: boolean | 'online' | 'offline' | string;
+  lastApiBalance?: string;
+  lastServicesCount?: number;
+  syncLogs?: Array<{
+    id?: string;
+    timestamp: string;
+    level?: string;
+    type?: string;
+    message: string;
+    details?: any;
+  }>;
+}
+
 interface DatabaseSchema {
   users: User[];
   credentials: Record<string, ServiceCredential>;
@@ -116,6 +187,10 @@ interface DatabaseSchema {
   supportMessages: SupportMessage[];
   freeFirePins: FreeFirePin[];
   reviews: ServiceReview[];
+  freeTrialClaims?: FreeTrialClaim[];
+  smmConfig?: SmmConfig;
+  smmServices?: SmmService[];
+  smmOrders?: SmmOrder[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -130,7 +205,22 @@ class JSONDatabase {
     visitorLogs: [],
     supportMessages: [],
     freeFirePins: [],
-    reviews: []
+    reviews: [],
+    freeTrialClaims: [],
+    smmConfig: {
+      apiUrl: process.env.SMM_API_URL || 'https://verifiedatacado.com/api/v2',
+      apiKey: process.env.SMM_API_KEY || 'fdd634b7dace29b68e6ac06a947e0407',
+      profitMargin: 2.0,
+      currencyRate: 1.0,
+      autoSync: true,
+      enabled: true,
+      testMode: false,
+      cooldownHours: 24,
+      freeTrialQty: 50,
+      bannedIps: []
+    },
+    smmServices: [],
+    smmOrders: []
   };
 
   constructor() {
@@ -165,6 +255,7 @@ class JSONDatabase {
     this.ensureDefaultCredentials();
     this.ensureDefaultFreeFirePins();
     this.ensureDefaultReviews();
+    this.ensureDefaultSmmServices();
     this.ensureSampleData();
   }
 
@@ -177,7 +268,21 @@ class JSONDatabase {
       visitorLogs: [],
       supportMessages: [],
       freeFirePins: [],
-      reviews: []
+      reviews: [],
+      smmConfig: {
+        apiUrl: process.env.SMM_API_URL || 'https://verifiedatacado.com/api/v2',
+        apiKey: process.env.SMM_API_KEY || 'fdd634b7dace29b68e6ac06a947e0407',
+        profitMargin: 2.0,
+        currencyRate: 1.0,
+        autoSync: true,
+        enabled: true,
+        testMode: true,
+        cooldownHours: 24,
+        freeTrialQty: 50,
+        bannedIps: []
+      },
+      smmServices: [],
+      smmOrders: []
     };
     this.save();
   }
@@ -1013,8 +1118,13 @@ class JSONDatabase {
       m => m.sender === 'user' && !m.readByAdmin
     ).length;
 
+    const smmOrders = this.data.smmOrders || [];
+    const smmTotalSales = smmOrders
+      .filter(o => o.status === 'CONCLUIDO' || o.status === 'PROCESSANDO' || o.status === 'EM_ANDAMENTO')
+      .reduce((sum, o) => sum + (o.cost || 0), 0);
+
     return {
-      totalSales,
+      totalSales: totalSales + smmTotalSales,
       totalUsers: this.data.users.length,
       primeAccessCount: primeCount,
       paramountAccessCount: paramountCount,
@@ -1030,8 +1140,502 @@ class JSONDatabase {
       otherVisits,
       mobileVisits,
       desktopVisits,
-      unreadMessagesCount
+      unreadMessagesCount,
+      smmOrdersCount: smmOrders.length,
+      smmTotalSales
     };
+  }
+
+  // SMM Methods & Defaults
+  private ensureDefaultSmmServices() {
+    if (!this.data.smmConfig) {
+      this.data.smmConfig = {
+        apiUrl: process.env.SMM_API_URL || 'https://verifiedatacado.com/api/v2',
+        apiKey: process.env.SMM_API_KEY || 'fdd634b7dace29b68e6ac06a947e0407',
+        profitMargin: 2.0,
+        currencyRate: 1.0,
+        autoSync: true,
+        enabled: true,
+        testMode: false,
+        cooldownHours: 24,
+        freeTrialQty: 50,
+        bannedIps: []
+      };
+    }
+    if (!this.data.smmOrders) {
+      this.data.smmOrders = [];
+    }
+    if (!this.data.smmServices || this.data.smmServices.length === 0) {
+      this.data.smmServices = [
+        {
+          id: 'smm_101',
+          serviceId: 101,
+          name: 'Instagram - Seguidores Brasileiros (Alta Qualidade & Reposição 30 Dias)',
+          category: 'Instagram - Seguidores',
+          originalRate: 4.25,
+          rate: 8.50,
+          min: 100,
+          max: 50000,
+          refill: true,
+          type: 'Default',
+          description: 'Seguidores 100% brasileiros com perfil ativo, foto e publicações. Entrega rápida e garantia de reposição de 30 dias.',
+          enabled: true
+        },
+        {
+          id: 'smm_102',
+          serviceId: 102,
+          name: 'Instagram - Seguidores Globais Reais (Entrega Imediata)',
+          category: 'Instagram - Seguidores',
+          originalRate: 2.60,
+          rate: 5.20,
+          min: 100,
+          max: 100000,
+          refill: true,
+          type: 'Default',
+          description: 'Seguidores mundiais reais. Ótimo para dar volume rápido e autoridade visual ao perfil.',
+          enabled: true
+        },
+        {
+          id: 'smm_103',
+          serviceId: 103,
+          name: 'Instagram - Curtidas em Fotos/Posts (Instantâneas & Reais)',
+          category: 'Instagram - Curtidas',
+          originalRate: 1.40,
+          rate: 2.80,
+          min: 100,
+          max: 20000,
+          refill: true,
+          type: 'Default',
+          description: 'Curtidas reais enviadas para suas fotos ou publicações. Início em 1-5 minutos.',
+          enabled: true
+        },
+        {
+          id: 'smm_104',
+          serviceId: 104,
+          name: 'Instagram - Curtidas Brasileiras em Reels & Vídeos',
+          category: 'Instagram - Curtidas',
+          originalRate: 1.80,
+          rate: 3.60,
+          min: 100,
+          max: 15000,
+          refill: true,
+          type: 'Default',
+          description: 'Curtidas de perfis brasileiros focadas em aumentar o engajamento no algoritmo do Reels.',
+          enabled: true
+        },
+        {
+          id: 'smm_105',
+          serviceId: 105,
+          name: 'Instagram - Visualizações em Reels/Stories/IGTV (Velocidade Máxima)',
+          category: 'Instagram - Visualizações',
+          originalRate: 0.60,
+          rate: 1.20,
+          min: 500,
+          max: 500000,
+          refill: false,
+          type: 'Default',
+          description: 'Milhares de visualizações entregues em tempo recorde para impulsionar suas métricas.',
+          enabled: true
+        },
+        {
+          id: 'smm_201',
+          serviceId: 201,
+          name: 'TikTok - Seguidores Reais & Ativos (Liberar Lives)',
+          category: 'TikTok',
+          originalRate: 6.50,
+          rate: 13.00,
+          min: 100,
+          max: 30000,
+          refill: true,
+          type: 'Default',
+          description: 'Seguidores reais para o seu perfil no TikTok. Excelente para liberar transmissões ao vivo.',
+          enabled: true
+        },
+        {
+          id: 'smm_202',
+          serviceId: 202,
+          name: 'TikTok - Curtidas em Vídeos (Entrega Rápida)',
+          category: 'TikTok',
+          originalRate: 1.90,
+          rate: 3.80,
+          min: 100,
+          max: 50000,
+          refill: true,
+          type: 'Default',
+          description: 'Aumente o engajamento dos seus vídeos para ranquear no feed Para Você (FYP).',
+          enabled: true
+        },
+        {
+          id: 'smm_203',
+          serviceId: 203,
+          name: 'TikTok - Visualizações Imediatas em Vídeos',
+          category: 'TikTok',
+          originalRate: 0.40,
+          rate: 0.80,
+          min: 1000,
+          max: 1000000,
+          refill: false,
+          type: 'Default',
+          description: 'Visualizações instantâneas para viralizar o seu conteúdo no TikTok.',
+          enabled: true
+        },
+        {
+          id: 'smm_301',
+          serviceId: 301,
+          name: 'YouTube - Inscritos Reais para Canal (Garantia 30 Dias)',
+          category: 'YouTube',
+          originalRate: 18.00,
+          rate: 36.00,
+          min: 100,
+          max: 10000,
+          refill: true,
+          type: 'Default',
+          description: 'Inscritos seguros para atingir as metas de monetização do seu canal no YouTube.',
+          enabled: true
+        },
+        {
+          id: 'smm_302',
+          serviceId: 302,
+          name: 'YouTube - Visualizações de Alta Retenção (Monetizáveis)',
+          category: 'YouTube',
+          originalRate: 8.00,
+          rate: 16.00,
+          min: 1000,
+          max: 50000,
+          refill: true,
+          type: 'Default',
+          description: 'Visualizações de tempo estendido com retenção real de público.',
+          enabled: true
+        },
+        {
+          id: 'smm_401',
+          serviceId: 401,
+          name: 'Kwai - Seguidores Reais para Perfil',
+          category: 'Kwai',
+          originalRate: 6.00,
+          rate: 12.00,
+          min: 100,
+          max: 20000,
+          refill: true,
+          type: 'Default',
+          description: 'Aumente sua audiência no Kwai com novos seguidores brasileiros reais.',
+          enabled: true
+        },
+        {
+          id: 'smm_501',
+          serviceId: 501,
+          name: 'Telegram - Membros para Canais e Grupos',
+          category: 'Telegram',
+          originalRate: 4.50,
+          rate: 9.00,
+          min: 100,
+          max: 30000,
+          refill: true,
+          type: 'Default',
+          description: 'Entrada de novos membros reais para impulsionar seu canal ou comunidade.',
+          enabled: true
+        }
+      ];
+    }
+    this.save();
+  }
+
+  public getSmmConfig(): SmmConfig {
+    return this.data.smmConfig || {
+      apiUrl: 'https://verifiedatacado.com/api/v2',
+      apiKey: 'fdd634b7dace29b68e6ac06a947e0407',
+      profitMargin: 2.0,
+      currencyRate: 1.0,
+      autoSync: true,
+      enabled: true,
+      testMode: false,
+      cooldownHours: 24,
+      freeTrialQty: 50,
+      disabledServices: [],
+      disabledCategories: [],
+      bannedIps: []
+    };
+  }
+
+  // Wallet Balance Management
+  public getUserWalletBalance(userId: string): number {
+    const user = this.data.users.find(u => u.id === userId || u.email.toLowerCase() === userId.toLowerCase());
+    return user?.walletBalance !== undefined ? user.walletBalance : 0.00;
+  }
+
+  public addWalletBalance(userId: string, amount: number): { success: boolean; newBalance: number; user?: User } {
+    const user = this.data.users.find(u => u.id === userId || u.email.toLowerCase() === userId.toLowerCase());
+    if (!user) {
+      return { success: false, newBalance: 0 };
+    }
+    const current = user.walletBalance || 0;
+    user.walletBalance = parseFloat((current + amount).toFixed(2));
+    this.save();
+    return { success: true, newBalance: user.walletBalance, user };
+  }
+
+  public deductWalletBalance(userId: string, amount: number): { success: boolean; newBalance: number; message?: string } {
+    const user = this.data.users.find(u => u.id === userId || u.email.toLowerCase() === userId.toLowerCase());
+    if (!user) {
+      return { success: false, newBalance: 0, message: 'Usuário não encontrado.' };
+    }
+    const current = user.walletBalance || 0;
+    if (current < amount) {
+      return {
+        success: false,
+        newBalance: current,
+        message: 'Saldo insuficiente em sua carteira. Recarregue no mínimo R$ 10,00 para continuar.'
+      };
+    }
+    user.walletBalance = parseFloat((current - amount).toFixed(2));
+    this.save();
+    return { success: true, newBalance: user.walletBalance };
+  }
+
+  // Free Trial Lock Management (Configurable Cooldown Hours per User ID & IP Address)
+  public checkFreeTrialEligibility(userId: string, userIp: string, type?: 'followers' | 'likes', isAdmin?: boolean): { eligible: boolean; remainingMs?: number; reason?: string } {
+    const config = this.getSmmConfig();
+
+    // Admins are always eligible to test without waiting for cooldown!
+    if (isAdmin) {
+      return { eligible: true, remainingMs: 0 };
+    }
+    
+    // Check if IP or user is banned
+    if (config.bannedIps && userIp && config.bannedIps.includes(userIp.trim())) {
+      return {
+        eligible: false,
+        remainingMs: 86400000,
+        reason: "❌ ACESSO BLOQUEADO: Seu IP foi temporariamente bloqueado por suspeita de uso indevido."
+      };
+    }
+
+    if (!this.data.freeTrialClaims) {
+      this.data.freeTrialClaims = [];
+    }
+    const now = Date.now();
+    const cooldownHours = config.cooldownHours || 24;
+    const COOLDOWN_MS = cooldownHours * 60 * 60 * 1000;
+
+    const matchingClaims = this.data.freeTrialClaims.filter(claim => {
+      const isSameUser = claim.userId && userId && claim.userId === userId;
+      const isSameIp = claim.ip && userIp && (claim.ip === userIp || claim.ip.trim() === userIp.trim());
+      const isWithinCooldown = (now - new Date(claim.claimedAt).getTime()) < COOLDOWN_MS;
+
+      return (isSameUser || isSameIp) && isWithinCooldown;
+    });
+
+    if (matchingClaims.length > 0) {
+      matchingClaims.sort((a, b) => new Date(b.claimedAt).getTime() - new Date(a.claimedAt).getTime());
+      const lastClaim = matchingClaims[0];
+      const timePassed = now - new Date(lastClaim.claimedAt).getTime();
+      const remainingMs = COOLDOWN_MS - timePassed;
+
+      return {
+        eligible: false,
+        remainingMs,
+        reason: `❌ BLOQUEADO: Você já resgatou seu teste gratuito recentemente. Aguarde o tempo restante de cooldown (${cooldownHours}h).`
+      };
+    }
+
+    return { eligible: true };
+  }
+
+  public clearFreeTrialClaims(userId?: string, ip?: string) {
+    if (!this.data.freeTrialClaims) {
+      this.data.freeTrialClaims = [];
+    } else if (userId || ip) {
+      this.data.freeTrialClaims = this.data.freeTrialClaims.filter(c => {
+        const matchUser = userId && c.userId === userId;
+        const matchIp = ip && c.ip && c.ip.trim() === ip.trim();
+        return !matchUser && !matchIp;
+      });
+    } else {
+      this.data.freeTrialClaims = [];
+    }
+    this.save();
+  }
+
+  public addFreeTrialClaim(userId: string, userEmail: string, userIp: string, type: 'followers' | 'likes'): FreeTrialClaim {
+    if (!this.data.freeTrialClaims) {
+      this.data.freeTrialClaims = [];
+    }
+    const claim: FreeTrialClaim = {
+      id: `FT_${Math.floor(100000 + Math.random() * 900000)}`,
+      userId,
+      userEmail,
+      ip: userIp || '0.0.0.0',
+      type,
+      claimedAt: new Date().toISOString()
+    };
+    this.data.freeTrialClaims.unshift(claim);
+    this.save();
+    return claim;
+  }
+
+  public updateSmmConfig(config: Partial<SmmConfig>) {
+    this.data.smmConfig = {
+      ...this.getSmmConfig(),
+      ...config
+    };
+    this.save();
+    return this.data.smmConfig;
+  }
+
+  public addSmmSyncLog(type: 'sync' | 'test' | 'error' | 'info', message: string, details?: string) {
+    const smmConfig = this.getSmmConfig();
+    if (!smmConfig.syncLogs) {
+      smmConfig.syncLogs = [];
+    }
+    smmConfig.syncLogs.unshift({
+      id: `LOG_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      timestamp: new Date().toISOString(),
+      type,
+      message,
+      details
+    });
+    // Keep last 100 logs
+    if (smmConfig.syncLogs.length > 100) {
+      smmConfig.syncLogs = smmConfig.syncLogs.slice(0, 100);
+    }
+    this.data.smmConfig = smmConfig;
+    this.save();
+  }
+
+  public toggleSmmCategoryDisabled(categoryName: string): string[] {
+    const smmConfig = this.getSmmConfig();
+    const disabled = smmConfig.disabledCategories || [];
+    let updated: string[];
+    if (disabled.includes(categoryName)) {
+      updated = disabled.filter(c => c !== categoryName);
+    } else {
+      updated = [...disabled, categoryName];
+    }
+    smmConfig.disabledCategories = updated;
+    this.data.smmConfig = smmConfig;
+    this.save();
+    return updated;
+  }
+
+  public toggleSmmServiceDisabled(serviceId: number): number[] {
+    const smmConfig = this.getSmmConfig();
+    const disabled = smmConfig.disabledServices || [];
+    let updated: number[];
+    if (disabled.includes(serviceId)) {
+      updated = disabled.filter(id => id !== serviceId);
+    } else {
+      updated = [...disabled, serviceId];
+    }
+    smmConfig.disabledServices = updated;
+    this.data.smmConfig = smmConfig;
+    this.save();
+    return updated;
+  }
+
+  public getSmmServices(): SmmService[] {
+    return (this.data.smmServices || []).filter(s => s.enabled);
+  }
+
+  public getAllSmmServices(): SmmService[] {
+    return this.data.smmServices || [];
+  }
+
+  public getSmmServiceById(serviceId: number): SmmService | undefined {
+    return (this.data.smmServices || []).find(s => Number(s.serviceId) === Number(serviceId));
+  }
+
+  public updateSmmServices(services: SmmService[]) {
+    this.data.smmServices = services;
+    this.save();
+  }
+
+  public addSmmOrder(
+    userId: string,
+    userEmail: string,
+    serviceId: number,
+    serviceName: string,
+    category: string,
+    link: string,
+    quantity: number,
+    cost: number,
+    supplierOrderId?: string | number,
+    status: SmmOrder['status'] = 'PROCESSANDO',
+    isFreeTrial: boolean = false
+  ): SmmOrder {
+    if (!this.data.smmOrders) {
+      this.data.smmOrders = [];
+    }
+
+    const newOrder: SmmOrder = {
+      id: `SMM_${Math.floor(100000 + Math.random() * 900000)}`,
+      userId,
+      userEmail,
+      serviceId,
+      serviceName,
+      category,
+      link,
+      quantity,
+      cost,
+      supplierOrderId: supplierOrderId || `MOCK_${Date.now()}`,
+      status,
+      isFreeTrial,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    this.data.smmOrders.unshift(newOrder);
+    this.save();
+    return newOrder;
+  }
+
+  public getSmmOrders(userId?: string): SmmOrder[] {
+    const orders = this.data.smmOrders || [];
+    if (userId) {
+      return orders.filter(o => o.userId === userId || o.userEmail?.toLowerCase() === userId.toLowerCase());
+    }
+    return orders;
+  }
+
+  public updateSmmOrderStatus(id: string, status: SmmOrder['status'], supplierOrderId?: string | number) {
+    if (!this.data.smmOrders) return null;
+    const order = this.data.smmOrders.find(o => o.id === id || String(o.supplierOrderId) === String(id));
+    if (order) {
+      order.status = status;
+      if (supplierOrderId) order.supplierOrderId = supplierOrderId;
+      order.updatedAt = new Date().toISOString();
+      this.save();
+      return order;
+    }
+    return null;
+  }
+
+  public updateSmmOrderRefill(id: string, refillId: string | number) {
+    if (!this.data.smmOrders) return null;
+    const order = this.data.smmOrders.find(o => o.id === id || String(o.supplierOrderId) === String(id));
+    if (order) {
+      order.refillId = refillId;
+      order.updatedAt = new Date().toISOString();
+      this.save();
+      return order;
+    }
+    return null;
+  }
+
+  public deleteSmmOrder(id: string, userId?: string, isAdmin: boolean = false): boolean {
+    if (!this.data.smmOrders) return false;
+    const initialLen = this.data.smmOrders.length;
+    this.data.smmOrders = this.data.smmOrders.filter(o => {
+      const isMatch = o.id === id || String(o.supplierOrderId) === String(id);
+      if (!isMatch) return true; // Keep non-matching
+      if (isAdmin) return false; // Admin can delete any match
+      if (userId && (o.userId === userId || o.userEmail?.toLowerCase() === userId.toLowerCase())) {
+        return false; // Owner can delete
+      }
+      return true; // Keep if not owner and not admin
+    });
+    const removed = this.data.smmOrders.length < initialLen;
+    if (removed) this.save();
+    return removed;
   }
 }
 

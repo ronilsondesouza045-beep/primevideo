@@ -8,6 +8,7 @@ import { ParamountModal } from './components/ParamountModal';
 import { CrunchyrollModal } from './components/CrunchyrollModal';
 import { NetflixModal } from './components/NetflixModal';
 import { FreeFireModal } from './components/FreeFireModal';
+import { IptvModal } from './components/IptvModal';
 import { ServiceReviewsModal } from './components/ServiceReviewsModal';
 import { UserAccesses } from './components/UserAccesses';
 import { AdminPanel } from './components/AdminPanel';
@@ -21,6 +22,7 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   // Modals state
+  const [isIptvModalOpen, setIsIptvModalOpen] = useState(false);
   const [primeCreds, setPrimeCreds] = useState<ServiceCredentials | null>(null);
   const [paramountCreds, setParamountCreds] = useState<ServiceCredentials | null>(null);
   const [crunchyrollCreds, setCrunchyrollCreds] = useState<ServiceCredentials | null>(null);
@@ -199,6 +201,12 @@ export default function App() {
     setUserAccessLogs([]);
     setUserPayments([]);
     checkPrimeStatus();
+  };
+
+  const handleUpdateUserBalance = (newBalance: number) => {
+    if (user) {
+      setUser({ ...user, walletBalance: newBalance });
+    }
   };
 
   // Generate Free Prime Video Access
@@ -449,6 +457,7 @@ export default function App() {
               onBuyNetflix={handleBuyNetflix}
             />
             <ServiceCards
+              onGenerateIptv={() => setIsIptvModalOpen(true)}
               onGeneratePrime={handleGeneratePrime}
               onGenerateParamount={handleGenerateParamount}
               onGenerateCrunchyroll={handleGenerateCrunchyroll}
@@ -568,6 +577,12 @@ export default function App() {
           onSimulateApprove={handleSimulateApprove}
         />
       )}
+
+      {/* IPTV Generator & Catalog Modal */}
+      <IptvModal
+        isOpen={isIptvModalOpen}
+        onClose={() => setIsIptvModalOpen(false)}
+      />
 
       {/* Floating Support Chatbot */}
       <SupportChatbot 

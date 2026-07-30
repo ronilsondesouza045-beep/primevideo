@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, AdminStats, PaymentRecord, VisitorLog, AccessLog } from '../types';
+import { User, AdminStats, PaymentRecord, VisitorLog, AccessLog, SmmOrder, SmmService } from '../types';
 import {
   ShieldCheck,
   Users,
@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Lock,
   Eye,
+  EyeOff,
   Monitor,
   Smartphone,
   Globe,
@@ -24,7 +25,16 @@ import {
   MessageSquare,
   Send,
   UserCheck,
-  Tv
+  Tv,
+  TrendingUp,
+  Link,
+  Layers,
+  Sparkles,
+  Settings,
+  ExternalLink,
+  Server,
+  Database,
+  ListFilter
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -35,12 +45,45 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'support' | 'visitors' | 'users' | 'accesses' | 'payments' | 'credentials'
   >('dashboard');
+
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [visitors, setVisitors] = useState<VisitorLog[]>([]);
   const [generatedAccesses, setGeneratedAccesses] = useState<(AccessLog & { userName?: string })[]>([]);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [supportChats, setSupportChats] = useState<any[]>([]);
+
+  // SMM Management State
+  const [smmBalance, setSmmBalance] = useState<{ balance: string; online: boolean; latencyMs: number } | null>(null);
+  const [smmOrders, setSmmOrders] = useState<SmmOrder[]>([]);
+  const [smmServices, setSmmServices] = useState<SmmService[]>([]);
+  const [smmConfig, setSmmConfig] = useState({
+    apiKey: 'fdd634b7dace29b68e6ac06a947e0407',
+    apiUrl: 'https://verifiedatacado.com/api/v2',
+    cooldownHours: 24,
+    freeTrialQty: 50,
+    bannedIps: [] as string[],
+    lastSyncAt: undefined as string | undefined,
+    lastApiStatus: undefined as boolean | undefined,
+    lastApiBalance: undefined as string | undefined,
+    lastServicesCount: undefined as number | undefined,
+    disabledCategories: [] as string[],
+    syncLogs: [] as any[]
+  });
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [connectionFeedback, setConnectionFeedback] = useState<{
+    success: boolean;
+    online: boolean;
+    message?: string;
+    error?: string;
+    balance?: string;
+    servicesCount?: number;
+    latencyMs?: number;
+    timestamp?: string;
+  } | null>(null);
+  const [newBanIp, setNewBanIp] = useState('');
+  const [syncingSmm, setSyncingSmm] = useState(false);
   const [selectedUserKey, setSelectedUserKey] = useState<string | null>(null);
   const [adminReplyText, setAdminReplyText] = useState('');
   const [sendingReply, setSendingReply] = useState(false);
@@ -160,12 +203,39 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         }
       }
 
+      // 7. Fetch SMM Supplier Balance & Config
+      const resBalance = await fetch('/api/smm/balance', fetchOptions);
+      if (resBalance.ok) {
+        const balData = await resBalance.json();
+        setSmmBalance({ balance: balData.balance || '0.00', online: balData.online, latencyMs: balData.latencyMs || 0 });
+      }
+
+      const resSmmOrders = await fetch('/api/admin/smm/orders', fetchOptions);
+      if (resSmmOrders.ok) {
+        const ordData = await resSmmOrders.json();
+        setSmmOrders(ordData.orders || []);
+      }
+
+      const resSmmConfig = await fetch('/api/admin/smm/config', fetchOptions);
+      if (resSmmConfig.ok) {
+        const cfgData = await resSmmConfig.json();
+        if (cfgData.config) setSmmConfig(cfgData.config);
+      }
+
+      const resSmmCatalog = await fetch('/api/smm/catalog', fetchOptions);
+      if (resSmmCatalog.ok) {
+        const catData = await resSmmCatalog.json();
+        setSmmServices(catData.services || []);
+      }
+
       // 7. Fetch Support Chats
       const resChats = await fetch('/api/admin/support/chats', fetchOptions);
       if (resChats.ok) {
         const data = await resChats.json();
         setSupportChats(data.chats || []);
       }
+
+
     } catch (err) {
       if (!silent) setErrorMsg('Erro ao conectar com o servidor do Painel Administrativo.');
     } finally {
@@ -319,6 +389,200 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       alert('Falha na comunicação com o servidor.');
     }
   };
+
+  const handleTestApiConnection = async () => {
+    try {
+      setTestingConnection(true);
+      setConnectionFeedback(null);
+      const res = await fetch('/api/admin/smm/test-connection', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({
+          apiUrl: smmConfig.apiUrl,
+          apiKey: smmConfig.apiKey
+        })
+      });
+      const data = await res.json();
+      setConnectionFeedback({
+        success: data.success,
+        online: data.online,
+        message: data.message,
+        error: data.error,
+        balance: data.balance,
+        servicesCount: data.servicesCount,
+        latencyMs: data.latencyMs,
+        timestamp: new Date().toLocaleString('pt-BR')
+      });
+
+      if (data.online) {
+        setSmmBalance({ balance: data.balance || '0.00', online: true, latencyMs: data.latencyMs || 0 });
+      } else {
+        setSmmBalance({ balance: '0.00', online: false, latencyMs: data.latencyMs || 999 });
+      }
+
+      loadAdminData(true);
+    } catch (err) {
+      setConnectionFeedback({
+        success: false,
+        online: false,
+        error: 'Erro na comunicação ao testar conexão com a API.',
+        timestamp: new Date().toLocaleString('pt-BR')
+      });
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
+  const handleToggleCategory = async (categoryName: string) => {
+    try {
+      const res = await fetch('/api/admin/smm/category/toggle', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({ categoryName })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSmmConfig(prev => ({
+          ...prev,
+          disabledCategories: data.disabledCategories || []
+        }));
+        loadAdminData(true);
+      }
+    } catch (err) {
+      console.error('Erro ao alternar categoria:', err);
+    }
+  };
+
+  const handleSyncSmmServices = async () => {
+    try {
+      setSyncingSmm(true);
+      const res = await fetch('/api/admin/smm/sync', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSuccessMsg(data.message || 'Serviços do catálogo SMM sincronizados com sucesso!');
+        loadAdminData(true);
+        setTimeout(() => setSuccessMsg(''), 4000);
+      } else {
+        alert(data.error || 'Erro ao sincronizar catálogo SMM.');
+      }
+    } catch (err) {
+      alert('Erro na comunicação ao sincronizar serviços SMM.');
+    } finally {
+      setSyncingSmm(false);
+    }
+  };
+
+  const handleSaveSmmSettings = async () => {
+    try {
+      const res = await fetch('/api/admin/smm/config', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+        body: JSON.stringify(smmConfig)
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSuccessMsg('Configurações do Módulo SMM salvas com sucesso!');
+        setTimeout(() => setSuccessMsg(''), 3000);
+      } else {
+        alert(data.error || 'Erro ao salvar configurações.');
+      }
+    } catch (err) {
+      alert('Erro ao salvar configurações SMM.');
+    }
+  };
+
+  const handleToggleSmmService = async (serviceId: number) => {
+    try {
+      const res = await fetch('/api/admin/smm/service/toggle', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({ serviceId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSmmServices(prev => prev.map(s => s.serviceId === serviceId ? { ...s, enabled: data.enabled } : s));
+      }
+    } catch (err) {
+      console.error('Erro ao alternar serviço:', err);
+    }
+  };
+
+  const handleAddBanIp = async () => {
+    if (!newBanIp.trim()) return;
+    const updated = Array.from(new Set([...(smmConfig.bannedIps || []), newBanIp.trim()]));
+    const newCfg = { ...smmConfig, bannedIps: updated };
+    setSmmConfig(newCfg);
+    setNewBanIp('');
+
+    await fetch('/api/admin/smm/config', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+      body: JSON.stringify(newCfg)
+    });
+    setSuccessMsg(`IP ${newBanIp} adicionado à lista de bloqueio.`);
+    setTimeout(() => setSuccessMsg(''), 3000);
+  };
+
+  const handleRemoveBanIp = async (ipToRemove: string) => {
+    const updated = (smmConfig.bannedIps || []).filter(ip => ip !== ipToRemove);
+    const newCfg = { ...smmConfig, bannedIps: updated };
+    setSmmConfig(newCfg);
+
+    await fetch('/api/admin/smm/config', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+      body: JSON.stringify(newCfg)
+    });
+  };
+
+  const handleResetSmmTrials = async () => {
+    if (!confirm('Deseja resetar e liberar todos os cooldowns de testes grátis agora?')) return;
+    try {
+      const res = await fetch('/api/admin/smm/reset-trials', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSuccessMsg(data.message || 'Cooldowns de teste resetados e liberados!');
+        setTimeout(() => setSuccessMsg(''), 4000);
+      }
+    } catch (err) {
+      alert('Erro ao resetar cooldowns.');
+    }
+  };
+
+  const handleUpdateSmmOrderStatus = async (orderId: string, status: SmmOrder['status']) => {
+    try {
+      const res = await fetch('/api/admin/smm/order/status', {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({ orderId, status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSmmOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+        setSuccessMsg(`Status do pedido #${orderId} alterado para ${status}`);
+        setTimeout(() => setSuccessMsg(''), 3000);
+      }
+    } catch (err) {
+      alert('Erro ao atualizar status do pedido.');
+    }
+  };
+
+
 
   // Filtered lists
   const filteredVisitors = visitors.filter(v =>
@@ -504,7 +768,553 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </button>
       </div>
 
-      {/* TAB 1: METRICS DASHBOARD */}
+      {/* TAB: SMM API & CATALOG CONFIGURATION */}
+      {activeTab === 'smm' && (
+        <div className="space-y-6 animate-fadeIn">
+          
+          {/* TOP METRICS CARDS */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <Users className="w-3.5 h-3.5 text-purple-400" /> Total Usuários
+              </span>
+              <p className="text-xl font-black text-white font-mono">
+                {stats?.totalUsers || users.length}
+              </p>
+              <p className="text-[10px] text-slate-500">Cadastrados na base</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-cyan-400" /> Solicitações Teste
+              </span>
+              <p className="text-xl font-black text-cyan-400 font-mono">
+                {smmOrders.length}
+              </p>
+              <p className="text-[10px] text-slate-500">Pedidos de teste gerados</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <Layers className="w-3.5 h-3.5 text-emerald-400" /> Serviços Sincronizados
+              </span>
+              <p className="text-xl font-black text-emerald-400 font-mono">
+                {smmConfig.lastServicesCount || smmServices.length}
+              </p>
+              <p className="text-[10px] text-slate-500">{smmServices.filter(s => s.enabled).length} serviços ativos</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <DollarSign className="w-3.5 h-3.5 text-amber-400" /> Saldo da API
+              </span>
+              <p className="text-xl font-black text-amber-300 font-mono">
+                R$ {smmConfig.lastApiBalance || smmBalance?.balance || '0.00'}
+              </p>
+              <p className="text-[10px] text-slate-500">Provedor Verified Atacado</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <Server className="w-3.5 h-3.5 text-sky-400" /> Status da API
+              </span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold font-mono ${smmBalance?.online ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'}`}>
+                  {smmBalance?.online ? '● ONLINE' : '○ OFFLINE'}
+                </span>
+                <span className="text-[10px] text-slate-500 font-mono">{smmBalance?.latencyMs || 0}ms</span>
+              </div>
+              <p className="text-[10px] text-slate-500">Resposta em tempo real</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <RefreshCw className="w-3.5 h-3.5 text-blue-400" /> Última Sincronização
+              </span>
+              <p className="text-xs font-bold text-slate-200 font-mono mt-1 truncate">
+                {smmConfig.lastSyncAt ? new Date(smmConfig.lastSyncAt).toLocaleString('pt-BR') : 'Ainda não sincronizado'}
+              </p>
+              <p className="text-[10px] text-slate-500">Catálogo do Fornecedor</p>
+            </div>
+
+          </div>
+
+          {/* MAIN API CONFIGURATION & ACTIONS CARD */}
+          <div className="bg-slate-900 border border-cyan-500/30 rounded-3xl p-6 space-y-6 shadow-xl shadow-cyan-950/20">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+              <div>
+                <h3 className="text-lg font-extrabold text-white flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-cyan-400" />
+                  <span>Configurações da API SMM</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Gerencie a credencial do provedor Verified Atacado, teste de conexão e sincronização do catálogo.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={handleTestApiConnection}
+                  disabled={testingConnection}
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 font-bold text-xs transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                >
+                  <Activity className={`w-4 h-4 ${testingConnection ? 'animate-spin text-cyan-400' : 'text-cyan-400'}`} />
+                  <span>{testingConnection ? 'Testando Conexão...' : 'Testar Conexão'}</span>
+                </button>
+
+                <button
+                  onClick={handleSyncSmmServices}
+                  disabled={syncingSmm}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs transition-all flex items-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-95 disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${syncingSmm ? 'animate-spin' : ''}`} />
+                  <span>{syncingSmm ? 'Sincronizando...' : 'Atualizar Catálogo'}</span>
+                </button>
+
+                <button
+                  onClick={handleResetSmmTrials}
+                  className="px-3.5 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-xs transition-all flex items-center gap-1.5 active:scale-95"
+                  title="Libera o cooldown de 24h para você e outros usuários realizarem novos testes"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Liberar Cooldowns</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Form Fields Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              
+              {/* URL da API */}
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                  URL da API <span className="text-cyan-400">(Padrão: https://verifiedatacado.com/api/v2)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={smmConfig.apiUrl}
+                    onChange={(e) => setSmmConfig({ ...smmConfig, apiUrl: e.target.value })}
+                    placeholder="https://verifiedatacado.com/api/v2"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-cyan-300 text-xs font-mono focus:outline-none focus:border-cyan-500 transition-colors"
+                  />
+                  <Server className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* API Key */}
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                  API Key <span className="text-slate-500">(Armazenada de forma segura no backend)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showApiKey ? 'text' : 'password'}
+                    value={smmConfig.apiKey}
+                    onChange={(e) => setSmmConfig({ ...smmConfig, apiKey: e.target.value })}
+                    placeholder="Insira sua chave de API aqui..."
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-500 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 p-1 transition-colors"
+                    title={showApiKey ? 'Ocultar API Key' : 'Exibir API Key'}
+                  >
+                    {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Intervalo do Teste Grátis (Horas) */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                  Intervalo de Teste (Horas)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="168"
+                  value={smmConfig.cooldownHours}
+                  onChange={(e) => setSmmConfig({ ...smmConfig, cooldownHours: parseInt(e.target.value) || 24 })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-500"
+                />
+                <p className="text-[10px] text-slate-500 mt-1">Bloqueio de solicitações por {smmConfig.cooldownHours}h</p>
+              </div>
+
+              {/* Quantidade por Teste Grátis */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                  Quantidade por Teste
+                </label>
+                <input
+                  type="number"
+                  min="10"
+                  max="1000"
+                  value={smmConfig.freeTrialQty}
+                  onChange={(e) => setSmmConfig({ ...smmConfig, freeTrialQty: parseInt(e.target.value) || 50 })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-500"
+                />
+                <p className="text-[10px] text-slate-500 mt-1">Ex: 50 curtidas/seguidores grátis</p>
+              </div>
+
+              {/* Save Button */}
+              <div className="md:col-span-2 flex items-end">
+                <button
+                  onClick={handleSaveSmmSettings}
+                  className="w-full px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 active:scale-95"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Salvar Configurações da API</span>
+                </button>
+              </div>
+
+            </div>
+
+            {/* TEST CONNECTION FEEDBACK CARD */}
+            {connectionFeedback && (
+              <div className={`p-5 rounded-2xl border ${connectionFeedback.online ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300' : 'bg-rose-950/40 border-rose-500/50 text-rose-300'} space-y-3 animate-in fade-in duration-300`}>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                  <div className="flex items-center gap-2">
+                    {connectionFeedback.online ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-rose-400" />
+                    )}
+                    <span className="font-extrabold text-sm text-white">
+                      {connectionFeedback.online ? 'Conexão com a API Estabelecida com Sucesso!' : 'Falha na Conexão com a API SMM'}
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono text-slate-400">
+                    Verificado em: {connectionFeedback.timestamp}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+                  <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-[10px] text-slate-400 block uppercase">Status</span>
+                    <strong className={connectionFeedback.online ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                      {connectionFeedback.online ? '● ONLINE' : '○ OFFLINE'}
+                    </strong>
+                  </div>
+
+                  <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-[10px] text-slate-400 block uppercase">Saldo Retornado</span>
+                    <strong className="text-white">
+                      R$ {connectionFeedback.balance || '0.00'}
+                    </strong>
+                  </div>
+
+                  <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-[10px] text-slate-400 block uppercase">Serviços no Provedor</span>
+                    <strong className="text-cyan-400">
+                      {connectionFeedback.servicesCount || 0} Serviços
+                    </strong>
+                  </div>
+
+                  <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-[10px] text-slate-400 block uppercase">Tempo de Resposta</span>
+                    <strong className="text-amber-300">
+                      {connectionFeedback.latencyMs || 0}ms
+                    </strong>
+                  </div>
+                </div>
+
+                <p className="text-xs leading-relaxed text-slate-300 pt-1">
+                  {connectionFeedback.message || connectionFeedback.error}
+                </p>
+              </div>
+            )}
+
+            {/* IP BAN LIST */}
+            <div className="pt-4 border-t border-slate-800 space-y-3">
+              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-rose-400" />
+                <span>Bloqueio de IPs & Usuários Abusivos ({smmConfig.bannedIps?.length || 0})</span>
+              </h4>
+
+              <div className="flex items-center gap-2 max-w-md">
+                <input
+                  type="text"
+                  placeholder="Digitar IP a ser banido (ex: 187.12.34.56)..."
+                  value={newBanIp}
+                  onChange={(e) => setNewBanIp(e.target.value)}
+                  className="flex-1 px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs font-mono"
+                />
+                <button
+                  onClick={handleAddBanIp}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all"
+                >
+                  Banir IP
+                </button>
+              </div>
+
+              {smmConfig.bannedIps && smmConfig.bannedIps.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {smmConfig.bannedIps.map((ip) => (
+                    <span
+                      key={ip}
+                      className="bg-rose-950/80 border border-rose-800 text-rose-300 px-2.5 py-1 rounded-lg text-xs font-mono flex items-center gap-2"
+                    >
+                      <span>{ip}</span>
+                      <button
+                        onClick={() => handleRemoveBanIp(ip)}
+                        className="text-rose-400 hover:text-white"
+                        title="Desbloquear IP"
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
+
+          {/* CATEGORY MANAGEMENT PANEL */}
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <ListFilter className="w-5 h-5 text-cyan-400" />
+                  <span>Gerenciamento de Categorias do Catálogo</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Ative ou desative categorias inteiras do catálogo exibido para os clientes.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+              {Array.from(new Set(smmServices.map(s => s.category))).map((cat: string) => {
+                const count = smmServices.filter(s => s.category === cat).length;
+                const isDisabled = (smmConfig.disabledCategories || []).includes(cat);
+
+                return (
+                  <div
+                    key={cat}
+                    className={`p-3.5 rounded-2xl border flex items-center justify-between transition-all ${isDisabled ? 'bg-slate-950/60 border-rose-900/50 text-slate-500' : 'bg-slate-950 border-slate-800 text-slate-200'}`}
+                  >
+                    <div className="truncate pr-2">
+                      <span className="font-bold text-xs block truncate text-white">{cat}</span>
+                      <span className="text-[10px] text-slate-500 font-mono">{count} serviços vinculados</span>
+                    </div>
+
+                    <button
+                      onClick={() => handleToggleCategory(cat)}
+                      className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all flex-shrink-0 ${isDisabled ? 'bg-rose-950 text-rose-400 border border-rose-800 hover:bg-rose-900' : 'bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900'}`}
+                    >
+                      {isDisabled ? 'Oculta' : 'Ativa'}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* SMM ORDERS MANAGEMENT TABLE */}
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Clock className="w-5 h-5 text-cyan-400" />
+                <span>Gerenciamento Global de Pedidos de Teste Grátis</span>
+              </h3>
+              <span className="text-xs font-mono text-slate-400">Total: {smmOrders.length} Solicitações</span>
+            </div>
+
+            {smmOrders.length === 0 ? (
+              <p className="text-xs text-slate-500 py-6 text-center">Nenhum pedido de teste grátis registrado no sistema.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-slate-300">
+                  <thead className="bg-slate-950 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+                    <tr>
+                      <th className="py-2.5 px-3">ID Pedido</th>
+                      <th className="py-2.5 px-3">Cliente / Email</th>
+                      <th className="py-2.5 px-3">Serviço</th>
+                      <th className="py-2.5 px-3">Link Destino</th>
+                      <th className="py-2.5 px-3 text-center">Qtd</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3">Data/Hora</th>
+                      <th className="py-2.5 px-3 text-right">Alterar Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-sans">
+                    {smmOrders.map((ord) => (
+                      <tr key={ord.id} className="hover:bg-slate-800/40 transition-colors">
+                        <td className="py-2.5 px-3 font-mono font-bold text-cyan-400">
+                          #{ord.id}
+                          {ord.supplierOrderId && (
+                            <span className="block text-[10px] text-slate-500">API: #{ord.supplierOrderId}</span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span className="font-bold text-white block">{ord.userEmail}</span>
+                          <span className="text-[10px] text-slate-500 font-mono">User ID: {ord.userId}</span>
+                        </td>
+                        <td className="py-2.5 px-3 max-w-xs">
+                          <span className="font-bold text-slate-200 block truncate">{ord.serviceName}</span>
+                          <span className="text-[10px] text-slate-500 font-mono">{ord.category}</span>
+                        </td>
+                        <td className="py-2.5 px-3 max-w-xs">
+                          <a
+                            href={ord.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-cyan-400 hover:underline truncate block flex items-center gap-1"
+                          >
+                            <span className="truncate max-w-[160px]">{ord.link}</span>
+                            <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                          </a>
+                        </td>
+                        <td className="py-2.5 px-3 text-center font-bold text-emerald-400">
+                          {ord.quantity}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-slate-950 border border-slate-800 text-slate-300">
+                            {ord.status}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-[10px] text-slate-400 whitespace-nowrap">
+                          {new Date(ord.createdAt).toLocaleString('pt-BR')}
+                        </td>
+                        <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                          <select
+                            value={ord.status}
+                            onChange={(e) => handleUpdateSmmOrderStatus(ord.id, e.target.value as SmmOrder['status'])}
+                            className="bg-slate-950 border border-slate-800 text-slate-200 text-xs px-2 py-1 rounded-lg focus:outline-none focus:border-cyan-500 font-mono"
+                          >
+                            <option value="PROCESSANDO">PROCESSANDO</option>
+                            <option value="CONCLUIDO">CONCLUIDO</option>
+                            <option value="EM_ANDAMENTO">EM_ANDAMENTO</option>
+                            <option value="PENDENTE_APROVACAO">PENDENTE_APROVACAO</option>
+                            <option value="PARCIAL">PARCIAL</option>
+                            <option value="CANCELADO">CANCELADO</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* SMM SYNC & AUDIT LOGS TABLE */}
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Database className="w-5 h-5 text-amber-400" />
+                <span>Logs de Auditoria & Sincronização SMM</span>
+              </h3>
+              <span className="text-xs font-mono text-slate-400">Últimos {smmConfig.syncLogs?.length || 0} Registros</span>
+            </div>
+
+            {(!smmConfig.syncLogs || smmConfig.syncLogs.length === 0) ? (
+              <p className="text-xs text-slate-500 py-6 text-center">Nenhum log de sincronização registrado até o momento.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-slate-300">
+                  <thead className="bg-slate-950 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+                    <tr>
+                      <th className="py-2.5 px-3">Data/Hora</th>
+                      <th className="py-2.5 px-3">Tipo / Nível</th>
+                      <th className="py-2.5 px-3">Mensagem</th>
+                      <th className="py-2.5 px-3">Detalhes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+                    {smmConfig.syncLogs.slice(0, 50).map((log, idx) => (
+                      <tr key={idx} className="hover:bg-slate-800/40 transition-colors">
+                        <td className="py-2 px-3 text-slate-400 whitespace-nowrap">
+                          {log.timestamp ? new Date(log.timestamp).toLocaleString('pt-BR') : '-'}
+                        </td>
+                        <td className="py-2 px-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            log.level === 'SUCCESS' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' :
+                            log.level === 'ERROR' ? 'bg-rose-950 text-rose-400 border border-rose-800' :
+                            'bg-blue-950 text-blue-400 border border-blue-800'
+                          }`}>
+                            {log.level}
+                          </span>
+                        </td>
+                        <td className="py-2 px-3 text-white font-sans font-medium">
+                          {log.message}
+                        </td>
+                        <td className="py-2 px-3 text-slate-400 truncate max-w-xs">
+                          {typeof log.details === 'object' ? JSON.stringify(log.details) : String(log.details || '-')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* CATALOG INDIVIDUAL SERVICES ACTIVATION */}
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-emerald-400" />
+                <span>Ativação Individual de Serviços no Catálogo Público</span>
+              </h3>
+              <span className="text-xs text-slate-400 font-mono">
+                {smmServices.filter(s => s.enabled).length} de {smmServices.length} Ativos
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-300">
+                <thead className="bg-slate-950 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+                  <tr>
+                    <th className="py-2.5 px-3">ID Serviço</th>
+                    <th className="py-2.5 px-3">Categoria</th>
+                    <th className="py-2.5 px-3">Nome do Serviço</th>
+                    <th className="py-2.5 px-3 text-center">Taxa Original</th>
+                    <th className="py-2.5 px-3 text-center">Status</th>
+                    <th className="py-2.5 px-3 text-right">Ação</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60 font-sans">
+                  {smmServices.slice(0, 100).map((srv) => (
+                    <tr key={srv.id} className="hover:bg-slate-800/40 transition-colors">
+                      <td className="py-2.5 px-3 font-mono font-bold text-cyan-400">
+                        #{srv.serviceId}
+                      </td>
+                      <td className="py-2.5 px-3 font-mono text-slate-400">
+                        {srv.category}
+                      </td>
+                      <td className="py-2.5 px-3 font-bold text-white max-w-md truncate">
+                        {srv.name}
+                      </td>
+                      <td className="py-2.5 px-3 text-center font-mono text-slate-300">
+                        R$ {srv.originalRate.toFixed(2)}
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${srv.enabled ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'}`}>
+                          {srv.enabled ? 'ATIVO' : 'DESATIVADO'}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        <button
+                          onClick={() => handleToggleSmmService(srv.serviceId)}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${srv.enabled ? 'bg-rose-950 text-rose-300 hover:bg-rose-900 border border-rose-800' : 'bg-emerald-950 text-emerald-300 hover:bg-emerald-900 border border-emerald-800'}`}
+                        >
+                          {srv.enabled ? 'Desativar' : 'Ativar'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      )}
       {activeTab === 'dashboard' && stats && (
         <div className="space-y-6 animate-fadeIn">
           {/* Main Stat Cards */}

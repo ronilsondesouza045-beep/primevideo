@@ -8,6 +8,7 @@ interface ServiceCardsProps {
   onGenerateCrunchyroll: () => void;
   onGenerateFreeFire: () => void;
   onBuyNetflix: () => void;
+  onGenerateIptv?: () => void;
   onOpenReviews?: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll') => void;
   primeBlocked?: boolean;
   primeError?: string | null;
@@ -25,6 +26,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
   onGenerateCrunchyroll,
   onGenerateFreeFire,
   onBuyNetflix,
+  onGenerateIptv,
   onOpenReviews,
   primeBlocked = false,
   primeError = null,
@@ -39,11 +41,117 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
           Catálogo VIP de Serviços & Prêmios Gratuitos
         </h2>
         <p className="text-slate-400 text-xs sm:text-sm mt-2 max-w-xl mx-auto">
-          Gerencie suas contas de streaming, veja as avaliações em tempo real de quem resgatou e pegue seu acesso instantâneo.
+          Gerencie suas contas de streaming, gere acessos de IPTV gratuitos com atualização instantânea e resgate seus benefícios.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        
+        {/* ======================================================== */}
+        {/* CARD 0: GERADOR & CATÁLOGO IPTV GRÁTIS (DESTAQUE PRINCIPAL) */}
+        {/* ======================================================== */}
+        <div className="relative rounded-3xl bg-gradient-to-b from-slate-900 via-indigo-950/40 to-slate-900 border-2 border-cyan-500/50 hover:border-cyan-400 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-cyan-500/20 group overflow-hidden md:col-span-2 lg:col-span-1">
+          
+          {/* Subtle Glow */}
+          <div className="absolute top-0 right-0 w-44 h-44 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/25 transition-all" />
+
+          <div>
+            {/* Header Badge */}
+            <div className="flex items-center justify-between gap-1.5 mb-4">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider text-cyan-300 bg-cyan-500/20 border border-cyan-500/40 uppercase flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-cyan-400 animate-pulse" />
+                100% GRÁTIS
+              </span>
+              <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+                31 Acessos Disponíveis
+              </span>
+            </div>
+
+            {/* Service Title & Logo Branding */}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 p-0.5 shadow-lg shadow-cyan-500/30 shrink-0">
+                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                  <Tv className="w-6 h-6 text-cyan-400" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-white leading-tight flex items-center gap-1.5">
+                  IPTV Grátis <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/30">M3U / XC</span>
+                </h3>
+                <p className="text-[11px] text-slate-300 font-medium">
+                  Catálogo & Gerador Instantâneo
+                </p>
+              </div>
+            </div>
+
+            <p className="text-slate-300 text-xs mb-3 leading-relaxed">
+              Gere usuários, senhas e listas M3U <strong className="text-white">gratuitamente</strong> para assistir a canais, filmes e séries.
+            </p>
+
+            {/* IPTV Banner */}
+            <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-cyan-500/40 group/img bg-slate-950 shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=800&q=80"
+                alt="Catálogo IPTV Grátis"
+                referrerPolicy="no-referrer"
+                className="w-full h-32 sm:h-36 object-cover object-center transform group-hover/img:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold text-cyan-200">
+                <span className="bg-slate-950/85 px-2 py-0.5 rounded-md border border-cyan-500/30 backdrop-blur-sm">
+                  Canais + Filmes + Séries
+                </span>
+                <span className="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-md border border-cyan-500/40 backdrop-blur-sm">
+                  FHD & 4K
+                </span>
+              </div>
+            </div>
+
+            {/* Warning Message Inside Card */}
+            <div className="p-2.5 rounded-xl border text-[10px] font-semibold mb-4 leading-normal bg-amber-950/60 border-amber-500/40 text-amber-200">
+              <div className="flex items-start gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                <span><strong>⚠️ AVISO:</strong> Alguns acessos podem estar ocupados por limite de conexões. Se não conectar, basta gerar outro usuário na hora!</span>
+              </div>
+            </div>
+
+            {/* Benefits List */}
+            <ul className="space-y-1.5 mb-4 text-[11px] text-slate-300">
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>31 Acessos Ativos Atualizados</span>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Usuário, Senha, Server DNS e M3U</span>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Cópia rápida em 1 Clique</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Action Button */}
+          <div>
+            <div className="p-2.5 mb-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
+              <span className="text-slate-400 text-[11px]">Servidor:</span>
+              <span className="font-mono font-bold text-cyan-300 text-[11px]">
+                ger99.xyz:80
+              </span>
+            </div>
+
+            <button
+              onClick={onGenerateIptv}
+              className="w-full py-3.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm shadow-xl shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white cursor-pointer transform active:scale-98"
+            >
+              <Sparkles className="w-4 h-4 text-cyan-200 animate-spin" />
+              <span>GERAR IPTV / VER CATÁLOGO</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+        </div>
         
         {/* ======================================================== */}
         {/* CARD 1: PRIME VIDEO (100% GRATUITO) */}

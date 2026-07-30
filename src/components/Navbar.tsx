@@ -61,7 +61,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
-              Início & Serviços
+              Início & Streaming
             </button>
 
             {user && (
@@ -93,7 +93,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </nav>
 
-          {/* User Auth Controls */}
+          {/* User Auth Controls & Golden Wallet */}
           <div className="flex items-center gap-2 sm:gap-3">
             {user ? (
               <div className="flex items-center gap-2 sm:gap-3">
@@ -118,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-emerald-500 border-2 border-slate-950 rounded-full" title="Sessão Ativa VIP"></span>
                 </div>
 
-                <div className="hidden sm:flex flex-col">
+                <div className="hidden lg:flex flex-col">
                   <span className="text-xs font-black text-slate-100 leading-tight">
                     {user.name || user.email.split('@')[0]}
                   </span>
@@ -148,7 +148,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
-      {/* Ergonomic Mobile Bottom Navigation Bar (Barra Fixa Inferior para Celular) */}
+      {/* Ergonomic Mobile Bottom Navigation Bar */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/90 py-1.5 px-2 flex items-center justify-around shadow-[0_-10px_25px_rgba(0,0,0,0.8)] pb-safe">
         <button
           onClick={() => setActiveTab('home')}
@@ -185,7 +185,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <MessageSquare className="w-5 h-5 mb-0.5" />
               <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             </div>
-            <span className="text-[10px]">Suporte 24h</span>
+            <span className="text-[10px]">Suporte</span>
           </button>
         )}
 
@@ -206,4 +206,5 @@ export const Navbar: React.FC<NavbarProps> = ({
     </>
   );
 };
+
 

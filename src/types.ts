@@ -5,6 +5,7 @@ export interface User {
   role: 'admin' | 'user';
   status: 'active' | 'blocked';
   avatarUrl?: string;
+  walletBalance?: number;
   createdAt?: string;
   lastLoginAt?: string;
   lastIp?: string;
@@ -126,3 +127,95 @@ export interface ServiceReviewStats {
   averageRating: number;
   recentReviews: ServiceReview[];
 }
+
+export interface FreeTrialClaim {
+  id: string;
+  userId: string;
+  userEmail: string;
+  ip: string;
+  type: 'followers' | 'likes';
+  claimedAt: string;
+}
+
+export interface SystemLog {
+  id: string;
+  timestamp: string;
+  level: 'info' | 'warn' | 'error' | 'security';
+  message: string;
+  details?: any;
+  ip?: string;
+}
+
+export interface SmmService {
+  id: string;
+  serviceId: number;
+  name: string;
+  category: string;
+  originalRate: number;
+  rate: number; // Retail rate in BRL per 1000
+  min: number;
+  max: number;
+  refill: boolean;
+  cancel?: boolean;
+  type?: string;
+  description?: string;
+  enabled: boolean;
+  freeTrialEnabled?: boolean;
+}
+
+export interface SmmOrder {
+  id: string;
+  userId: string;
+  userEmail: string;
+  userIp?: string;
+  serviceId: number;
+  serviceName: string;
+  category: string;
+  link: string;
+  quantity: number;
+  cost: number;
+  supplierOrderId?: string | number;
+  refillId?: string | number;
+  status: 'PENDENTE_APROVACAO' | 'PENDENTE' | 'PROCESSANDO' | 'EM_ANDAMENTO' | 'CONCLUIDO' | 'PARCIAL' | 'CANCELADO';
+  isFreeTrial?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SmmConfig {
+  apiUrl: string;
+  apiKey: string;
+  profitMargin: number; // e.g. 2.0 (100% profit margin)
+  currencyRate: number; // e.g. 1.0
+  autoSync: boolean;
+  enabled: boolean;
+  testMode: boolean;
+  cooldownHours: number; // Default 24h
+  freeTrialQty: number; // Default 50 units
+  disabledServices?: number[];
+  disabledCategories?: string[];
+  bannedIps: string[];
+  lastSyncAt?: string;
+  lastApiStatus?: boolean | 'online' | 'offline' | string;
+  lastApiBalance?: string;
+  lastServicesCount?: number;
+  syncLogs?: Array<{
+    id?: string;
+    timestamp: string;
+    level?: string;
+    type?: 'sync' | 'test' | 'error' | 'info' | string;
+    message: string;
+    details?: any;
+  }>;
+}
+
+export interface IptvAccount {
+  id: string;
+  username: string;
+  password: string;
+  expiration: string;
+  connections: number;
+  status: string;
+  server: string;
+}
+
