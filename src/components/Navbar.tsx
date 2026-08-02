@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from '../types';
-import { Tv, ShieldCheck, LogIn, LogOut, Sparkles, MessageSquare, KeyRound } from 'lucide-react';
+import { Tv, ShieldCheck, LogIn, LogOut, Sparkles, MessageSquare, KeyRound, Film } from 'lucide-react';
 
 interface NavbarProps {
   user: User | null;

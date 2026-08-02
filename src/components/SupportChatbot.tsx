@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User, ChatMessage } from '../types';
-import { X, Send, User as UserIcon, Loader2, Sparkles, Volume2, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { X, Send, User as UserIcon, Loader2, Sparkles, Volume2, CheckCircle2, ShieldCheck, Tv, Film, Zap, MessageSquare, Radio } from 'lucide-react';
 import { StandingBotAvatar } from './StandingBotAvatar';
 
 interface SupportChatbotProps {
@@ -34,7 +34,17 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({
     {
       id: 'init_1',
       role: 'assistant',
-      content: 'Olá! Sou o **Robô de Atendimento VIP**! 🤖🍿\nSeja bem-vindo ao suporte inteligente do StreamHub. Como posso te ajudar hoje?',
+      content: '🤖 **Central de Atendimento & Status StreamHub VIP** 🍿\n\n' +
+        'Seja bem-vindo(a) ao nosso suporte virtual inteligente! Confira abaixo o **Status em Tempo Real** da nossa plataforma:\n\n' +
+        '🟢 **SERVIÇOS NO AR (100% OPERACIONAIS & GRÁTIS):**\n' +
+        '• 📺 **IPTV Grátis (M3U / Xtream):** 31 Acessos ativos (Servidor `ger99.xyz:80`)\n' +
+        '• 🎬 **Prime Video VIP:** Liberação Instantânea\n' +
+        '• 🍿 **Paramount+ VIP:** Liberação Instantânea\n' +
+        '• 🎌 **Crunchyroll VIP:** Animes e Desenhos HD\n\n' +
+        '🔴 **SERVIÇOS FORA DO AR (EM MANUTENÇÃO / REABASTECENDO):**\n' +
+        '• 🔥 **Free Fire (Codiguin/PIN):** Em manutenção no portal oficial\n' +
+        '• 🎥 **Netflix VIP:** Estoque em reabastecimento (Em breve R$ 10/mês)\n\n' +
+        '💡 *Clique em uma das opções acima ou digite sua dúvida para o assistente te ajudar!*',
       timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -114,19 +124,94 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({
 
   const getSmartBotResponse = (query: string, currentUser?: User | null): string => {
     const lower = query.toLowerCase();
-    const firstName = currentUser?.name ? currentUser.name.split(' ')[0] : 'Cliente';
+    const firstName = currentUser?.name ? currentUser.name.split(' ')[0] : 'Cliente VIP';
 
-    // 1. Paramount+
+    // 1. General Status Check (O que tá no ar / O que tá fora do ar)
+    if (
+      lower.includes('status') ||
+      lower.includes('fora do ar') ||
+      lower.includes('funciona') ||
+      lower.includes('pegando') ||
+      lower.includes('no ar') ||
+      lower.includes('tudo') ||
+      lower.includes('organizado') ||
+      lower.includes('geral') ||
+      lower.includes('relatorio') ||
+      lower.includes('relatório')
+    ) {
+      return `📊 **Painel de Status dos Serviços (Atualizado)**\n\n` +
+        `🟢 **NO AR - FUNCIONANDO 100% (GRÁTIS):**\n` +
+        `• 📺 **IPTV Grátis (M3U / Xtream):** 31 Acessos Ativos | Servidor: \`ger99.xyz:80\`\n` +
+        `• 🎬 **Prime Video VIP:** Liberação Imediata (\`primevideosouza368@gmail.com\`)\n` +
+        `• 🍿 **Paramount+ VIP:** Liberação Imediata (\`olivia8515@web-library.net\`)\n` +
+        `• 🎌 **Crunchyroll VIP:** Animes em HD (\`skeespq11@hotmail.com\`)\n\n` +
+        `🔴 **FORA DO AR - EM MANUTENÇÃO / REABASTECIMENTO:**\n` +
+        `• 🔥 **Free Fire (Codiguin/PIN):** Manutenção no portal oficial e lote de estoque\n` +
+        `• 🎥 **Netflix VIP:** Estoque em reabastecimento (Lançamento em breve por R$ 10/mês)\n\n` +
+        `💡 *Para usar o IPTV, clique no card de IPTV ou peça a lista aqui! Se um usuário IPTV estiver cheio, basta gerar outro usuário!*`;
+    }
+
+    // 2. IPTV Grátis / M3U / Listas / Canais
+    if (
+      lower.includes('iptv') ||
+      lower.includes('m3u') ||
+      lower.includes('canal') ||
+      lower.includes('canais') ||
+      lower.includes('ger99') ||
+      lower.includes('xtream') ||
+      lower.includes('filme') ||
+      lower.includes('serie') ||
+      lower.includes('série')
+    ) {
+      return `📺 **Catálogo & Gerador de IPTV Grátis (31 Acessos Ativos):**\n\n` +
+        `🟢 **Status:** 100% ONLINE E OPERACIONAL\n` +
+        `🌐 **Servidor / DNS:** \`http://ger99.xyz:80\`\n` +
+        `📊 **Total de Contas Disponíveis:** 31 Usuários com validade estendida\n\n` +
+        `📌 **Exemplo de Acesso IPTV Pronto:**\n` +
+        `• **Usuário:** \`WKSH7D9F23\`\n` +
+        `• **Senha:** \`diwnRPxesR\`\n` +
+        `• **Server:** \`http://ger99.xyz:80\`\n\n` +
+        `⚠️ **Aviso Importante:** Cada conta permite 1 conexão por vez. Se a conta acima der erro ou estiver ocupada, abra o card **IPTV Grátis** no topo do site para clicar em **"Gerar Outro Usuário"** ou ver a lista completa!`;
+    }
+
+    // 3. Crunchyroll VIP / Animes
+    if (
+      lower.includes('crunchyroll') ||
+      lower.includes('anime') ||
+      lower.includes('desenho')
+    ) {
+      return `🎌 **Acesso Crunchyroll VIP Liberado!**\n\n` +
+        `🟢 **Status:** 100% ONLINE E OPERACIONAL\n` +
+        `📧 **E-mail:** \`skeespq11@hotmail.com\`\n` +
+        `🔑 **Senha:** \`12344321\`\n\n` +
+        `📌 **Instruções:** Acesse o app ou site [crunchyroll.com](https://www.crunchyroll.com) e faça login.\n\n` +
+        `⚠️ **Nota:** Por ser uma conta pública gratuita, os acessos podem ser alterados periodicamente.`;
+    }
+
+    // 4. Paramount+
     if (lower.includes('paramount')) {
-      return `🎉 **Acesso Paramount+ Gratuito Liberado!**\n\n` +
+      return `🍿 **Acesso Paramount+ Gratuito Liberado!**\n\n` +
+        `🟢 **Status:** 100% ONLINE E OPERACIONAL\n` +
         `📧 **E-mail:** \`olivia8515@web-library.net\`\n` +
         `🔑 **Senha:** \`4400988\`\n\n` +
-        `⚠️ **Aviso:** A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.\n\n` +
         `📌 **Instruções:** Acesse [paramountplus.com](https://www.paramountplus.com) e faça login.\n\n` +
+        `⚠️ **Nota:** Acesso mantido e atualizado regularmente pelo sistema.`;
+    }
+
+    // 5. Prime Video
+    if (
+      lower.includes('prime') ||
+      lower.includes('amazon')
+    ) {
+      return `🎬 **Acesso Prime Video VIP Liberado com Sucesso!**\n\n` +
+        `🟢 **Status:** 100% ONLINE E OPERACIONAL\n` +
+        `📧 **E-mail:** \`primevideosouza368@gmail.com\`\n` +
+        `🔑 **Senha:** \`roni141821\`\n\n` +
+        `📌 **Instruções:** Acesse [primevideo.com](https://www.primevideo.com) e faça login.\n\n` +
         `💡 *Este acesso também fica salvo para você na seção "Meus Acessos Liberados" no menu do seu perfil!*`;
     }
 
-    // 2. Free Fire / Codiguin / PIN / Diamantes
+    // 6. Free Fire / Codiguin / PIN / Diamantes
     if (
       lower.includes('freefire') ||
       lower.includes('free fire') ||
@@ -135,34 +220,13 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({
       lower.includes('ff') ||
       lower.includes('pin')
     ) {
-      return `🔥 **Codiguin Free Fire (100 Diamantes + 10% Bônus):**\n\n` +
-        `⚠️ **Status do Serviço:** O resgate de Códigos Digitais / PINs do Free Fire está em **manutenção temporária** para atualizações e reabastecimento de estoque.\n\n` +
-        `📌 **Como Funciona o Resgate:**\n` +
-        `1. Acesse o portal oficial [recargajogo.com.br](https://recargajogo.com.br)\n` +
-        `2. Faça login com seu ID do Free Fire\n` +
-        `3. Insira o código digital PIN e confirme para receber seus diamantes na conta!\n\n` +
-        `💡 *Fique atento! Novos códigos serão adicionados ao catálogo principal assim que a manutenção for concluída.*`;
+      return `🔴 **Free Fire Codiguin / PIN (Status: FORA DO AR):**\n\n` +
+        `⚠️ **Status do Serviço:** O resgate automático de PINs de 100 Diamantes do Free Fire está em **manutenção temporária** para reabastecimento de lote e atualização do portal [recargajogo.com.br](https://recargajogo.com.br).\n\n` +
+        `📌 **Previsão:** Novos lotes de códigos digitais serão disponibilizados assim que a manutenção do fornecedor for concluída.\n\n` +
+        `💡 Enquanto isso, aproveite os serviços de **IPTV**, **Prime Video** e **Paramount+** 100% GRATUITOS na plataforma!`;
     }
 
-    // 3. Prime Video
-    if (
-      lower.includes('prime') ||
-      lower.includes('gratis') ||
-      lower.includes('gratuito') ||
-      lower.includes('resgatar') ||
-      lower.includes('como') ||
-      lower.includes('senha') ||
-      lower.includes('conta') ||
-      lower.includes('acesso')
-    ) {
-      return `🎉 **Acesso Prime Video VIP Liberado com Sucesso!**\n\n` +
-        `📧 **E-mail:** \`primevideosouza368@gmail.com\`\n` +
-        `🔑 **Senha:** \`roni141821\`\n\n` +
-        `📌 **Instruções:** Acesse [primevideo.com](https://www.primevideo.com) e faça login.\n\n` +
-        `💡 *Este acesso também fica salvo para você na seção "Meus Acessos Liberados" no menu do seu perfil!*`;
-    }
-
-    // 3. Netflix / Valor / Ton / Pix
+    // 7. Netflix / Valor / Ton / Pix
     if (
       lower.includes('netflix') ||
       lower.includes('10') ||
@@ -173,13 +237,13 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({
       lower.includes('pix') ||
       lower.includes('ton')
     ) {
-      return `🍿 **Netflix VIP (Em Breve):**\n\n` +
-        `O serviço da Netflix está temporariamente indisponível para novos pedidos pois nosso estoque de contas VIP está em fase de reabastecimento.\n\n` +
-        `Assim que reabastecido, estará disponível por apenas **R$ 10,00/mês** via Pix ou Cartão pelo nosso checkout oficial Ton.\n\n` +
-        `💡 Enquanto isso, aproveite o **Prime Video** e **Paramount+** 100% GRATUITOS disponíveis na plataforma!`;
+      return `🔴 **Netflix VIP (Status: FORA DO AR / REABASTECENDO):**\n\n` +
+        `⚠️ O serviço da Netflix está temporariamente indisponível pois nosso estoque de telas VIP está sendo reabastecido.\n\n` +
+        `📌 **Lançamento Em Breve:** Valor promocional de **R$ 10,00/mês** com pagamento via Pix e Ton com aprovação automática.\n\n` +
+        `💡 Aproveite os outros serviços da plataforma que estão **100% ON-LINE e GRATUITOS**!`;
     }
 
-    // 4. Admin / Suporte / Contato / Roni
+    // 8. Admin / Suporte / Contato / Roni
     if (
       lower.includes('admin') ||
       lower.includes('administrador') ||
@@ -190,14 +254,14 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({
       lower.includes('contato') ||
       lower.includes('email')
     ) {
-      return `✉️ **Atendimento com o Administrador:**\n\n` +
-        `Você pode entrar em contato diretamente com a administração oficial:\n` +
-        `• **E-mail do Admin:** \`ronisouza495@gmail.com\`\n` +
-        `• **Atendimento:** Resposta rápida em até 24 horas.\n\n` +
+      return `✉️ **Atendimento Direto com o Administrador Roni:**\n\n` +
+        `• **E-mail Oficial:** \`ronisouza495@gmail.com\`\n` +
+        `• **Tempo Médio de Resposta:** Até 24 horas\n` +
+        `• **Suporte no Chat:** Sua mensagem digitada aqui no chat também é encaminhada para a caixa do Admin no painel!\n\n` +
         `Como posso te ajudar por aqui enquanto isso, ${firstName}?`;
     }
 
-    // 5. Saudações
+    // 9. Saudações
     if (
       lower.includes('ola') ||
       lower.includes('olá') ||
@@ -208,17 +272,16 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({
       lower.includes('tudo bem') ||
       lower.includes('fala')
     ) {
-      return `👋 Olá, ${firstName}! Sou a **Assistente Virtual StreamHub VIP**! 🤖🍿\n\nComo posso te ajudar hoje? Você pode me perguntar sobre como resgatar o Prime Video e Paramount+ grátis ou como falar com o suporte.`;
+      return `👋 Olá, ${firstName}! Sou a **Assistente Virtual StreamHub VIP**! 🤖🍿\n\nEstou aqui para te ajudar. Você pode pedir o **Status Geral** dos serviços, resgatar o **IPTV Grátis**, **Prime Video**, **Paramount+**, **Crunchyroll** ou falar com a **Administração**!`;
     }
 
-    // 6. Resposta Padrão de Suporte VIP
+    // 10. Resposta Padrão Organizada
     return `🤖 **Atendimento de Suporte StreamHub VIP**\n\n` +
-      `Como posso ajudar você, ${firstName}?\n\n` +
-      `• 🎬 **Prime Video:** 100% Gratuito!\n` +
-      `• 📺 **Paramount+:** 100% Gratuito!\n` +
-      `• 🍿 **Netflix VIP:** Em breve por R$ 10,00/mês.\n` +
-      `• ✉️ **Suporte Admin:** Fale pelo e-mail \`ronisouza495@gmail.com\`.\n\n` +
-      `Digite sua dúvida aqui que eu te ajudo na hora!`;
+      `Como posso te ajudar, ${firstName}?\n\n` +
+      `🟢 **Serviços no Ar:** IPTV Grátis, Prime Video, Paramount+ e Crunchyroll VIP.\n` +
+      `🔴 **Serviços Fora do Ar:** Free Fire (Manutenção) e Netflix VIP (Reabastecendo).\n` +
+      `✉️ **Admin:** \`ronisouza495@gmail.com\`.\n\n` +
+      `Digite sua dúvida ou selecione uma opção acima!`;
   };
 
   const saveParamountAccessToLocal = () => {
@@ -502,44 +565,81 @@ export const SupportChatbot: React.FC<SupportChatbotProps> = ({
             </button>
           </div>
 
-          {/* Quick Action Pills */}
-          <div className="px-3 py-2 bg-slate-950/80 border-b border-slate-800/80 flex gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
-            <button
-              onClick={() => handleSendMessage('Como resgatar meu Crunchyroll VIP com animes e desenhos?')}
-              className="px-2.5 py-1 rounded-full bg-orange-500/10 text-orange-300 border border-orange-500/30 whitespace-nowrap hover:bg-orange-500/20 transition-all font-medium"
-            >
-              🎌 Crunchyroll VIP
-            </button>
-            <button
-              onClick={() => handleSendMessage('Como resgatar meu Paramount+ grátis?')}
-              className="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30 whitespace-nowrap hover:bg-blue-500/20 transition-all font-medium"
-            >
-              📺 Paramount+
-            </button>
-            <button
-              onClick={() => handleSendMessage('Como resgatar meu Prime Video grátis?')}
-              className="px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 whitespace-nowrap hover:bg-cyan-500/20 transition-all font-medium"
-            >
-              🎬 Prime Video
-            </button>
-            <button
-              onClick={() => handleSendMessage('Como resgatar os diamantes do Free Fire?')}
-              className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 whitespace-nowrap hover:bg-amber-500/20 transition-all font-medium"
-            >
-              🔥 Free Fire
-            </button>
-            <button
-              onClick={() => handleSendMessage('Quando a Netflix vai estar disponível?')}
-              className="px-2.5 py-1 rounded-full bg-red-500/10 text-red-300 border border-red-500/30 whitespace-nowrap hover:bg-red-500/20 transition-all font-medium"
-            >
-              🍿 Netflix (Em Breve)
-            </button>
-            <button
-              onClick={() => handleSendMessage('Quero falar com a administração do sistema')}
-              className="px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/30 whitespace-nowrap hover:bg-purple-500/20 transition-all font-medium"
-            >
-              ✉️ Falar com Admin
-            </button>
+          {/* Quick Action Bar - Organized Horizontal Scroll Row with Clean Uniform Pills */}
+          <div className="px-3 py-2.5 bg-slate-950/95 border-b border-slate-800/80 space-y-2">
+            <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+              <span className="flex items-center gap-1.5 text-slate-300">
+                <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                Atalhos Rápidos de Atendimento
+              </span>
+              <span className="text-[9px] text-slate-500 font-bold hidden sm:inline">Deslize →</span>
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none select-none">
+              <button
+                onClick={() => handleSendMessage('Qual é o status geral dos serviços? O que está no ar e fora do ar?')}
+                className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:border-emerald-400 text-emerald-300 hover:bg-emerald-500/20 transition-all font-extrabold text-[11px] flex items-center gap-1.5 shrink-0 shadow-sm"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Status Geral</span>
+              </button>
+
+              <button
+                onClick={() => handleSendMessage('Como usar o IPTV grátis com servidor e lista M3U?')}
+                className="px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:bg-cyan-500/20 transition-all font-extrabold text-[11px] flex items-center gap-1.5 shrink-0 shadow-sm"
+              >
+                <Tv className="w-3.5 h-3.5 text-cyan-400" />
+                <span>IPTV Grátis (31)</span>
+              </button>
+
+              <button
+                onClick={() => handleSendMessage('Como resgatar meu Prime Video grátis?')}
+                className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/30 hover:border-blue-400 text-blue-300 hover:bg-blue-500/20 transition-all font-bold text-[11px] flex items-center gap-1.5 shrink-0 shadow-sm"
+              >
+                <Film className="w-3.5 h-3.5 text-blue-400" />
+                <span>Prime Video</span>
+              </button>
+
+              <button
+                onClick={() => handleSendMessage('Como resgatar meu Paramount+ grátis?')}
+                className="px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 hover:border-indigo-400 text-indigo-300 hover:bg-indigo-500/20 transition-all font-bold text-[11px] flex items-center gap-1.5 shrink-0 shadow-sm"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Paramount+</span>
+              </button>
+
+              <button
+                onClick={() => handleSendMessage('Como resgatar meu Crunchyroll VIP com animes e desenhos?')}
+                className="px-3 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/30 hover:border-orange-400 text-orange-300 hover:bg-orange-500/20 transition-all font-bold text-[11px] flex items-center gap-1.5 shrink-0 shadow-sm"
+              >
+                <Zap className="w-3.5 h-3.5 text-orange-400" />
+                <span>Crunchyroll</span>
+              </button>
+
+              <button
+                onClick={() => handleSendMessage('Como resgatar os diamantes do Free Fire?')}
+                className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-slate-600 text-slate-400 transition-all font-medium text-[11px] flex items-center gap-1.5 shrink-0 shadow-sm opacity-80"
+              >
+                <span className="w-2 h-2 rounded-full bg-red-500" />
+                <span>Free Fire (Off)</span>
+              </button>
+
+              <button
+                onClick={() => handleSendMessage('Quando a Netflix vai estar disponível?')}
+                className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-slate-600 text-slate-400 transition-all font-medium text-[11px] flex items-center gap-1.5 shrink-0 shadow-sm opacity-80"
+              >
+                <span className="w-2 h-2 rounded-full bg-red-500" />
+                <span>Netflix (Off)</span>
+              </button>
+
+              <button
+                onClick={() => handleSendMessage('Quero falar com a administração do sistema')}
+                className="px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/30 hover:border-purple-400 text-purple-300 hover:bg-purple-500/20 transition-all font-bold text-[11px] flex items-center gap-1.5 shrink-0 shadow-sm"
+              >
+                <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
+                <span>Falar com Admin</span>
+              </button>
+            </div>
           </div>
 
           {/* Messages Area */}

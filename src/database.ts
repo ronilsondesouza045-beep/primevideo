@@ -16,6 +16,21 @@ export interface User {
   lastIp?: string;
 }
 
+export interface Movie {
+  id: string;
+  title: string;
+  description: string;
+  coverUrl: string;
+  videoUrl: string;
+  category: string;
+  year?: string;
+  duration?: string;
+  quality?: string;
+  rating?: string;
+  addedAt: string;
+  addedBy?: string;
+}
+
 export interface FreeTrialClaim {
   id: string;
   userId: string;
@@ -191,6 +206,7 @@ interface DatabaseSchema {
   smmConfig?: SmmConfig;
   smmServices?: SmmService[];
   smmOrders?: SmmOrder[];
+  movies?: Movie[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -220,7 +236,8 @@ class JSONDatabase {
       bannedIps: []
     },
     smmServices: [],
-    smmOrders: []
+    smmOrders: [],
+    movies: []
   };
 
   constructor() {
@@ -256,6 +273,7 @@ class JSONDatabase {
     this.ensureDefaultFreeFirePins();
     this.ensureDefaultReviews();
     this.ensureDefaultSmmServices();
+    this.ensureDefaultMovies();
     this.ensureSampleData();
   }
 
@@ -1634,6 +1652,95 @@ class JSONDatabase {
       return true; // Keep if not owner and not admin
     });
     const removed = this.data.smmOrders.length < initialLen;
+    if (removed) this.save();
+    return removed;
+  }
+
+  private ensureDefaultMovies() {
+    if (!this.data.movies || this.data.movies.length === 0) {
+      this.data.movies = [
+        {
+          id: 'mov_001',
+          title: 'Avatar: O Caminho da Água',
+          description: 'Acompanhe a família Sully e as incríveis batalhas no oceano de Pandora nesta jornada espetacular em 4K.',
+          coverUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80',
+          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+          category: 'Ação / Sci-Fi',
+          year: '2023',
+          duration: '3h 12m',
+          quality: '4K Ultra HD',
+          rating: '9.8',
+          addedAt: new Date().toISOString(),
+          addedBy: 'Admin'
+        },
+        {
+          id: 'mov_002',
+          title: 'Duna: Parte 2',
+          description: 'Paul Atreides se une a Chani e aos Fremen em uma guerra de vingança contra os conspiradores que destruíram sua família.',
+          coverUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80',
+          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+          category: 'Aventura / Sci-Fi',
+          year: '2024',
+          duration: '2h 46m',
+          quality: '4K Ultra HD',
+          rating: '9.9',
+          addedAt: new Date().toISOString(),
+          addedBy: 'Admin'
+        },
+        {
+          id: 'mov_003',
+          title: 'Divertida Mente 2',
+          description: 'Novas emoções entram na mente de Riley em plena adolescência! Assista a essa fantástica animação completa.',
+          coverUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+          category: 'Animação',
+          year: '2024',
+          duration: '1h 36m',
+          quality: '1080p Full HD',
+          rating: '9.7',
+          addedAt: new Date().toISOString(),
+          addedBy: 'Admin'
+        },
+        {
+          id: 'mov_004',
+          title: 'Deadpool & Wolverine',
+          description: 'Deadpool convoca Wolverine para uma missão cósmica que mudará para sempre o destino do multiverso!',
+          coverUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80',
+          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantDream.mp4',
+          category: 'Ação / Comédia',
+          year: '2024',
+          duration: '2h 08m',
+          quality: '1080p Full HD',
+          rating: '9.8',
+          addedAt: new Date().toISOString(),
+          addedBy: 'Admin'
+        }
+      ];
+      this.save();
+    }
+  }
+
+  public getMovies(): Movie[] {
+    return this.data.movies || [];
+  }
+
+  public addMovie(movieData: Omit<Movie, 'id' | 'addedAt'>): Movie {
+    if (!this.data.movies) this.data.movies = [];
+    const newMovie: Movie = {
+      ...movieData,
+      id: `mov_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      addedAt: new Date().toISOString()
+    };
+    this.data.movies.unshift(newMovie);
+    this.save();
+    return newMovie;
+  }
+
+  public deleteMovie(id: string): boolean {
+    if (!this.data.movies) return false;
+    const initialLen = this.data.movies.length;
+    this.data.movies = this.data.movies.filter(m => m.id !== id);
+    const removed = this.data.movies.length < initialLen;
     if (removed) this.save();
     return removed;
   }

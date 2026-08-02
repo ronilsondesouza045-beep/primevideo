@@ -613,6 +613,67 @@ app.get('/api/services/iptv-list', (req: Request, res: Response) => {
   });
 });
 
+// ==============================================
+// MOVIES CATALOG API ENDPOINTS
+// ==============================================
+
+// GET all movies
+app.get('/api/movies', (req: Request, res: Response) => {
+  try {
+    const movies = db.getMovies();
+    return res.json({ success: true, movies });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao carregar catálogo de filmes.' });
+  }
+});
+
+// POST add new movie (Admin or User)
+app.post('/api/movies', (req: Request, res: Response) => {
+  try {
+    const { title, description, coverUrl, videoUrl, category, year, duration, quality, rating } = req.body;
+
+    if (!title || !videoUrl) {
+      return res.status(400).json({ error: 'Título e Link do Filme/Vídeo são obrigatórios!' });
+    }
+
+    const newMovie = db.addMovie({
+      title: title.trim(),
+      description: (description || 'Filme completo no catálogo StreamHub VIP. Assista em alta definição!').trim(),
+      coverUrl: coverUrl?.trim() || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
+      videoUrl: videoUrl.trim(),
+      category: category?.trim() || 'Lançamentos',
+      year: year?.trim() || new Date().getFullYear().toString(),
+      duration: duration?.trim() || '2h 00m',
+      quality: quality?.trim() || '1080p Full HD',
+      rating: rating?.trim() || '9.8',
+      addedBy: 'Administrador StreamHub'
+    });
+
+    return res.json({
+      success: true,
+      message: 'Filme adicionado ao catálogo com sucesso!',
+      movie: newMovie
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao adicionar filme.' });
+  }
+});
+
+// DELETE movie
+app.delete('/api/movies/:id', (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const removed = db.deleteMovie(id);
+    if (removed) {
+      return res.json({ success: true, message: 'Filme removido do catálogo.' });
+    } else {
+      return res.status(404).json({ error: 'Filme não encontrado.' });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao deletar filme.' });
+  }
+});
+
 // Generate Free Fire PIN / Codiguin
 app.post('/api/services/generate-freefire', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   return res.status(400).json({
@@ -2301,13 +2362,22 @@ REGRAS RÍGIDAS DE SEGURANÇA QUE VOCÊ DEVE SEGUIR:
      "❌ Bloqueado! Você ou alguém da sua rede (IP) já resgatou o acesso gratuito do Prime Video. O limite é de apenas 1 resgate por pessoa/conexão."
    - NUNCA forneça senhas de Prime Video se a pessoa estiver bloqueada.
 
-2. INFORMAÇÕES DA PLATAFORMA:
-   - CRUNCHYROLL VIP: 100% GRATUITO. E-mail: skeespq11@hotmail.com | Senha: 12344321. Catálogo organizado com Animes, Desenhos Animados e Filmes de Anime. AVISO IMPORTANTE: A qualquer momento o e-mail e a senha podem ser alterados ou parar de funcionar sem aviso prévio!
-   - PARAMOUNT+: 100% GRATUITO. E-mail: olivia8515@web-library.net | Senha: 4400988. Sempre informe que a qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar.
-   - PRIME VIDEO: É um serviço 100% GRATUITO ativo no momento (limite de 1 resgate por pessoa/IP). E-mail: primevideosouza368@gmail.com | Senha: roni141821.
-   - FREE FIRE (100 DIAMANTES + 10% BÔNUS): O serviço de resgate automático de Codiguins/PINs está em MANUTENÇÃO TEMPORÁRIA para atualizações de estoque. Resgate feito em recargajogo.com.br.
-   - NETFLIX VIP: O serviço da Netflix está BLOQUEADO e TEMPORARIAMENTE INDISPONÍVEL (EM BREVE). NÃO há vendas ou liberações de Netflix no momento, pois o estoque está em reabastecimento. Se o cliente perguntar sobre a Netflix, diga educadamente que está bloqueada/indisponível temporariamente e estará disponível em breve!
-   - Suporte / Admin: ronisouza495@gmail.com
+2. INFORMAÇÕES ORGANIZADAS DA PLATAFORMA (STATUS EM TEMPO REAL):
+   🟢 SERVIÇOS ONLINE (100% OPERACIONAIS & GRÁTIS):
+   - IPTV GRÁTIS: 100% OPERACIONAL. Possui 31 contas ativas e renovadas no servidor http://ger99.xyz:80 com suporte a Xtream e Lista M3U. Se um cliente perguntar do IPTV, explique que o servidor é http://ger99.xyz:80 e que há 31 usuários no catálogo. Diga que se um usuário estiver ocupado (máximo 1 conexão por conta), ele pode gerar outro usuário no painel IPTV do site!
+   - PRIME VIDEO VIP: 100% GRATUITO E ONLINE. E-mail: primevideosouza368@gmail.com | Senha: roni141821 (limite de 1 resgate por pessoa/IP).
+   - PARAMOUNT+ VIP: 100% GRATUITO E ONLINE. E-mail: olivia8515@web-library.net | Senha: 4400988.
+   - CRUNCHYROLL VIP: 100% GRATUITO E ONLINE. E-mail: skeespq11@hotmail.com | Senha: 12344321. Animes e desenhos animados em HD.
+
+   🔴 SERVIÇOS FORA DO AR (EM MANUTENÇÃO / REABASTECIMENTO):
+   - FREE FIRE (CODIGUIN / PIN 100 DIAMANTES): FORA DO AR / MANUTENÇÃO TEMPORÁRIA no portal oficial Recarga Jogo e reabastecimento de lote de estoque.
+   - NETFLIX VIP: FORA DO AR / REABASTECENDO ESTOQUE. Lançamento em breve por R$ 10,00/mês.
+
+   ✉️ CONTATO ADMIN: ronisouza495@gmail.com (atendimento humano garantido).
+
+3. FORMATO DE RESPOSTA:
+   - Se o cliente perguntar o que está funcionando ou o que está fora do ar, forneça uma lista dividida de forma limpa e organizada com 🟢 NO AR e 🔴 FORA DO AR.
+   - Seja profissional, claro, prestativo e direto. Usar formatação em negrito (**) para destacar credenciais e botões.
 `;
 
     let formattedHistory = '';
