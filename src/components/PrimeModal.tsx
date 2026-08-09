@@ -71,7 +71,7 @@ export const PrimeModal: React.FC<PrimeModalProps> = ({
         {/* Catalog Banner Image */}
         <div className="relative mb-4 rounded-2xl overflow-hidden border border-cyan-500/30 bg-slate-950 shadow-lg">
           <img
-            src="https://www.estadao.com.br/resizer/v2/R7LIQKAH2VAPXH5FZC3WR4CBO4.jpg?auth=7bbc99ce8d477bc5ca0bf74b850e698ffc80c46235b29c3a71bda5629a0378cd"
+            src="https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg"
             alt="Catálogo Prime Video"
             referrerPolicy="no-referrer"
             className="w-full h-28 sm:h-32 object-cover object-center"
@@ -324,7 +324,7 @@ export const PrimeModal: React.FC<PrimeModalProps> = ({
             className="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-2 border border-slate-700"
           >
             <HelpCircle className="w-4 h-4 text-cyan-400" />
-            <span>Suporte Bot</span>
+            <span>Suporte</span>
           </button>
         </div>
 

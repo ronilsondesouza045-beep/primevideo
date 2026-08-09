@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, AdminStats, PaymentRecord, VisitorLog, AccessLog } from '../types';
+import { User, AdminStats, PaymentRecord, VisitorLog, AccessLog, UserRole } from '../types';
 import {
   ShieldCheck,
   Users,
@@ -20,8 +20,16 @@ import {
   MessageSquare,
   Send,
   UserCheck,
-  Tv
+  Tv,
+  BarChart3,
+  Tag,
+  Layout,
+  UserPlus
 } from 'lucide-react';
+import { AnalyticsDashboardAdmin } from './AnalyticsDashboardAdmin';
+import { OnlineUsersAdmin } from './OnlineUsersAdmin';
+import { CouponsAdmin } from './CouponsAdmin';
+import { HomeConfigAdmin } from './HomeConfigAdmin';
 
 interface AdminPanelProps {
   currentUser: User | null;
@@ -29,8 +37,8 @@ interface AdminPanelProps {
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'support' | 'users' | 'accesses' | 'payments' | 'credentials' | 'visitors'
-  >('dashboard');
+    'dashboard' | 'analytics' | 'online' | 'coupons' | 'home-config' | 'support' | 'users' | 'accesses' | 'payments' | 'credentials' | 'visitors'
+  >('analytics');
 
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -225,6 +233,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     }
   };
 
+  const handleUpdateUserRole = async (userId: string, role: string) => {
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/role`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({ role })
+      });
+      if (res.ok) {
+        setSuccessMsg(`Cargo do usuário atualizado para ${role.toUpperCase()}`);
+        loadAdminData(true);
+        setTimeout(() => setSuccessMsg(''), 3000);
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Erro ao alterar permissão do usuário.');
+      }
+    } catch (err) {
+      alert('Erro ao alterar permissão.');
+    }
+  };
+
   const handleDeleteUser = async (userId: string) => {
     if (!confirm('Tem certeza que deseja excluir este usuário permanentemente?')) return;
     try {
@@ -415,6 +444,55 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       {/* Admin Nav Tabs */}
       <div className="flex items-center gap-1.5 border-b border-slate-800/80 pb-2 overflow-x-auto scrollbar-none">
+        
+        <button
+          onClick={() => setActiveTab('analytics')}
+          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'analytics'
+              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4 text-amber-400" />
+          Métricas & Relatórios
+        </button>
+
+        <button
+          onClick={() => setActiveTab('online')}
+          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'online'
+              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+          Usuários Conectados
+        </button>
+
+        <button
+          onClick={() => setActiveTab('coupons')}
+          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'coupons'
+              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <Tag className="w-4 h-4 text-amber-300" />
+          Cupons & Promoções
+        </button>
+
+        <button
+          onClick={() => setActiveTab('home-config')}
+          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'home-config'
+              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <Layout className="w-4 h-4 text-blue-400" />
+          Layout da Home
+        </button>
+
         <button
           onClick={() => setActiveTab('dashboard')}
           className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
@@ -510,7 +588,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       </div>
 
       {/* SEARCH BAR FOR TABLES */}
-      {activeTab !== 'dashboard' && activeTab !== 'credentials' && (
+      {!['dashboard', 'credentials', 'analytics', 'online', 'coupons', 'home-config'].includes(activeTab) && (
         <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 p-2.5 rounded-xl">
           <Search className="w-4 h-4 text-slate-400 ml-2" />
           <input
@@ -521,6 +599,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
             className="w-full bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none font-medium"
           />
         </div>
+      )}
+
+      {/* TAB: ANALYTICS & METRICS */}
+      {activeTab === 'analytics' && (
+        <AnalyticsDashboardAdmin currentUser={currentUser} />
+      )}
+
+      {/* TAB: ONLINE USERS PRESENCE */}
+      {activeTab === 'online' && (
+        <OnlineUsersAdmin currentUser={currentUser} />
+      )}
+
+      {/* TAB: COUPONS & PROMOTIONS */}
+      {activeTab === 'coupons' && (
+        <CouponsAdmin currentUser={currentUser} />
+      )}
+
+      {/* TAB: HOME CONTENT CONFIG */}
+      {activeTab === 'home-config' && (
+        <HomeConfigAdmin currentUser={currentUser} />
       )}
 
       {/* TAB 1: VISÃO GERAL / DASHBOARD */}
@@ -823,8 +921,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                 <th className="pb-2.5 px-3">ID</th>
                 <th className="pb-2.5 px-3">Nome</th>
                 <th className="pb-2.5 px-3">E-mail</th>
+                <th className="pb-2.5 px-3">Cargo (RBAC)</th>
                 <th className="pb-2.5 px-3">Último Acesso</th>
-                <th className="pb-2.5 px-3">IP</th>
                 <th className="pb-2.5 px-3">Status</th>
                 <th className="pb-2.5 px-3 text-right">Ação</th>
               </tr>
@@ -835,10 +933,28 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                   <td className="py-3 px-3 font-mono font-bold text-amber-300 text-[11px]">{u.id}</td>
                   <td className="py-3 px-3 text-white font-bold">{u.name}</td>
                   <td className="py-3 px-3 font-mono text-cyan-300">{u.email}</td>
+                  
+                  {/* RBAC Role Selector Dropdown */}
+                  <td className="py-3 px-3">
+                    <select
+                      value={u.role || 'client'}
+                      disabled={u.email.toLowerCase() === 'ronisouza495@gmail.com'}
+                      onChange={(e) => handleUpdateUserRole(u.id, e.target.value)}
+                      className="bg-slate-950 border border-slate-700 text-amber-300 font-bold text-[10px] uppercase rounded-lg px-2 py-1 focus:outline-none focus:border-amber-500 cursor-pointer disabled:opacity-50"
+                    >
+                      <option value="client">Client (Padrão)</option>
+                      <option value="vip">VIP Member</option>
+                      <option value="reseller">Revendedor</option>
+                      <option value="moderator">Moderador</option>
+                      <option value="support">Atendente Suporte</option>
+                      <option value="admin">Administrador</option>
+                      <option value="super_admin">Super Admin</option>
+                    </select>
+                  </td>
+
                   <td className="py-3 px-3 text-slate-300 font-mono text-[10px]">
                     {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString('pt-BR') : (u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-BR') : 'N/A')}
                   </td>
-                  <td className="py-3 px-3 font-mono text-slate-400">{u.lastIp || '127.0.0.1'}</td>
                   <td className="py-3 px-3">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-black ${
                       u.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'

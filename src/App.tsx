@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { User, ServiceCredentials, AccessLog, PaymentRecord } from './types';
 import { Navbar } from './components/Navbar';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { Hero } from './components/Hero';
 import { ServiceCards } from './components/ServiceCards';
+import { CatalogPage } from './components/CatalogPage';
+import { BenefitsPage } from './components/BenefitsPage';
+import { UserProfile } from './components/UserProfile';
 import { PrimeModal } from './components/PrimeModal';
 import { ParamountModal } from './components/ParamountModal';
 import { CrunchyrollModal } from './components/CrunchyrollModal';
@@ -13,13 +17,25 @@ import { ServiceReviewsModal } from './components/ServiceReviewsModal';
 import { UserAccesses } from './components/UserAccesses';
 import { AdminPanel } from './components/AdminPanel';
 import { AuthModal } from './components/AuthModal';
+import { ForgotPasswordModal } from './components/ForgotPasswordModal';
 import { SupportChatbot } from './components/SupportChatbot';
-import { Tv, Sparkles, ShieldCheck, Heart } from 'lucide-react';
+import { OfflineBanner } from './components/OfflineBanner';
+import { GlobalSearchModal } from './components/GlobalSearchModal';
+import { NotificationsModal } from './components/NotificationsModal';
+import { SupportTickets } from './components/SupportTickets';
+import { SystemStatusPage } from './components/SystemStatusPage';
+import { FavoritesPage } from './components/FavoritesPage';
+import { Tv } from 'lucide-react';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [activeTab, setActiveTab] = useState<'home' | 'accesses' | 'admin'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'catalog' | 'benefits' | 'accesses' | 'orders' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites'>('catalog');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isForgotPassOpen, setIsForgotPassOpen] = useState(false);
+
+  // ETAPA 2 Modals state
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isNotifsOpen, setIsNotifsOpen] = useState(false);
 
   // Modals state
   const [isIptvModalOpen, setIsIptvModalOpen] = useState(false);
@@ -68,7 +84,45 @@ export default function App() {
     checkPrimeStatus();
     checkFreeFireStatus();
     trackVisit();
-  }, []);
+
+    // Ctrl+K Global Search shortcut
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Track user presence heartbeat
+    trackUserPresence();
+    const presenceInterval = setInterval(trackUserPresence, 20000);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      clearInterval(presenceInterval);
+    };
+  }, [user]);
+
+  const trackUserPresence = async () => {
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      const token = localStorage.getItem('streamhub_token');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      if (user?.email) headers['x-user-email'] = user.email;
+
+      await fetch('/api/track-presence', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          userId: user?.id || 'guest',
+          userName: user?.name || 'Visitante',
+          userEmail: user?.email || 'visitante@streamhub.com',
+          role: user?.role || 'client'
+        })
+      });
+    } catch (e) {}
+  };
 
   const checkFreeFireStatus = async () => {
     setFreeFireStock({
@@ -149,181 +203,128 @@ export default function App() {
     // Check local storage first
     const localLogsRaw = localStorage.getItem(`streamhub_logs_${userEmailKey}`);
     if (localLogsRaw) {
-      try {
-        logs = JSON.parse(localLogsRaw);
-      } catch (e) {}
+      try { logs = JSON.parse(localLogsRaw); } catch (e) {}
     }
 
+    const localPymtsRaw = localStorage.getItem(`streamhub_payments_${userEmailKey}`);
+    if (localPymtsRaw) {
+      try { pymts = JSON.parse(localPymtsRaw); } catch (e) {}
+    }
+
+    // Attempt API load
     try {
-      const res = await fetch('/api/services/user-accesses', { headers: getAuthHeaders() });
+      const res = await fetch('/api/user/accesses', { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
-        if (data.accessLogs && data.accessLogs.length > 0) {
-          const merged = [...data.accessLogs];
-          logs.forEach((l) => {
-            if (!merged.some((m) => m.id === l.id || m.service === l.service)) {
-              merged.push(l);
-            }
-          });
-          logs = merged;
-        }
-        if (data.payments) {
-          pymts = data.payments;
-        }
+        if (data.accesses && data.accesses.length > 0) logs = data.accesses;
+        if (data.payments && data.payments.length > 0) pymts = data.payments;
       }
-    } catch (err) {
-      console.log('API history check bypassed, loading local storage logs');
-    }
+    } catch (e) {}
 
-    // Deduplicate logs strictly by service (1 card per service type)
-    const uniqueLogs: AccessLog[] = [];
-    const seenServices = new Set<string>();
-    for (const log of logs) {
-      if (!seenServices.has(log.service)) {
-        seenServices.add(log.service);
-        uniqueLogs.push(log);
-      }
-    }
-
-    localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(uniqueLogs));
-    setUserAccessLogs(uniqueLogs);
+    setUserAccessLogs(logs);
     setUserPayments(pymts);
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST', headers: getAuthHeaders() });
-    } catch (e) {}
+  const handleLogout = () => {
     localStorage.removeItem('streamhub_user');
     localStorage.removeItem('streamhub_token');
     setUser(null);
     setActiveTab('home');
-    setUserAccessLogs([]);
-    setUserPayments([]);
-    checkPrimeStatus();
   };
 
-  const handleUpdateUserBalance = (newBalance: number) => {
-    if (user) {
-      setUser({ ...user, walletBalance: newBalance });
-    }
-  };
-
-  // Generate Free Prime Video Access
+  // Generate Prime Credentials
   const handleGeneratePrime = async () => {
     if (!user) {
       setIsAuthOpen(true);
       return;
     }
-
-    setPrimeError(null);
     setPrimeBlocked(false);
+    setPrimeError(null);
 
-    const defaultPrimeCredentials = {
-      email: 'primevideosouza368@gmail.com',
-      password: 'roni141821',
-      pin: 'Sem PIN',
-      screen: 'Livre / Escolha qualquer perfil'
-    };
-
-    // 1. Try server API
     try {
-      const res = await fetch('/api/services/generate-prime', {
+      let res = await fetch('/api/services/prime', {
         method: 'POST',
-        headers: getAuthHeaders()
+        headers: getAuthHeaders(),
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.access) {
-          setPrimeCreds(data.access.credentials);
-          setPrimeBlocked(false);
-          loadUserHistory();
-          return;
-        }
+      if (!res.ok && res.status === 404) {
+        res = await fetch('/api/services/generate-prime', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+        });
+      }
+      const data = await res.json();
+      const creds = data.credentials || data.access?.credentials;
+
+      if (res.ok && creds) {
+        setPrimeCreds(creds);
+        loadUserHistory();
+      } else {
+        const fallbackCreds = {
+          email: 'primevideosouza368@gmail.com',
+          password: 'roni141821',
+          pin: 'Sem PIN',
+          screen: 'Livre / Escolha qualquer perfil'
+        };
+        setPrimeCreds(fallbackCreds);
+        loadUserHistory();
       }
     } catch (err) {
-      console.log('Server API unreachable, executing robust client-side VIP Prime generation');
+      const fallbackCreds = {
+        email: 'primevideosouza368@gmail.com',
+        password: 'roni141821',
+        pin: 'Sem PIN',
+        screen: 'Livre / Escolha qualquer perfil'
+      };
+      setPrimeCreds(fallbackCreds);
+      loadUserHistory();
     }
-
-    // 2. Client-side fallback (Guarantees instant generation on Vercel static sites)
-    const userEmailKey = user.email.toLowerCase();
-
-    const newAccessLog: AccessLog = {
-      id: `acc_local_${Date.now()}`,
-      userId: user.id,
-      userEmail: user.email,
-      service: 'prime',
-      credentials: defaultPrimeCredentials,
-      createdAt: new Date().toISOString()
-    };
-
-    const updatedLogs = [newAccessLog, ...userAccessLogs.filter(l => l.service !== 'prime')];
-    setUserAccessLogs(updatedLogs);
-    localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(updatedLogs));
-
-    setPrimeCreds(defaultPrimeCredentials);
-    setPrimeBlocked(false);
   };
 
-  // Generate Free Paramount+ Access
+  // Generate Paramount Credentials
   const handleGenerateParamount = async () => {
     if (!user) {
       setIsAuthOpen(true);
       return;
     }
 
-    const defaultParamountCredentials = {
-      email: 'olivia8515@web-library.net',
-      password: '4400988',
-      screen: 'Perfil Livre / Gratuito',
-      warning: 'Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.'
-    };
-
-    // 1. Try server API
     try {
-      const res = await fetch('/api/services/generate-paramount', {
+      let res = await fetch('/api/services/paramount', {
         method: 'POST',
-        headers: getAuthHeaders()
+        headers: getAuthHeaders(),
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.access) {
-          setParamountCreds(data.access.credentials);
-          loadUserHistory();
-          return;
-        }
+      if (!res.ok && res.status === 404) {
+        res = await fetch('/api/services/generate-paramount', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+        });
+      }
+      const data = await res.json();
+      const creds = data.credentials || data.access?.credentials;
+
+      if (res.ok && creds) {
+        setParamountCreds(creds);
+        loadUserHistory();
+      } else {
+        const fallbackCreds = {
+          email: 'olivia8515@web-library.net',
+          password: '4400988',
+          screen: 'Perfil Livre / Gratuito'
+        };
+        setParamountCreds(fallbackCreds);
+        loadUserHistory();
       }
     } catch (err) {
-      console.log('Server API unreachable, executing client-side Paramount generation');
+      const fallbackCreds = {
+        email: 'olivia8515@web-library.net',
+        password: '4400988',
+        screen: 'Perfil Livre / Gratuito'
+      };
+      setParamountCreds(fallbackCreds);
+      loadUserHistory();
     }
-
-    // 2. Client-side fallback
-    const userEmailKey = user.email.toLowerCase();
-
-    const newAccessLog: AccessLog = {
-      id: `acc_paramount_local_${Date.now()}`,
-      userId: user.id,
-      userEmail: user.email,
-      service: 'paramount',
-      credentials: defaultParamountCredentials,
-      createdAt: new Date().toISOString()
-    };
-
-    const updatedLogs = [newAccessLog, ...userAccessLogs.filter(l => l.service !== 'paramount')];
-    setUserAccessLogs(updatedLogs);
-    localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(updatedLogs));
-
-    setParamountCreds(defaultParamountCredentials);
   };
 
-  // Generate Crunchyroll VIP Access (100% Free)
-  const defaultCrunchyrollCredentials: ServiceCredentials = {
-    email: 'skeespq11@hotmail.com',
-    password: '12344321',
-    screen: 'Perfil Livre / Gratuito',
-    warning: 'Aviso: A qualquer momento o e-mail e a senha do Crunchyroll podem ser alterados ou parar de funcionar sem aviso prévio.'
-  };
-
+  // Generate Crunchyroll Credentials
   const handleGenerateCrunchyroll = async () => {
     if (!user) {
       setIsAuthOpen(true);
@@ -331,70 +332,122 @@ export default function App() {
     }
 
     try {
-      const res = await fetch('/api/services/generate-crunchyroll', {
+      let res = await fetch('/api/services/crunchyroll', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: getAuthHeaders(),
       });
-      const data = await res.json();
-
-      if (res.ok && data.access) {
-        setCrunchyrollCreds(data.access.credentials);
-        loadUserHistory();
-        return;
+      if (!res.ok && res.status === 404) {
+        res = await fetch('/api/services/generate-crunchyroll', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+        });
       }
-    } catch (e) {
-      console.warn('API error, using local fallback:', e);
+      const data = await res.json();
+      const creds = data.credentials || data.access?.credentials;
+
+      if (res.ok && creds) {
+        setCrunchyrollCreds(creds);
+        loadUserHistory();
+      } else {
+        const fallbackCreds = {
+          email: 'skeespq11@hotmail.com',
+          password: '12344321',
+          screen: 'Perfil Livre / Gratuito'
+        };
+        setCrunchyrollCreds(fallbackCreds);
+        loadUserHistory();
+      }
+    } catch (err) {
+      const fallbackCreds = {
+        email: 'skeespq11@hotmail.com',
+        password: '12344321',
+        screen: 'Perfil Livre / Gratuito'
+      };
+      setCrunchyrollCreds(fallbackCreds);
+      loadUserHistory();
     }
-
-    // Local fallback
-    const userEmailKey = user.email.toLowerCase().trim();
-    const newAccessLog: AccessLog = {
-      id: `crunchy_${Date.now()}`,
-      userId: user.id,
-      userEmail: user.email,
-      service: 'crunchyroll',
-      credentials: defaultCrunchyrollCredentials,
-      createdAt: new Date().toISOString()
-    };
-
-    const updatedLogs = [newAccessLog, ...userAccessLogs.filter(l => l.service !== 'crunchyroll')];
-    setUserAccessLogs(updatedLogs);
-    localStorage.setItem(`streamhub_logs_${userEmailKey}`, JSON.stringify(updatedLogs));
-
-    setCrunchyrollCreds(defaultCrunchyrollCredentials);
   };
 
-  // Generate Free Fire Codiguin PIN (Temporarily blocked for maintenance)
+  // Claim Free Fire PIN
   const handleGenerateFreeFire = async () => {
     if (!user) {
       setIsAuthOpen(true);
       return;
     }
 
-    setFreeFireResult({
-      message: '⚠️ O resgate de códigos do Free Fire está temporariamente suspenso para manutenção e atualização do sistema. Por favor, tente novamente em breve!',
-      success: false,
-      outOfStock: true
-    });
+    try {
+      const res = await fetch('/api/services/freefire', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+      });
+      const data = await res.json();
+
+      setFreeFireResult({
+        code: data.code,
+        message: data.message || data.error,
+        success: res.ok && data.success,
+        outOfStock: data.outOfStock,
+        alreadyClaimed: data.alreadyClaimed
+      });
+
+      checkFreeFireStatus();
+      loadUserHistory();
+    } catch (err) {
+      setFreeFireResult({
+        message: 'Erro de conexão ao solicitar CODIGUIN Free Fire.',
+        success: false
+      });
+    }
   };
 
-  // Buy Netflix Access (R$ 10,00) - Temporarily blocked / Em Breve
-  const handleBuyNetflix = () => {
-    alert('🔒 Acessos da Netflix temporariamente em reabastecimento!\n\nEm breve teremos novos logins Netflix VIP disponíveis nesta plataforma.\n\nAproveite e resgate seu Prime Video 100% GRATUITO no momento!');
+  // Buy Netflix 4K Profile via Ton / Pix
+  const handleBuyNetflix = async () => {
+    if (!user) {
+      setIsAuthOpen(true);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ amount: 10.00 })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.payment) {
+        setActivePayment({
+          id: data.payment.id,
+          status: data.payment.status,
+          tonLink: data.tonLink || 'https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO',
+          pixCode: data.pixCode || '',
+          credentials: data.payment.credentials || null
+        });
+        loadUserHistory();
+      } else {
+        alert(data.error || 'Erro ao gerar pedido de pagamento.');
+      }
+    } catch (err) {
+      alert('Erro ao processar solicitação de pagamento.');
+    }
   };
 
   // Verify Payment Status
   const handleVerifyPayment = async (paymentId: string) => {
     try {
-      const res = await fetch(`/api/payments/verify/${paymentId}`, { method: 'POST' });
+      const res = await fetch(`/api/payments/${paymentId}/status`, {
+        headers: getAuthHeaders(),
+      });
       const data = await res.json();
 
-      if (res.ok && data.approved) {
-        setActivePayment((prev) => prev ? {
-          ...prev,
-          status: 'APROVADO',
-          credentials: data.credentials
-        } : null);
+      if (res.ok && data.payment) {
+        setActivePayment({
+          id: data.payment.id,
+          status: data.payment.status,
+          tonLink: 'https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO',
+          pixCode: data.payment.pixCode || '',
+          credentials: data.payment.credentials || null
+        });
         loadUserHistory();
       }
     } catch (err) {
@@ -402,7 +455,7 @@ export default function App() {
     }
   };
 
-  // Simulate Payment Approval for Demo Testing
+  // Simulate Payment Approval
   const handleSimulateApprove = async (paymentId: string) => {
     try {
       const res = await fetch('/api/payments/simulate-confirm', {
@@ -435,9 +488,22 @@ export default function App() {
     });
   };
 
+  const handleSelectServiceFromCatalog = (serviceKey: string) => {
+    if (serviceKey === 'prime') handleGeneratePrime();
+    else if (serviceKey === 'paramount') handleGenerateParamount();
+    else if (serviceKey === 'crunchyroll') handleGenerateCrunchyroll();
+    else if (serviceKey === 'netflix') handleBuyNetflix();
+    else if (serviceKey === 'iptv') setIsIptvModalOpen(true);
+    else if (serviceKey === 'smm') setIsChatOpen(true);
+    else if (serviceKey === 'freefire') handleGenerateFreeFire();
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-red-500 selection:text-white flex flex-col justify-between">
       
+      {/* Offline Status Connectivity Banner */}
+      <OfflineBanner />
+
       {/* Top Navbar */}
       <Navbar
         user={user}
@@ -446,32 +512,34 @@ export default function App() {
         onOpenAuth={() => setIsAuthOpen(true)}
         onLogout={handleLogout}
         onOpenChat={() => setIsChatOpen(true)}
+        onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenNotifs={() => setIsNotifsOpen(true)}
       />
 
       {/* Main Content Body */}
-      <main className="flex-1 pb-16 md:pb-0">
-        {activeTab === 'home' && (
-          <>
-            <Hero
-              onGeneratePrime={handleGeneratePrime}
-              onBuyNetflix={handleBuyNetflix}
-            />
-            <ServiceCards
-              onGenerateIptv={() => setIsIptvModalOpen(true)}
-              onGeneratePrime={handleGeneratePrime}
-              onGenerateParamount={handleGenerateParamount}
-              onGenerateCrunchyroll={handleGenerateCrunchyroll}
-              onGenerateFreeFire={handleGenerateFreeFire}
-              onBuyNetflix={handleBuyNetflix}
-              onOpenReviews={(srv) => setSelectedReviewService(srv)}
-              primeBlocked={primeBlocked}
-              primeError={primeError}
-              freeFireStock={freeFireStock}
-            />
-          </>
+      <main className="flex-1 pb-20 md:pb-8">
+        {(activeTab === 'catalog' || activeTab === 'home') && (
+          <CatalogPage
+            user={user}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onSelectService={handleSelectServiceFromCatalog}
+          />
         )}
 
-        {activeTab === 'accesses' && (
+        {activeTab === 'benefits' && (
+          <BenefitsPage
+            onOpenCatalog={() => setActiveTab('catalog')}
+          />
+        )}
+
+        {activeTab === 'profile' && user && (
+          <UserProfile
+            user={user}
+            onUpdateUser={(updated) => setUser(updated)}
+          />
+        )}
+
+        {(activeTab === 'accesses' || activeTab === 'orders') && (
           <UserAccesses
             accessLogs={userAccessLogs}
             payments={userPayments}
@@ -480,22 +548,60 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'favorites' && (
+          <FavoritesPage
+            currentUser={user}
+            onSelectService={handleSelectServiceFromCatalog}
+          />
+        )}
+
+        {activeTab === 'tickets' && (
+          <SupportTickets currentUser={user} />
+        )}
+
+        {activeTab === 'status' && (
+          <SystemStatusPage />
+        )}
+
         {activeTab === 'admin' && (
           <AdminPanel currentUser={user} />
         )}
       </main>
+
+      {/* ETAPA 2 Global Modals */}
+      <GlobalSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onSelectService={(serviceKey) => {
+          setIsSearchOpen(false);
+          handleSelectServiceFromCatalog(serviceKey);
+        }}
+      />
+
+      <NotificationsModal
+        isOpen={isNotifsOpen}
+        onClose={() => setIsNotifsOpen(false)}
+      />
+
+      {/* Mobile Bottom Navigation Bar */}
+      <MobileBottomNav
+        user={user}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenAuth={() => setIsAuthOpen(true)}
+      />
 
       {/* Footer */}
       <footer className="border-t border-slate-900 bg-slate-950/90 py-8 px-4 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Tv className="w-5 h-5 text-red-500" />
-            <span className="font-bold text-slate-300">StreamHub VIP</span>
+            <span className="font-black text-slate-300">STREAMHUB VIP 2.0</span>
             <span>- Seu portal exclusivo de streaming e entretenimento.</span>
           </div>
 
           <div className="text-slate-500 text-[11px]">
-            &copy; {new Date().getFullYear()} StreamHub VIP. Todos os direitos reservados. Suporte: <span className="text-slate-300 font-bold">ronisouza495@gmail.com</span>
+            &copy; {new Date().getFullYear()} STREAMHUB VIP 2.0. Todos os direitos reservados. Suporte: <span className="text-slate-300 font-bold">ronisouza495@gmail.com</span>
           </div>
         </div>
       </footer>
@@ -510,8 +616,15 @@ export default function App() {
             setUser(loggedInUser);
             loadUserHistory();
           }}
+          onOpenForgotPassword={() => setIsForgotPassOpen(true)}
         />
       )}
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotPassOpen}
+        onClose={() => setIsForgotPassOpen(false)}
+      />
 
       {/* Prime Video Released Credentials Modal */}
       {primeCreds && (

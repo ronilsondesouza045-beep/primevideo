@@ -7,6 +7,7 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 interface AuthModalProps {
   onClose: () => void;
   onSuccess: (user: User) => void;
+  onOpenForgotPassword?: () => void;
 }
 
 declare global {
@@ -15,7 +16,7 @@ declare global {
   }
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess, onOpenForgotPassword }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -373,7 +374,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
           </div>
 
           <div>
-            <label className="text-[11px] font-bold text-slate-400 block mb-1">Senha</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] font-bold text-slate-400">Senha</label>
+              {!isRegistering && onOpenForgotPassword && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenForgotPassword();
+                  }}
+                  className="text-[10px] font-bold text-amber-400 hover:underline"
+                >
+                  Esqueceu a senha?
+                </button>
+              )}
+            </div>
             <input
               type="password"
               required

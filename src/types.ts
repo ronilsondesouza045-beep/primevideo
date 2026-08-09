@@ -1,13 +1,36 @@
+export type UserRole = 'user' | 'vip' | 'support' | 'moderator' | 'admin' | 'super_admin';
+
+export interface UserSession {
+  id: string;
+  device: string;
+  browser: string;
+  ip: string;
+  lastActive: string;
+  current?: boolean;
+}
+
+export interface VipStatus {
+  active: boolean;
+  plan: 'VIP Bronze' | 'VIP Silver' | 'VIP Gold' | 'VIP Diamond' | 'Premium';
+  expiresAt: string;
+  benefits?: string[];
+  discountPercentage?: number;
+}
+
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: UserRole;
   status: 'active' | 'blocked';
   avatarUrl?: string;
   walletBalance?: number;
+  vipStatus?: VipStatus;
+  favorites?: string[];
+  activeSessions?: UserSession[];
   createdAt?: string;
   lastLoginAt?: string;
+  lastActiveAt?: string;
   lastIp?: string;
 }
 
@@ -207,6 +230,134 @@ export interface SmmConfig {
     message: string;
     details?: any;
   }>;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  category: 'Streaming' | 'Entretenimento' | 'Games' | 'Premium' | 'Gratuitos' | 'Outros';
+  price: number;
+  originalPrice?: number;
+  promoEndDate?: string; // ISO date for countdown timer
+  isFree?: boolean;
+  image: string;
+  banner?: string;
+  stockCount?: number;
+  minStockThreshold?: number;
+  stockStatus: 'DISPONIVEL' | 'ESTOQUE_BAIXO' | 'ESGOTADO' | 'EM_BREVE';
+  rating?: number;
+  ratingCount?: number;
+  features?: string[];
+  badge?: string;
+  isVipExclusive?: boolean;
+  totalSales?: number;
+  downloadUrl?: string;
+  instructions?: string[];
+  updatedAt?: string;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  minAmount?: number;
+  maxUses?: number;
+  usedCount: number;
+  validUntil?: string;
+  onlyVip?: boolean;
+  active: boolean;
+  productCategory?: string;
+  productId?: string;
+  createdAt: string;
+}
+
+export interface CouponValidationResult {
+  valid: boolean;
+  discount: number;
+  finalPrice: number;
+  message: string;
+  coupon?: Coupon;
+}
+
+export interface TicketMessage {
+  id: string;
+  sender: 'user' | 'support' | 'admin' | 'system';
+  senderName: string;
+  text: string;
+  createdAt: string;
+}
+
+export interface Ticket {
+  id: string;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  subject: string;
+  category: string;
+  priority: 'Baixa' | 'Média' | 'Alta' | 'Urgente';
+  status: 'ABERTO' | 'EM_ATENDIMENTO' | 'AGUARDANDO_USUARIO' | 'RESOLVIDO' | 'FECHADO';
+  assignedTo?: string;
+  messages: TicketMessage[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserPresence {
+  userId: string;
+  userEmail: string;
+  userName: string;
+  role: UserRole;
+  lastActiveAt: string;
+  device?: string;
+  browser?: string;
+  ip?: string;
+  activeSessionId?: string;
+  status: 'online' | 'idle' | 'offline';
+}
+
+export interface HomeBanner {
+  id: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  badge?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  bgGradient?: string;
+  imageUrl?: string;
+  active: boolean;
+}
+
+export interface HomeContentConfig {
+  banners: HomeBanner[];
+  announcementText?: string;
+  announcementActive?: boolean;
+  featuredProductIds: string[];
+}
+
+export interface SystemNotification {
+  id: string;
+  userId?: string;
+  title: string;
+  message: string;
+  read: boolean;
+  type: 'info' | 'success' | 'warning' | 'alert';
+  link?: string;
+  createdAt: string;
+}
+
+export interface AuditLog {
+  id: string;
+  timestamp: string;
+  adminEmail: string;
+  action: string;
+  target?: string;
+  details?: string;
+  ip?: string;
 }
 
 export interface IptvAccount {

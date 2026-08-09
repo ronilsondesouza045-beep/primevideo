@@ -1,0 +1,22 @@
+{
+  "short_name": "StreamHub VIP",
+  "name": "STREAMHUB VIP PROFESSIONAL+",
+  "description": "Sua plataforma profissional de streaming, IPTV, jogos e entretenimento.",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=192&h=192&q=80",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?auto=format&fit=crop&w=512&h=512&q=80",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#020617",
+  "theme_color": "#ef4444",
+  "display": "standalone",
+  "orientation": "portrait"
+}

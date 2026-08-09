@@ -1,6 +1,8 @@
 {
-  "name": "StreamHub VIP",
-  "description": "Seu portal exclusivo de streaming e entretenimento.",
+  "name": "STREAMHUB VIP 2.0",
+  "description": "Plataforma premium de entretenimento, streaming e serviços digitais com experiência VIP.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

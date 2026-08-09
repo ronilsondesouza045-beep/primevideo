@@ -1,18 +1,34 @@
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
+import { 
+  Product, 
+  SystemNotification, 
+  AuditLog, 
+  UserRole, 
+  VipStatus, 
+  Coupon, 
+  Ticket, 
+  UserPresence, 
+  HomeContentConfig, 
+  UserSession 
+} from './types';
 
 export interface User {
   id: string;
   email: string;
   passwordHash: string;
   name: string;
-  role: 'admin' | 'user';
+  role: UserRole;
   status: 'active' | 'blocked';
   avatarUrl?: string;
   walletBalance?: number;
+  vipStatus?: VipStatus;
+  favorites?: string[];
+  activeSessions?: UserSession[];
   createdAt: string;
   lastLoginAt?: string;
+  lastActiveAt?: string;
   lastIp?: string;
 }
 
@@ -207,6 +223,13 @@ interface DatabaseSchema {
   smmServices?: SmmService[];
   smmOrders?: SmmOrder[];
   movies?: Movie[];
+  products?: Product[];
+  notifications?: SystemNotification[];
+  auditLogs?: AuditLog[];
+  coupons?: Coupon[];
+  tickets?: Ticket[];
+  userPresence?: UserPresence[];
+  homeContentConfig?: HomeContentConfig;
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -259,6 +282,56 @@ class JSONDatabase {
         if (!this.data.reviews) {
           this.data.reviews = [];
         }
+        if (!this.data.coupons) {
+          this.data.coupons = [
+            {
+              id: 'coup_vip10',
+              code: 'STREAM10',
+              discountType: 'percentage',
+              discountValue: 10,
+              minAmount: 10,
+              maxUses: 100,
+              usedCount: 3,
+              active: true,
+              createdAt: new Date().toISOString()
+            },
+            {
+              id: 'coup_vip20',
+              code: 'VIP50',
+              discountType: 'percentage',
+              discountValue: 50,
+              onlyVip: true,
+              active: true,
+              maxUses: 50,
+              usedCount: 0,
+              createdAt: new Date().toISOString()
+            }
+          ];
+        }
+        if (!this.data.tickets) {
+          this.data.tickets = [];
+        }
+        if (!this.data.userPresence) {
+          this.data.userPresence = [];
+        }
+        if (!this.data.homeContentConfig) {
+          this.data.homeContentConfig = {
+            banners: [
+              {
+                id: 'banner_1',
+                title: 'STREAMHUB VIP PROFESSIONAL+',
+                subtitle: 'Assinaturas de Streaming, IPTV e Códigos de Jogos com Ativação Imediata.',
+                badge: 'OFERTA ESPECIAL',
+                ctaText: 'Ver Catálogo VIP',
+                ctaLink: '/catalog',
+                active: true
+              }
+            ],
+            announcementText: '🔥 PROMOÇÃO NETFLIX 4K: Apenas R$ 10/mês com garantia e liberação instantânea!',
+            announcementActive: true,
+            featuredProductIds: ['prod_netflix', 'prod_prime', 'prod_crunchyroll', 'prod_iptv']
+          };
+        }
       } catch (err) {
         console.error('Error reading database file, re-initializing default data:', err);
         this.seedDefaults();
@@ -274,6 +347,7 @@ class JSONDatabase {
     this.ensureDefaultReviews();
     this.ensureDefaultSmmServices();
     this.ensureDefaultMovies();
+    this.ensureDefaultProducts();
     this.ensureSampleData();
   }
 
@@ -1743,6 +1817,651 @@ class JSONDatabase {
     const removed = this.data.movies.length < initialLen;
     if (removed) this.save();
     return removed;
+  }
+
+  // ==============================================
+  // PRODUCTS CATALOG MANAGEMENT
+  // ==============================================
+  public ensureDefaultProducts() {
+    if (!this.data.products || this.data.products.length === 0) {
+      this.data.products = [
+        {
+          id: 'prod_prime',
+          name: 'Prime Video VIP (Acesso Grátis)',
+          description: 'Acesso completo ao catálogo de filmes, séries e produções originais do Prime Video em resolução 4K Ultra HD.',
+          category: 'Streaming',
+          price: 0,
+          isFree: true,
+          image: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
+          banner: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
+          stockStatus: 'DISPONIVEL',
+          rating: 4.9,
+          badge: '100% GRÁTIS',
+          features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Suporte VIP via Chatbot'],
+          instructions: [
+            'Acesse o site oficial do Prime Video (primevideo.com).',
+            'Insira o e-mail e a senha liberados na aba "Meus Acessos".',
+            'Escolha qualquer perfil e aproveite sem limites.'
+          ],
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'prod_paramount',
+          name: 'Paramount+ VIP (Gratuito)',
+          description: 'Desfrute de séries exclusivas, filmes campeões de bilheteria e esportes ao vivo na plataforma Paramount+.',
+          category: 'Streaming',
+          price: 0,
+          isFree: true,
+          image: 'https://t2.tudocdn.net/703654?w=1200&h=1200',
+          banner: 'https://t2.tudocdn.net/703654?w=1200&h=1200',
+          stockStatus: 'DISPONIVEL',
+          rating: 4.8,
+          badge: 'DE GRAÇA',
+          features: ['Séries exclusivas', 'Transmissões esportivas', 'Catálogo Infantil Nickelodeon', 'Acesso direto'],
+          instructions: [
+            'Acesse paramountplus.com.',
+            'Digite as credenciais disponibilizadas.',
+            'Selecione o perfil e divirta-se.'
+          ],
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'prod_crunchyroll',
+          name: 'Crunchyroll Premium VIP',
+          description: 'A maior biblioteca de animes do mundo! Assista em HD com legendas e dublagens em português sem anúncios.',
+          category: 'Entretenimento',
+          price: 0,
+          isFree: true,
+          image: 'https://t2.tudocdn.net/793619?w=776&h=338',
+          banner: 'https://t2.tudocdn.net/793619?w=776&h=338',
+          stockStatus: 'DISPONIVEL',
+          rating: 4.9,
+          badge: 'ANIMES HD',
+          features: ['Lançamentos simulcast', 'Sem comerciais', 'Qualidade 1080p Full HD', 'Catálogo completo'],
+          instructions: [
+            'Entre no site ou app Crunchyroll.',
+            'Insira a conta fornecida no painel.'
+          ],
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'prod_netflix',
+          name: 'Netflix VIP Ultra HD (Perfil Individual)',
+          description: 'Conta individual com perfil próprio na Netflix, qualidade 4K HDR e garantia de estabilidade durante todo o mês.',
+          category: 'Premium',
+          price: 10.00,
+          isFree: false,
+          image: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
+          banner: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
+          stockStatus: 'ESTOQUE_BAIXO',
+          rating: 5.0,
+          badge: 'PROMOÇÃO R$ 10',
+          features: ['Perfil com PIN exclusivo', 'Qualidade 4K Ultra HD', 'Garantia de 30 dias', 'Suporte prioritário'],
+          instructions: [
+            'Após o pagamento aprovado no Ton/Pix, a credencial será revelada em "Meus Acessos".',
+            'Use a conta na Netflix e acesse apenas o perfil com seu nome e PIN.'
+          ],
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'prod_iptv',
+          name: 'Servidor IPTV Lista M3U & Xtream',
+          description: 'Mais de 30 canais ao vivo, filmes e séries para Smart TV, TV Box, celular e computador no servidor ger99.xyz.',
+          category: 'Entretenimento',
+          price: 0,
+          isFree: true,
+          image: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg',
+          banner: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg',
+          stockStatus: 'DISPONIVEL',
+          rating: 4.8,
+          badge: '31 CONTAS',
+          features: ['Servidor ger99.xyz:80', 'Suporte Xtream API', 'Canais Full HD', 'Atualização mensal'],
+          instructions: [
+            'Abra seu reprodutor IPTV (IPTV Smarters, XCIPTV, TViMate).',
+            'Insira o servidor http://ger99.xyz:80 e os dados de um dos 31 usuários da lista.'
+          ],
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'prod_social_boost',
+          name: 'Impulso Redes Sociais - SMM Boost',
+          description: 'Engajamento real para Instagram, TikTok e YouTube. Teste 50 unidades gratuitas a cada 24 horas.',
+          category: 'Premium',
+          price: 0,
+          isFree: true,
+          image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
+          banner: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=1200&q=80',
+          stockStatus: 'DISPONIVEL',
+          rating: 4.9,
+          badge: 'AUTOMÁTICO',
+          features: ['Entrega ultra rápida', 'Seguidores & Curtidas', 'Teste Grátis 50 unidades', 'Painel de acompanhamento'],
+          instructions: [
+            'Cole o link do seu perfil ou publicação.',
+            'Solicite o teste grátis ou compre com seu saldo de carteira.'
+          ],
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'prod_freefire',
+          name: 'Free Fire - Codiguin & 100 Diamantes (Gratuito)',
+          description: 'Resgate de código PIN digital válido para 100 Diamantes + 10% de Bônus diretamente no site oficial Recarga Jogo.',
+          category: 'Games',
+          price: 0,
+          isFree: true,
+          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
+          banner: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
+          stockStatus: 'DISPONIVEL',
+          rating: 5.0,
+          badge: 'CODIGUIN FF',
+          features: ['100 Diamantes + 10% de Bônus', 'Resgate Oficial Recarga Jogo', '100% Gratuito', 'Código Digital Instantâneo'],
+          instructions: [
+            'Acesse recargajogo.com.br.',
+            'Faça login com o ID do jogador ou conta Free Fire.',
+            'Selecione a opção "E-Prepag" ou "Código PIN" e insira o código revelado.'
+          ],
+          updatedAt: new Date().toISOString()
+        }
+      ];
+      this.save();
+    }
+  }
+
+  public getProducts(): Product[] {
+    if (!this.data.products) this.ensureDefaultProducts();
+    return this.data.products || [];
+  }
+
+  public getProductById(id: string): Product | undefined {
+    return this.getProducts().find(p => p.id === id);
+  }
+
+  public addProduct(productData: Omit<Product, 'id' | 'updatedAt'>): Product {
+    if (!this.data.products) this.data.products = [];
+    const newProduct: Product = {
+      ...productData,
+      id: `prod_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      updatedAt: new Date().toISOString()
+    };
+    this.data.products.unshift(newProduct);
+    this.save();
+    return newProduct;
+  }
+
+  public updateProduct(id: string, updates: Partial<Product>): Product | null {
+    if (!this.data.products) return null;
+    const idx = this.data.products.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      this.data.products[idx] = {
+        ...this.data.products[idx],
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+      this.save();
+      return this.data.products[idx];
+    }
+    return null;
+  }
+
+  public deleteProduct(id: string): boolean {
+    if (!this.data.products) return false;
+    const initialLen = this.data.products.length;
+    this.data.products = this.data.products.filter(p => p.id !== id);
+    const removed = this.data.products.length < initialLen;
+    if (removed) this.save();
+    return removed;
+  }
+
+  // ==============================================
+  // NOTIFICATIONS SYSTEM
+  // ==============================================
+  public getNotifications(userId?: string): SystemNotification[] {
+    const list = this.data.notifications || [];
+    if (!userId) return list.slice(0, 20);
+    return list.filter(n => !n.userId || n.userId === userId).slice(0, 20);
+  }
+
+  public addNotification(userId: string | undefined, title: string, message: string, type: SystemNotification['type'] = 'info', link?: string): SystemNotification {
+    if (!this.data.notifications) this.data.notifications = [];
+    const notification: SystemNotification = {
+      id: `notif_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      userId,
+      title,
+      message,
+      read: false,
+      type,
+      link,
+      createdAt: new Date().toISOString()
+    };
+    this.data.notifications.unshift(notification);
+    if (this.data.notifications.length > 100) {
+      this.data.notifications = this.data.notifications.slice(0, 100);
+    }
+    this.save();
+    return notification;
+  }
+
+  public markNotificationsRead(userId?: string): boolean {
+    if (!this.data.notifications) return false;
+    this.data.notifications.forEach(n => {
+      if (!userId || n.userId === userId) {
+        n.read = true;
+      }
+    });
+    this.save();
+    return true;
+  }
+
+  // ==============================================
+  // AUDIT LOGS FOR SECURITY
+  // ==============================================
+  public addAuditLog(adminEmail: string, action: string, target?: string, details?: string, ip?: string): AuditLog {
+    if (!this.data.auditLogs) this.data.auditLogs = [];
+    const log: AuditLog = {
+      id: `audit_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      timestamp: new Date().toISOString(),
+      adminEmail,
+      action,
+      target,
+      details,
+      ip
+    };
+    this.data.auditLogs.unshift(log);
+    if (this.data.auditLogs.length > 200) {
+      this.data.auditLogs = this.data.auditLogs.slice(0, 200);
+    }
+    this.save();
+    return log;
+  }
+
+  public getAuditLogs(): AuditLog[] {
+    return this.data.auditLogs || [];
+  }
+
+  // ==============================================
+  // RBAC & USER MANAGEMENT
+  // ==============================================
+  public updateUserRole(targetUserId: string, newRole: UserRole, executorEmail: string): User | null {
+    const user = this.data.users.find(u => u.id === targetUserId);
+    if (!user) return null;
+    const oldRole = user.role;
+    user.role = newRole;
+    this.addAuditLog(executorEmail, 'CHANGE_ROLE', user.email, `Role alterado de ${oldRole} para ${newRole}`);
+    this.save();
+    return user;
+  }
+
+  public updateUserVipStatus(targetUserId: string, vipData: Partial<VipStatus>, executorEmail: string): User | null {
+    const user = this.data.users.find(u => u.id === targetUserId);
+    if (!user) return null;
+    
+    const current = user.vipStatus || {
+      active: true,
+      plan: 'Premium',
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      benefits: ['10% Desconto Geral', 'Acesso Antecipado', 'Suporte Prioritário'],
+      discountPercentage: 10
+    };
+
+    user.vipStatus = { ...current, ...vipData };
+    if (vipData.active) {
+      user.role = user.role === 'user' ? 'vip' : user.role;
+    }
+    this.addAuditLog(executorEmail, 'UPDATE_VIP_STATUS', user.email, `VIP atualizado: ${JSON.stringify(user.vipStatus)}`);
+    this.save();
+    return user;
+  }
+
+  public toggleFavorite(userId: string, productId: string): string[] {
+    const user = this.data.users.find(u => u.id === userId);
+    if (!user) return [];
+    if (!user.favorites) user.favorites = [];
+    
+    const index = user.favorites.indexOf(productId);
+    if (index > -1) {
+      user.favorites.splice(index, 1);
+    } else {
+      user.favorites.push(productId);
+    }
+    this.save();
+    return user.favorites;
+  }
+
+  // ==============================================
+  // COUPONS ENGINE
+  // ==============================================
+  public getCoupons(): Coupon[] {
+    return this.data.coupons || [];
+  }
+
+  public addCoupon(couponData: Omit<Coupon, 'id' | 'usedCount' | 'createdAt'>): Coupon {
+    if (!this.data.coupons) this.data.coupons = [];
+    const newCoupon: Coupon = {
+      ...couponData,
+      id: `coup_${Date.now()}`,
+      code: couponData.code.toUpperCase().trim(),
+      usedCount: 0,
+      createdAt: new Date().toISOString()
+    };
+    this.data.coupons.unshift(newCoupon);
+    this.save();
+    return newCoupon;
+  }
+
+  public updateCoupon(id: string, updates: Partial<Coupon>): Coupon | null {
+    if (!this.data.coupons) return null;
+    const idx = this.data.coupons.findIndex(c => c.id === id);
+    if (idx !== -1) {
+      this.data.coupons[idx] = { ...this.data.coupons[idx], ...updates };
+      if (updates.code) this.data.coupons[idx].code = updates.code.toUpperCase().trim();
+      this.save();
+      return this.data.coupons[idx];
+    }
+    return null;
+  }
+
+  public deleteCoupon(id: string): boolean {
+    if (!this.data.coupons) return false;
+    const initialLen = this.data.coupons.length;
+    this.data.coupons = this.data.coupons.filter(c => c.id !== id);
+    const removed = this.data.coupons.length < initialLen;
+    if (removed) this.save();
+    return removed;
+  }
+
+  public validateCoupon(code: string, amount: number, user?: User | null, category?: string, productId?: string) {
+    const coupons = this.getCoupons();
+    const cleanCode = code.toUpperCase().trim();
+    const coupon = coupons.find(c => c.code === cleanCode && c.active);
+
+    if (!coupon) {
+      return { valid: false, discount: 0, finalPrice: amount, message: 'Cupom inválido ou expirado.' };
+    }
+
+    if (coupon.validUntil && new Date(coupon.validUntil) < new Date()) {
+      return { valid: false, discount: 0, finalPrice: amount, message: 'Cupom expirou.' };
+    }
+
+    if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
+      return { valid: false, discount: 0, finalPrice: amount, message: 'Cupom atingiu o limite de usos.' };
+    }
+
+    if (coupon.minAmount && amount < coupon.minAmount) {
+      return { valid: false, discount: 0, finalPrice: amount, message: `Valor mínimo para este cupom é R$ ${coupon.minAmount.toFixed(2)}.` };
+    }
+
+    if (coupon.onlyVip) {
+      const isVip = user?.role === 'vip' || user?.vipStatus?.active;
+      if (!isVip) {
+        return { valid: false, discount: 0, finalPrice: amount, message: 'Cupom exclusivo para assinantes VIP.' };
+      }
+    }
+
+    if (coupon.productCategory && category && coupon.productCategory !== category) {
+      return { valid: false, discount: 0, finalPrice: amount, message: `Cupom válido apenas para a categoria ${coupon.productCategory}.` };
+    }
+
+    if (coupon.productId && productId && coupon.productId !== productId) {
+      return { valid: false, discount: 0, finalPrice: amount, message: 'Cupom não aplicável a este produto.' };
+    }
+
+    let discount = 0;
+    if (coupon.discountType === 'percentage') {
+      discount = (amount * coupon.discountValue) / 100;
+    } else {
+      discount = coupon.discountValue;
+    }
+
+    if (discount > amount) discount = amount;
+    const finalPrice = Math.max(0, amount - discount);
+
+    return {
+      valid: true,
+      discount,
+      finalPrice,
+      message: `Cupom ${coupon.code} aplicado com sucesso!`,
+      coupon
+    };
+  }
+
+  // ==============================================
+  // TICKETS SUPPORT ENGINE
+  // ==============================================
+  public getTickets(userRole?: UserRole, userId?: string): Ticket[] {
+    const tickets = this.data.tickets || [];
+    if (userRole === 'admin' || userRole === 'super_admin' || userRole === 'support' || userRole === 'moderator') {
+      return tickets;
+    }
+    if (userId) {
+      return tickets.filter(t => t.userId === userId);
+    }
+    return [];
+  }
+
+  public getTicketById(id: string): Ticket | undefined {
+    return (this.data.tickets || []).find(t => t.id === id);
+  }
+
+  public createTicket(userId: string, userEmail: string, userName: string, subject: string, category: string, priority: Ticket['priority'], initialText: string): Ticket {
+    if (!this.data.tickets) this.data.tickets = [];
+    const now = new Date().toISOString();
+    const ticket: Ticket = {
+      id: `tkt_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      userId,
+      userEmail,
+      userName,
+      subject,
+      category,
+      priority,
+      status: 'ABERTO',
+      messages: [
+        {
+          id: `msg_${Date.now()}`,
+          sender: 'user',
+          senderName: userName,
+          text: initialText,
+          createdAt: now
+        }
+      ],
+      createdAt: now,
+      updatedAt: now
+    };
+    this.data.tickets.unshift(ticket);
+    this.addNotification(undefined, 'Novo Ticket de Suporte', `Novo ticket de ${userName}: ${subject}`, 'info', `/suporte/${ticket.id}`);
+    this.save();
+    return ticket;
+  }
+
+  public addTicketMessage(ticketId: string, sender: 'user' | 'support' | 'admin' | 'system', senderName: string, text: string): Ticket | null {
+    if (!this.data.tickets) return null;
+    const ticket = this.data.tickets.find(t => t.id === ticketId);
+    if (!ticket) return null;
+
+    const now = new Date().toISOString();
+    ticket.messages.push({
+      id: `msg_${Date.now()}`,
+      sender,
+      senderName,
+      text,
+      createdAt: now
+    });
+    ticket.updatedAt = now;
+    if (sender === 'support' || sender === 'admin') {
+      ticket.status = 'AGUARDANDO_USUARIO';
+      this.addNotification(ticket.userId, 'Resposta no Suporte', `O suporte respondeu ao seu chamado #${ticket.id.slice(-6)}.`, 'info');
+    } else if (sender === 'user') {
+      ticket.status = 'EM_ATENDIMENTO';
+    }
+    this.save();
+    return ticket;
+  }
+
+  public updateTicketStatus(ticketId: string, status: Ticket['status'], assignedTo?: string): Ticket | null {
+    if (!this.data.tickets) return null;
+    const ticket = this.data.tickets.find(t => t.id === ticketId);
+    if (!ticket) return null;
+    ticket.status = status;
+    if (assignedTo) ticket.assignedTo = assignedTo;
+    ticket.updatedAt = new Date().toISOString();
+    this.save();
+    return ticket;
+  }
+
+  // ==============================================
+  // USER PRESENCE & ONLINE ENGINE
+  // ==============================================
+  public trackUserPresence(userId: string, userEmail: string, userName: string, role: UserRole, device?: string, browser?: string, ip?: string) {
+    if (!this.data.userPresence) this.data.userPresence = [];
+    const now = new Date().toISOString();
+    const existingIdx = this.data.userPresence.findIndex(p => p.userId === userId);
+    
+    if (existingIdx !== -1) {
+      this.data.userPresence[existingIdx] = {
+        userId,
+        userEmail,
+        userName,
+        role,
+        lastActiveAt: now,
+        device: device || this.data.userPresence[existingIdx].device,
+        browser: browser || this.data.userPresence[existingIdx].browser,
+        ip: ip || this.data.userPresence[existingIdx].ip,
+        status: 'online'
+      };
+    } else {
+      this.data.userPresence.push({
+        userId,
+        userEmail,
+        userName,
+        role,
+        lastActiveAt: now,
+        device,
+        browser,
+        ip,
+        status: 'online'
+      });
+    }
+
+    // Also update User record
+    const user = this.data.users.find(u => u.id === userId);
+    if (user) {
+      user.lastActiveAt = now;
+      if (ip) user.lastIp = ip;
+    }
+
+    this.save();
+  }
+
+  public getOnlineUsers(): UserPresence[] {
+    if (!this.data.userPresence) return [];
+    const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    return this.data.userPresence.filter(p => p.lastActiveAt >= fifteenMinsAgo);
+  }
+
+  // ==============================================
+  // HOME CONTENT CONFIG ENGINE
+  // ==============================================
+  public getHomeConfig(): HomeContentConfig {
+    if (!this.data.homeContentConfig) {
+      this.data.homeContentConfig = {
+        banners: [
+          {
+            id: 'banner_1',
+            title: 'STREAMHUB VIP PROFESSIONAL+',
+            subtitle: 'Assinaturas de Streaming, IPTV e Códigos de Jogos com Ativação Imediata.',
+            badge: 'OFERTA ESPECIAL',
+            ctaText: 'Ver Catálogo VIP',
+            ctaLink: '/catalog',
+            active: true
+          }
+        ],
+        announcementText: '🔥 PROMOÇÃO NETFLIX 4K: Apenas R$ 10/mês com garantia e liberação instantânea!',
+        announcementActive: true,
+        featuredProductIds: ['prod_netflix', 'prod_prime', 'prod_crunchyroll', 'prod_iptv']
+      };
+    }
+    return this.data.homeContentConfig;
+  }
+
+  public updateHomeConfig(updates: Partial<HomeContentConfig>): HomeContentConfig {
+    const current = this.getHomeConfig();
+    this.data.homeContentConfig = { ...current, ...updates };
+    this.save();
+    return this.data.homeContentConfig;
+  }
+
+  // ==============================================
+  // ADVANCED ANALYTICS ENGINE
+  // ==============================================
+  public getAdvancedAnalytics(period: 'today' | '7d' | '30d' | '90d' | '12m' = '30d') {
+    const now = new Date();
+    let startDate = new Date();
+
+    if (period === 'today') {
+      startDate.setHours(0, 0, 0, 0);
+    } else if (period === '7d') {
+      startDate.setDate(now.getDate() - 7);
+    } else if (period === '30d') {
+      startDate.setDate(now.getDate() - 30);
+    } else if (period === '90d') {
+      startDate.setDate(now.getDate() - 90);
+    } else if (period === '12m') {
+      startDate.setFullYear(now.getFullYear() - 1);
+    }
+
+    const isoStart = startDate.toISOString();
+    const payments = (this.data.payments || []).filter(p => p.createdAt >= isoStart);
+    const approvedPayments = payments.filter(p => p.status === 'APROVADO');
+    const pendingPayments = payments.filter(p => p.status === 'PENDENTE');
+
+    const totalRevenue = approvedPayments.reduce((acc, p) => acc + (p.amount || 0), 0);
+    const totalOrders = payments.length;
+    const pendingOrders = pendingPayments.length;
+
+    const users = this.data.users || [];
+    const newUsers = users.filter(u => u.createdAt >= isoStart).length;
+    const onlineUsers = this.getOnlineUsers();
+
+    const products = this.getProducts();
+    const lowStockProducts = products.filter(p => p.stockStatus === 'ESTOQUE_BAIXO' || p.stockStatus === 'ESGOTADO');
+
+    // Chart Data: Sales per Day
+    const daysMap: Record<string, { date: string; sales: number; revenue: number; orders: number }> = {};
+    const dayCount = period === 'today' ? 1 : period === '7d' ? 7 : 30;
+
+    for (let i = dayCount - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      daysMap[dateStr] = { date: dateStr, sales: 0, revenue: 0, orders: 0 };
+    }
+
+    payments.forEach(p => {
+      const dateStr = p.createdAt.split('T')[0];
+      if (daysMap[dateStr]) {
+        daysMap[dateStr].orders += 1;
+        if (p.status === 'APROVADO') {
+          daysMap[dateStr].revenue += p.amount || 0;
+          daysMap[dateStr].sales += 1;
+        }
+      }
+    });
+
+    const salesChart = Object.values(daysMap);
+
+    return {
+      period,
+      revenue: totalRevenue,
+      totalOrders,
+      pendingOrders,
+      approvedOrders: approvedPayments.length,
+      totalUsers: users.length,
+      newUsers,
+      onlineUsersCount: onlineUsers.length,
+      onlineUsers,
+      totalProducts: products.length,
+      lowStockCount: lowStockProducts.length,
+      lowStockProducts,
+      salesChart
+    };
   }
 }
 

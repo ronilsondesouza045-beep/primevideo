@@ -91,7 +91,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             {/* IPTV Banner */}
             <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-cyan-500/40 group/img bg-slate-950 shadow-md">
               <img
-                src="https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=800&q=80"
+                src="https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg"
                 alt="Catálogo IPTV Grátis"
                 referrerPolicy="no-referrer"
                 className="w-full h-32 sm:h-36 object-cover object-center transform group-hover/img:scale-105 transition-transform duration-300"
@@ -201,7 +201,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             {/* Prime Video Catalog Banner / Banner de Séries e Filmes */}
             <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-cyan-500/30 group/img bg-slate-950 shadow-md">
               <img
-                src="https://www.estadao.com.br/resizer/v2/R7LIQKAH2VAPXH5FZC3WR4CBO4.jpg?auth=7bbc99ce8d477bc5ca0bf74b850e698ffc80c46235b29c3a71bda5629a0378cd"
+                src="https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg"
                 alt="Catálogo Prime Video"
                 referrerPolicy="no-referrer"
                 className="w-full h-32 sm:h-36 object-cover object-center transform group-hover/img:scale-105 transition-transform duration-300"

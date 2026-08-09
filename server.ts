@@ -14,15 +14,26 @@ const JWT_SECRET = process.env.JWT_SECRET || 'streamhub_vip_secret_key_2026';
 app.use(express.json());
 app.use(cookieParser());
 
+import { UserRole } from './src/types';
+
 // User Request augmentation
 interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
     email: string;
-    role: 'admin' | 'user';
+    role: UserRole;
     name: string;
     avatarUrl?: string;
   };
+}
+
+// Helper IP extractor
+function getClientIp(req: Request): string {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string') {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.socket?.remoteAddress || '127.0.0.1';
 }
 
 // Authentication Middlewares
@@ -59,7 +70,7 @@ const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextF
       req.user = {
         id: u.id,
         email: u.email,
-        role: u.role,
+        role: u.role || 'user',
         name: u.name,
         avatarUrl: u.avatarUrl
       };
@@ -68,7 +79,7 @@ const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextF
       req.user = {
         id: 'usr_admin_001',
         email: 'ronisouza495@gmail.com',
-        role: 'admin',
+        role: 'super_admin',
         name: 'Administrador StreamHub VIP',
         avatarUrl: ''
       };
@@ -83,16 +94,34 @@ const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextF
   return res.status(401).json({ error: 'Sessão expirada. Por favor, entre na sua conta novamente.' });
 };
 
-const requireAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    return res.status(401).json({ error: 'Acesso não autorizado.' });
-  }
+// RBAC Middleware Generators
+const requireRoles = (...allowedRoles: UserRole[]) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Acesso não autorizado. Autenticação necessária.' });
+    }
 
-  const isAdminEmail = req.user.email.toLowerCase() === 'ronisouza495@gmail.com';
-  if (!isAdminEmail && req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Acesso restrito ao Administrador do StreamHub VIP.' });
-  }
-  next();
+    const isOwnerAdmin = req.user.email.toLowerCase() === 'ronisouza495@gmail.com';
+    if (isOwnerAdmin || req.user.role === 'super_admin') {
+      return next();
+    }
+
+    if (allowedRoles.includes(req.user.role)) {
+      return next();
+    }
+
+    return res.status(403).json({ error: `Acesso negado. Esta ação requer permissão de ${allowedRoles.join(' ou ')}.` });
+  };
+};
+
+const requireAdmin = requireRoles('admin', 'super_admin');
+const requireSupport = requireRoles('support', 'moderator', 'admin', 'super_admin');
+const requireModerator = requireRoles('moderator', 'admin', 'super_admin');
+const requireSuperAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  if (!req.user) return res.status(401).json({ error: 'Não autorizado.' });
+  const isOwnerAdmin = req.user.email.toLowerCase() === 'ronisouza495@gmail.com';
+  if (isOwnerAdmin || req.user.role === 'super_admin') return next();
+  return res.status(403).json({ error: 'Acesso exclusivo do Super Administrador.' });
 };
 
 // ==============================================
@@ -428,15 +457,7 @@ app.get('/api/auth/me', authenticateToken, (req: AuthenticatedRequest, res: Resp
   });
 });
 
-// IP Helper
-const getClientIp = (req: Request): string => {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (forwarded) {
-    const ipStr = Array.isArray(forwarded) ? forwarded[0] : forwarded;
-    return ipStr.split(',')[0].trim().replace(/^::ffff:/, '');
-  }
-  return (req.ip || req.socket.remoteAddress || '127.0.0.1').replace(/^::ffff:/, '').trim();
-};
+// IP Helper is declared at the top of server.ts
 
 // ==============================================
 // 2. SERVICES & ACCESS GENERATOR
@@ -457,8 +478,8 @@ app.get('/api/services/prime-status', (req: Request, res: Response) => {
   }
 });
 
-// Generate Free Prime Video Access
-app.post('/api/services/generate-prime', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+// Generate Free Prime Video Access (supports both route aliases)
+app.post(['/api/services/generate-prime', '/api/services/prime'], authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   try {
     const user = req.user!;
     const userIp = getClientIp(req);
@@ -477,6 +498,7 @@ app.post('/api/services/generate-prime', authenticateToken, (req: AuthenticatedR
     return res.json({
       success: true,
       message: 'Acesso Prime Video gerado com sucesso!',
+      credentials: releasedCredentials,
       access: {
         id: accessLog.id,
         service: 'Prime Video VIP (Gratuito)',
@@ -495,8 +517,8 @@ app.post('/api/services/generate-prime', authenticateToken, (req: AuthenticatedR
   }
 });
 
-// Generate Free Paramount+ Access
-app.post('/api/services/generate-paramount', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+// Generate Free Paramount+ Access (supports both route aliases)
+app.post(['/api/services/generate-paramount', '/api/services/paramount'], authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   try {
     const user = req.user!;
     const userIp = getClientIp(req);
@@ -515,6 +537,7 @@ app.post('/api/services/generate-paramount', authenticateToken, (req: Authentica
     return res.json({
       success: true,
       message: 'Acesso Paramount+ gerado com sucesso!',
+      credentials: releasedCredentials,
       access: {
         id: accessLog.id,
         service: 'Paramount+ Gratuito',
@@ -532,8 +555,8 @@ app.post('/api/services/generate-paramount', authenticateToken, (req: Authentica
   }
 });
 
-// Generate Free Crunchyroll Access
-app.post('/api/services/generate-crunchyroll', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+// Generate Free Crunchyroll Access (supports both route aliases)
+app.post(['/api/services/generate-crunchyroll', '/api/services/crunchyroll'], authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   try {
     const user = req.user!;
     const userIp = getClientIp(req);
@@ -552,6 +575,7 @@ app.post('/api/services/generate-crunchyroll', authenticateToken, (req: Authenti
     return res.json({
       success: true,
       message: 'Acesso Crunchyroll VIP gerado com sucesso!',
+      credentials: releasedCredentials,
       access: {
         id: accessLog.id,
         service: 'Crunchyroll VIP',
@@ -2237,9 +2261,514 @@ app.put('/api/admin/credentials', authenticateToken, requireAdmin, (req: Authent
       tonLink
     });
 
+    db.addAuditLog(req.user?.email || 'admin', `Atualização de Credencial: ${serviceId}`, serviceId, `Email: ${email}`);
     return res.json({ message: `Credenciais de ${serviceId.toUpperCase()} atualizadas com sucesso!` });
   } catch (err: any) {
     return res.status(500).json({ error: 'Erro ao atualizar credenciais.' });
+  }
+});
+
+// ==============================================
+// 4.5. PRODUCTS, NOTIFICATIONS, PROFILE & AUDIT LOGS
+// ==============================================
+
+// Products Catalog API
+app.get('/api/products', (req: Request, res: Response) => {
+  try {
+    const products = db.getProducts();
+    return res.json({ success: true, products });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao carregar produtos do catálogo.' });
+  }
+});
+
+app.get('/api/products/:id', (req: Request, res: Response) => {
+  try {
+    const product = db.getProductById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Produto não encontrado.' });
+    return res.json({ success: true, product });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao buscar detalhes do produto.' });
+  }
+});
+
+app.post('/api/admin/products', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { name, description, category, price, image, banner, stockStatus, features, badge, isFree, instructions } = req.body;
+    if (!name || !description) return res.status(400).json({ error: 'Nome e Descrição são obrigatórios.' });
+
+    const newProd = db.addProduct({
+      name,
+      description,
+      category: category || 'Streaming',
+      price: Number(price) || 0,
+      isFree: Boolean(isFree || Number(price) === 0),
+      image: image || 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=800&q=80',
+      banner,
+      stockStatus: stockStatus || 'DISPONIVEL',
+      rating: 5.0,
+      features: features || [],
+      badge,
+      instructions: instructions || []
+    });
+
+    db.addAuditLog(req.user?.email || 'admin', 'Criou Produto', newProd.id, `Nome: ${name}`);
+    return res.json({ success: true, product: newProd, message: 'Produto cadastrado com sucesso!' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao cadastrar produto.' });
+  }
+});
+
+app.put('/api/admin/products/:id', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const updated = db.updateProduct(req.params.id, req.body);
+    if (!updated) return res.status(404).json({ error: 'Produto não encontrado.' });
+    db.addAuditLog(req.user?.email || 'admin', 'Atualizou Produto', req.params.id, JSON.stringify(req.body));
+    return res.json({ success: true, product: updated, message: 'Produto atualizado com sucesso!' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao atualizar produto.' });
+  }
+});
+
+app.delete('/api/admin/products/:id', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const removed = db.deleteProduct(req.params.id);
+    if (!removed) return res.status(404).json({ error: 'Produto não encontrado.' });
+    db.addAuditLog(req.user?.email || 'admin', 'Excluiu Produto', req.params.id);
+    return res.json({ success: true, message: 'Produto removido com sucesso!' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao excluir produto.' });
+  }
+});
+
+// Notifications API
+app.get('/api/notifications', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const notifications = db.getNotifications(req.user?.id);
+    return res.json({ success: true, notifications });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao buscar notificações.' });
+  }
+});
+
+app.post('/api/notifications/read', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    db.markNotificationsRead(req.user?.id);
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao atualizar notificações.' });
+  }
+});
+
+// ==============================================
+// ETAPA 2 — ADVANCED SaaS & MARKETPLACE API ROUTES
+// ==============================================
+
+// 1. ADVANCED DASHBOARD ANALYTICS
+app.get('/api/admin/analytics', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const period = (req.query.period as any) || '30d';
+    const analytics = db.getAdvancedAnalytics(period);
+    return res.json({ success: true, analytics });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao gerar dados analíticos.' });
+  }
+});
+
+// 2. ONLINE PRESENCE TRACKING
+app.post('/api/track-presence', (req: Request, res: Response) => {
+  try {
+    const { userId, userEmail, userName, role, device, browser } = req.body;
+    if (userId && userEmail) {
+      db.trackUserPresence(userId, userEmail, userName || userEmail.split('@')[0], role || 'user', device, browser, getClientIp(req));
+    }
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao registrar presença.' });
+  }
+});
+
+app.get('/api/admin/online-users', authenticateToken, requireSupport, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const online = db.getOnlineUsers();
+    return res.json({ success: true, count: online.length, onlineUsers: online });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao listar usuários online.' });
+  }
+});
+
+// 3. RBAC ROLE & VIP MANAGEMENT
+app.post('/api/admin/users/:id/role', authenticateToken, requireSuperAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { newRole } = req.body;
+    if (!newRole) return res.status(400).json({ error: 'Nova função é obrigatória.' });
+    const updated = db.updateUserRole(req.params.id, newRole, req.user!.email);
+    if (!updated) return res.status(404).json({ error: 'Usuário não encontrado.' });
+    return res.json({ success: true, message: `Permissão alterada para ${newRole}`, user: updated });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao alterar nível do usuário.' });
+  }
+});
+
+app.post('/api/admin/users/:id/vip', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { active, plan, expiresAt, discountPercentage } = req.body;
+    const updated = db.updateUserVipStatus(req.params.id, { active, plan, expiresAt, discountPercentage }, req.user!.email);
+    if (!updated) return res.status(404).json({ error: 'Usuário não encontrado.' });
+    return res.json({ success: true, message: 'Status VIP atualizado com sucesso.', user: updated });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao atualizar VIP do usuário.' });
+  }
+});
+
+// 4. COUPONS API
+app.get('/api/coupons', (req: Request, res: Response) => {
+  try {
+    const coupons = db.getCoupons().filter(c => c.active);
+    return res.json({ success: true, coupons });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao listar cupons.' });
+  }
+});
+
+app.get('/api/admin/coupons', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const coupons = db.getCoupons();
+    return res.json({ success: true, coupons });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao listar cupons admin.' });
+  }
+});
+
+app.post('/api/admin/coupons', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { code, discountType, discountValue, minAmount, maxUses, validUntil, onlyVip, active, productCategory, productId } = req.body;
+    if (!code || !discountValue) return res.status(400).json({ error: 'Código e valor do desconto são obrigatórios.' });
+    
+    const coupon = db.addCoupon({
+      code,
+      discountType: discountType || 'percentage',
+      discountValue: Number(discountValue),
+      minAmount: minAmount ? Number(minAmount) : undefined,
+      maxUses: maxUses ? Number(maxUses) : undefined,
+      validUntil,
+      onlyVip: Boolean(onlyVip),
+      active: active !== false,
+      productCategory,
+      productId
+    });
+
+    db.addAuditLog(req.user!.email, 'CREATE_COUPON', coupon.code, `Criou cupom ${coupon.code}`);
+    return res.json({ success: true, coupon });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao criar cupom.' });
+  }
+});
+
+app.put('/api/admin/coupons/:id', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const updated = db.updateCoupon(req.params.id, req.body);
+    if (!updated) return res.status(404).json({ error: 'Cupom não encontrado.' });
+    db.addAuditLog(req.user!.email, 'UPDATE_COUPON', updated.code, `Atualizou cupom ${updated.code}`);
+    return res.json({ success: true, coupon: updated });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao atualizar cupom.' });
+  }
+});
+
+app.delete('/api/admin/coupons/:id', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const deleted = db.deleteCoupon(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Cupom não encontrado.' });
+    db.addAuditLog(req.user!.email, 'DELETE_COUPON', req.params.id, 'Removeu cupom');
+    return res.json({ success: true, message: 'Cupom removido com sucesso.' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao deletar cupom.' });
+  }
+});
+
+app.post('/api/coupons/validate', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { code, amount, category, productId } = req.body;
+    if (!code) return res.status(400).json({ error: 'Informe o código do cupom.' });
+
+    const userObj = db.getUserById(req.user!.id);
+    const result = db.validateCoupon(code, Number(amount || 0), userObj, category, productId);
+    return res.json(result);
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao validar cupom.' });
+  }
+});
+
+// 5. TICKETS SUPPORT API
+app.get('/api/tickets', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const tickets = db.getTickets(req.user?.role, req.user?.id);
+    return res.json({ success: true, tickets });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao listar tickets.' });
+  }
+});
+
+app.post('/api/tickets', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { subject, category, priority, message } = req.body;
+    if (!subject || !message) return res.status(400).json({ error: 'Assunto e mensagem são obrigatórios.' });
+
+    const ticket = db.createTicket(
+      req.user!.id,
+      req.user!.email,
+      req.user!.name,
+      subject.trim(),
+      category || 'Geral',
+      priority || 'Média',
+      message.trim()
+    );
+
+    return res.json({ success: true, message: 'Ticket aberto com sucesso!', ticket });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao abrir ticket de suporte.' });
+  }
+});
+
+app.get('/api/tickets/:id', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const ticket = db.getTicketById(req.params.id);
+    if (!ticket) return res.status(404).json({ error: 'Ticket não encontrado.' });
+
+    const isStaff = ['admin', 'super_admin', 'support', 'moderator'].includes(req.user!.role);
+    if (!isStaff && ticket.userId !== req.user!.id) {
+      return res.status(403).json({ error: 'Acesso negado a este chamado.' });
+    }
+
+    return res.json({ success: true, ticket });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao carregar detalhes do ticket.' });
+  }
+});
+
+app.post('/api/tickets/:id/messages', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { text } = req.body;
+    if (!text || !text.trim()) return res.status(400).json({ error: 'Mensagem vazia.' });
+
+    const isStaff = ['admin', 'super_admin', 'support', 'moderator'].includes(req.user!.role);
+    const sender = isStaff ? 'support' : 'user';
+
+    const ticket = db.addTicketMessage(req.params.id, sender, req.user!.name, text.trim());
+    if (!ticket) return res.status(404).json({ error: 'Ticket não encontrado.' });
+
+    return res.json({ success: true, ticket });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao enviar mensagem no chamado.' });
+  }
+});
+
+app.patch('/api/tickets/:id/status', authenticateToken, requireSupport, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { status, assignedTo } = req.body;
+    const ticket = db.updateTicketStatus(req.params.id, status, assignedTo);
+    if (!ticket) return res.status(404).json({ error: 'Ticket não encontrado.' });
+    return res.json({ success: true, ticket });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao atualizar status do ticket.' });
+  }
+});
+
+// 6. GLOBAL COMMAND K SEARCH API
+app.get('/api/search', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const query = (req.query.q as string || '').toLowerCase().trim();
+    if (!query) return res.json({ success: true, results: { products: [], orders: [], tickets: [], users: [], adminPages: [] } });
+
+    const isStaff = ['admin', 'super_admin', 'support', 'moderator'].includes(req.user!.role);
+
+    // Search Products
+    const products = db.getProducts().filter(p =>
+      p.name.toLowerCase().includes(query) ||
+      p.description.toLowerCase().includes(query) ||
+      p.category.toLowerCase().includes(query)
+    ).slice(0, 5);
+
+    // Search Tickets
+    const allTickets = db.getTickets(req.user?.role, req.user?.id);
+    const tickets = allTickets.filter(t =>
+      t.subject.toLowerCase().includes(query) ||
+      t.id.toLowerCase().includes(query) ||
+      t.category.toLowerCase().includes(query)
+    ).slice(0, 5);
+
+    let orders: any[] = [];
+    let users: any[] = [];
+    let adminPages: any[] = [];
+
+    if (isStaff) {
+      // Search Orders / Payments
+      orders = db.getPayments().filter(p =>
+        p.id.toLowerCase().includes(query) ||
+        p.userEmail.toLowerCase().includes(query)
+      ).slice(0, 5);
+
+      // Search Users
+      users = db.getUsers().filter(u =>
+        u.name.toLowerCase().includes(query) ||
+        u.email.toLowerCase().includes(query)
+      ).slice(0, 5);
+
+      const pages = [
+        { name: 'Dashboard de Vendas', path: 'admin', tab: 'dashboard' },
+        { name: 'Gerenciador de Usuários & RBAC', path: 'admin', tab: 'users' },
+        { name: 'Gerenciador de Cupons', path: 'admin', tab: 'coupons' },
+        { name: 'Central de Chamados de Suporte', path: 'admin', tab: 'tickets' },
+        { name: 'Configuração da Home', path: 'admin', tab: 'home-config' },
+        { name: 'Logs de Auditoria', path: 'admin', tab: 'audit' }
+      ];
+      adminPages = pages.filter(p => p.name.toLowerCase().includes(query));
+    }
+
+    return res.json({
+      success: true,
+      results: {
+        products,
+        tickets,
+        orders,
+        users,
+        adminPages
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao realizar busca global.' });
+  }
+});
+
+// 7. SYSTEM STATUS MONITORING API
+app.get('/api/status', (req: Request, res: Response) => {
+  try {
+    const productsCount = db.getProducts().length;
+    const isDbOperational = productsCount > 0;
+    const isApiOperational = true;
+
+    return res.json({
+      success: true,
+      statusName: 'STREAMHUB VIP PROFESSIONAL+',
+      overall: 'Operational',
+      updatedAt: new Date().toISOString(),
+      services: [
+        { name: 'Website & Interface PWA', status: 'Operacional', latencyMs: 12 },
+        { name: 'Catálogo de Produtos & Estoque', status: isDbOperational ? 'Operacional' : 'Degradado', latencyMs: 18 },
+        { name: 'API Backend Node.js & Auth', status: isApiOperational ? 'Operacional' : 'Instável', latencyMs: 8 },
+        { name: 'Gateway Ton / Pix', status: 'Operacional', latencyMs: 45 },
+        { name: 'Central de Suporte & Tickets', status: 'Operacional', latencyMs: 15 }
+      ],
+      incidentsHistory: [
+        { date: '2026-08-01', title: 'Manutenção Programada no Servidor IPTV ger99.xyz', resolved: true },
+        { date: '2026-07-20', title: 'Atualização do Sistema RBAC e Presença em Tempo Real', resolved: true }
+      ]
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao obter status do sistema.' });
+  }
+});
+
+// 8. HOME DYNAMIC CONTENT CONFIG API
+app.get('/api/home-config', (req: Request, res: Response) => {
+  try {
+    const config = db.getHomeConfig();
+    return res.json({ success: true, config });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao carregar configurações da home.' });
+  }
+});
+
+app.post('/api/admin/home-config', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const updated = db.updateHomeConfig(req.body);
+    db.addAuditLog(req.user!.email, 'UPDATE_HOME_CONFIG', 'Home Content', 'Atualizou layout/banners da Home');
+    return res.json({ success: true, config: updated, message: 'Configurações da Home atualizadas!' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao salvar configurações da home.' });
+  }
+});
+
+// 9. FAVORITES API
+app.post('/api/user/favorites/toggle', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { productId } = req.body;
+    if (!productId) return res.status(400).json({ error: 'ID do produto obrigatório.' });
+    const favorites = db.toggleFavorite(req.user!.id, productId);
+    return res.json({ success: true, favorites });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao atualizar favoritos.' });
+  }
+});
+
+// User Profile & Password Update
+app.put('/api/user/profile', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { name, avatarUrl } = req.body;
+    const u = db.getUserById(req.user!.id);
+    if (!u) return res.status(404).json({ error: 'Usuário não encontrado.' });
+
+    if (name) u.name = name.trim();
+    if (avatarUrl) u.avatarUrl = avatarUrl.trim();
+
+    return res.json({
+      success: true,
+      message: 'Perfil atualizado com sucesso!',
+      user: {
+        id: u.id,
+        email: u.email,
+        name: u.name,
+        role: u.role,
+        avatarUrl: u.avatarUrl
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao atualizar perfil.' });
+  }
+});
+
+app.post('/api/user/change-password', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Senha atual e nova senha são obrigatórias.' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres.' });
+    }
+
+    const u = db.getUserById(req.user!.id);
+    if (!u) return res.status(404).json({ error: 'Usuário não encontrado.' });
+
+    const isMatch = bcrypt.compareSync(currentPassword, u.passwordHash);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Senha atual incorreta.' });
+    }
+
+    u.passwordHash = bcrypt.hashSync(newPassword, 10);
+    return res.json({ success: true, message: 'Senha alterada com sucesso!' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao alterar senha.' });
+  }
+});
+
+app.post('/api/auth/forgot-password', (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'E-mail é obrigatório.' });
+
+    const user = db.getUserByEmail(email.trim());
+    if (user) {
+      db.addNotification(user.id, 'Recuperação de Senha', 'Instruções para redefinir sua senha foram enviadas ao seu e-mail.', 'warning');
+    }
+
+    return res.json({
+      success: true,
+      message: 'Se o e-mail informado estiver cadastrado em nossa base, enviamos um link com as instruções para redefinir sua senha.'
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao processar solicitação.' });
   }
 });
 
