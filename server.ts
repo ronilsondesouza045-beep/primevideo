@@ -327,11 +327,15 @@ app.post('/api/auth/social-login', (req: Request, res: Response) => {
 // GET Current Authenticated User (Me)
 app.get('/api/auth/me', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   try {
-    const u = req.user!;
-    const user = db.getUserById(u.id) || db.getUserByEmail(u.email);
+    if (!req.user) {
+      return res.status(401).json({ error: 'Não autenticado' });
+    }
+    const user = db.getUserById(req.user.id) || db.getUserByEmail(req.user.email);
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
+
+    const avatarUrl = user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.email)}&background=dc2626&color=ffffff&bold=true`;
 
     return res.json({
       user: {
@@ -340,7 +344,8 @@ app.get('/api/auth/me', authenticateToken, (req: AuthenticatedRequest, res: Resp
         name: user.name,
         role: user.role,
         status: user.status,
-        avatarUrl: user.avatarUrl,
+        avatarUrl: avatarUrl,
+        createdAt: user.createdAt,
         walletBalance: db.getUserWalletBalance(user.id)
       }
     });
@@ -433,28 +438,6 @@ app.get('/api/support/history', (req: Request, res: Response) => {
 app.post('/api/auth/logout', (req: Request, res: Response) => {
   res.clearCookie('token');
   return res.json({ message: 'Sessão encerrada com sucesso.' });
-});
-
-// Current User Info
-app.get('/api/auth/me', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
-  if (!req.user) return res.status(401).json({ error: 'Não autenticado' });
-
-  const user = db.getUserById(req.user.id);
-  if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
-
-  const avatarUrl = user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.email)}&background=dc2626&color=ffffff&bold=true`;
-
-  return res.json({
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      status: user.status,
-      avatarUrl: avatarUrl,
-      createdAt: user.createdAt
-    }
-  });
 });
 
 // IP Helper is declared at the top of server.ts
@@ -2644,6 +2627,10 @@ app.get('/api/search', authenticateToken, (req: AuthenticatedRequest, res: Respo
 // 7. SYSTEM STATUS MONITORING API
 app.get('/api/status', (req: Request, res: Response) => {
   try {
+    // Run periodic auto-maintenance check if interval reached
+    const autoUpdateRes = db.runAutoMaintenanceCheck(false);
+    const autoUpdateInfo = db.getAutoUpdateInfo();
+
     const productsCount = db.getProducts().length;
     const isDbOperational = productsCount > 0;
     const isApiOperational = true;
@@ -2653,12 +2640,15 @@ app.get('/api/status', (req: Request, res: Response) => {
       statusName: 'STREAMHUB VIP PROFESSIONAL+',
       overall: 'Operational',
       updatedAt: new Date().toISOString(),
+      autoUpdate: autoUpdateInfo,
+      autoUpdateCheckResult: autoUpdateRes,
       services: [
         { name: 'Website & Interface PWA', status: 'Operacional', latencyMs: 12 },
         { name: 'Catálogo de Produtos & Estoque', status: isDbOperational ? 'Operacional' : 'Degradado', latencyMs: 18 },
         { name: 'API Backend Node.js & Auth', status: isApiOperational ? 'Operacional' : 'Instável', latencyMs: 8 },
         { name: 'Gateway Ton / Pix', status: 'Operacional', latencyMs: 45 },
-        { name: 'Central de Suporte & Tickets', status: 'Operacional', latencyMs: 15 }
+        { name: 'Central de Suporte & Tickets', status: 'Operacional', latencyMs: 15 },
+        { name: 'Motor de Atualização Automática & Auto-Heal', status: 'Ativo e Monitorando', latencyMs: 5 }
       ],
       incidentsHistory: [
         { date: '2026-08-01', title: 'Manutenção Programada no Servidor IPTV ger99.xyz', resolved: true },
@@ -2667,6 +2657,35 @@ app.get('/api/status', (req: Request, res: Response) => {
     });
   } catch (err) {
     return res.status(500).json({ error: 'Erro ao obter status do sistema.' });
+  }
+});
+
+// 7.1 AUTO-UPDATE API ENDPOINTS
+app.get('/api/auto-update', (req: Request, res: Response) => {
+  try {
+    const info = db.getAutoUpdateInfo();
+    return res.json({ success: true, autoUpdate: info });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao buscar dados de atualização automática.' });
+  }
+});
+
+app.post('/api/auto-update/run', (req: Request, res: Response) => {
+  try {
+    const result = db.runAutoMaintenanceCheck(true);
+    return res.json({ success: true, result });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao executar atualização manual.' });
+  }
+});
+
+app.post('/api/auto-update/settings', (req: Request, res: Response) => {
+  try {
+    const { enabled, intervalDays } = req.body;
+    const updated = db.updateAutoUpdateSettings(Boolean(enabled), Number(intervalDays) || 2);
+    return res.json({ success: true, autoUpdate: updated });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao atualizar configurações.' });
   }
 });
 
