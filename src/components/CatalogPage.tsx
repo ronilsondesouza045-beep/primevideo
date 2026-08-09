@@ -37,26 +37,143 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     prod_social_boost: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80'
   };
 
+  const FALLBACK_PRODUCTS: Product[] = [
+    {
+      id: 'prod_prime',
+      name: 'Prime Video VIP (Acesso Grátis)',
+      description: 'Acesso completo ao catálogo de filmes, séries e produções originais do Prime Video em resolução 4K Ultra HD.',
+      category: 'Streaming',
+      price: 0,
+      isFree: true,
+      image: OFFICIAL_IMAGES['prod_prime'],
+      banner: OFFICIAL_IMAGES['prod_prime'],
+      stockStatus: 'DISPONIVEL',
+      rating: 4.9,
+      badge: '100% GRÁTIS',
+      features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Suporte VIP via Chatbot'],
+      instructions: ['Acesse o site oficial do Prime Video (primevideo.com).', 'Insira o e-mail e a senha liberados na aba "Meus Acessos".', 'Escolha qualquer perfil e aproveite sem limites.'],
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'prod_paramount',
+      name: 'Paramount+ VIP (Gratuito)',
+      description: 'Desfrute de séries exclusivas, filmes campeões de bilheteria e esportes ao vivo na plataforma Paramount+.',
+      category: 'Streaming',
+      price: 0,
+      isFree: true,
+      image: OFFICIAL_IMAGES['prod_paramount'],
+      banner: OFFICIAL_IMAGES['prod_paramount'],
+      stockStatus: 'DISPONIVEL',
+      rating: 4.8,
+      badge: 'DE GRAÇA',
+      features: ['Séries exclusivas', 'Transmissões esportivas', 'Catálogo Infantil Nickelodeon', 'Acesso direto'],
+      instructions: ['Acesse paramountplus.com.', 'Digite as credenciais disponibilizadas.', 'Selecione o perfil e divirta-se.'],
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'prod_crunchyroll',
+      name: 'Crunchyroll Premium VIP',
+      description: 'A maior biblioteca de animes do mundo! Assista em HD com legendas e dublagens em português sem anúncios.',
+      category: 'Entretenimento',
+      price: 0,
+      isFree: true,
+      image: OFFICIAL_IMAGES['prod_crunchyroll'],
+      banner: OFFICIAL_IMAGES['prod_crunchyroll'],
+      stockStatus: 'DISPONIVEL',
+      rating: 4.9,
+      badge: 'ANIMES HD',
+      features: ['Lançamentos simulcast', 'Sem comerciais', 'Qualidade 1080p Full HD', 'Catálogo completo'],
+      instructions: ['Entre no site ou app Crunchyroll.', 'Insira a conta fornecida no painel.'],
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'prod_netflix',
+      name: 'Netflix VIP Ultra HD (Perfil Individual)',
+      description: 'Conta individual com perfil próprio na Netflix, qualidade 4K HDR e garantia de estabilidade durante todo o mês.',
+      category: 'Premium',
+      price: 10.00,
+      isFree: false,
+      image: OFFICIAL_IMAGES['prod_netflix'],
+      banner: OFFICIAL_IMAGES['prod_netflix'],
+      stockStatus: 'ESTOQUE_BAIXO',
+      rating: 5.0,
+      badge: 'PROMOÇÃO R$ 10',
+      features: ['Perfil com PIN exclusivo', 'Qualidade 4K Ultra HD', 'Garantia de 30 dias', 'Suporte prioritário'],
+      instructions: ['Após o pagamento aprovado no Ton/Pix, a credencial será revelada em "Meus Acessos".', 'Use a conta na Netflix e acesse apenas o perfil com seu nome e PIN.'],
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'prod_iptv',
+      name: 'Servidor IPTV Lista M3U & Xtream',
+      description: 'Mais de 30 canais ao vivo, filmes e séries para Smart TV, TV Box, celular e computador no servidor ger99.xyz.',
+      category: 'Entretenimento',
+      price: 0,
+      isFree: true,
+      image: OFFICIAL_IMAGES['prod_iptv'],
+      banner: OFFICIAL_IMAGES['prod_iptv'],
+      stockStatus: 'DISPONIVEL',
+      rating: 4.8,
+      badge: '31 CONTAS',
+      features: ['Servidor ger99.xyz:80', 'Suporte Xtream API', 'Canais Full HD', 'Atualização mensal'],
+      instructions: ['Abra seu reprodutor IPTV (IPTV Smarters, XCIPTV, TViMate).', 'Insira o servidor http://ger99.xyz:80 e os dados de um dos 31 usuários da lista.'],
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'prod_social_boost',
+      name: 'Impulso Redes Sociais - SMM Boost',
+      description: 'Engajamento real para Instagram, TikTok e YouTube. Teste 50 unidades gratuitas a cada 24 horas.',
+      category: 'Premium',
+      price: 0,
+      isFree: true,
+      image: OFFICIAL_IMAGES['prod_social_boost'],
+      banner: OFFICIAL_IMAGES['prod_social_boost'],
+      stockStatus: 'DISPONIVEL',
+      rating: 4.9,
+      badge: 'AUTOMÁTICO',
+      features: ['Entrega ultra rápida', 'Seguidores & Curtidas', 'Teste Grátis 50 unidades', 'Painel de acompanhamento'],
+      instructions: ['Cole o link do seu perfil ou publicação.', 'Solicite o teste grátis ou compre com seu saldo de carteira.'],
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'prod_freefire',
+      name: 'Free Fire - Codiguin & 100 Diamantes (Gratuito)',
+      description: 'Resgate de códigos promocionais e recargas de diamantes diretamente na sua conta Free Fire.',
+      category: 'Games',
+      price: 0,
+      isFree: true,
+      image: OFFICIAL_IMAGES['prod_freefire'],
+      banner: OFFICIAL_IMAGES['prod_freefire'],
+      stockStatus: 'DISPONIVEL',
+      rating: 4.7,
+      badge: 'CODIGUIN',
+      features: ['Códigos válidos', 'Resgate no site da Garena', 'Entrega de Diamantes', 'Grátis para membros'],
+      instructions: ['Acesse o site oficial de resgate da Garena (reward.ff.garena.com).', 'Insira o Codiguin gerado.'],
+      updatedAt: new Date().toISOString()
+    }
+  ];
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/products');
       if (res.ok) {
         const data = await res.json();
-        if (data.products) {
+        if (data.products && Array.isArray(data.products) && data.products.length > 0) {
           const normalized = data.products.map((p: Product) => ({
             ...p,
             image: OFFICIAL_IMAGES[p.id] || p.image,
             banner: OFFICIAL_IMAGES[p.id] || p.banner || p.image
           }));
           setProducts(normalized);
+          setLoading(false);
+          return;
         }
       }
     } catch (e) {
       console.error('Erro ao buscar produtos:', e);
-    } finally {
-      setLoading(false);
     }
+    setProducts(FALLBACK_PRODUCTS);
+    setLoading(false);
   };
 
   const categories = ['Todos', 'Streaming', 'Entretenimento', 'Games', 'Premium', 'Gratuitos'];
