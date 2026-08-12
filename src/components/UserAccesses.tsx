@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AccessLog, PaymentRecord } from '../types';
-import { Sparkles, Copy, Check, Play, ShieldCheck, Zap, ExternalLink, Clock, RefreshCw, Tv, AlertTriangle, Flame } from 'lucide-react';
+import { Sparkles, Copy, Check, Play, ShieldCheck, Zap, ExternalLink, Clock, RefreshCw, Tv, AlertTriangle, Flame, Bot } from 'lucide-react';
 import { PrimeCountdown } from './PrimeCountdown';
 
 interface UserAccessesProps {
@@ -154,6 +154,7 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                 const isParamount = a.service === 'paramount';
                 const isCrunchyroll = a.service === 'crunchyroll';
                 const isFreeFire = a.service === 'freefire';
+                const isChatGpt = a.service === 'chatgpt';
 
                 return (
                   <div
@@ -161,6 +162,8 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                   className={`p-5 rounded-2xl bg-slate-900 border transition-all space-y-3 ${
                     isFreeFire
                       ? 'border-slate-800 hover:border-amber-500/50'
+                      : isChatGpt
+                      ? 'border-slate-800 hover:border-emerald-500/50'
                       : isCrunchyroll
                       ? 'border-slate-800 hover:border-orange-500/50'
                       : isParamount
@@ -172,13 +175,15 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded border ${
                       isFreeFire
                         ? 'text-amber-300 bg-amber-950/60 border-amber-500/30'
+                        : isChatGpt
+                        ? 'text-emerald-300 bg-emerald-950/60 border-emerald-500/30'
                         : isCrunchyroll
                         ? 'text-orange-300 bg-orange-950/60 border-orange-500/30'
                         : isParamount
                         ? 'text-blue-400 bg-blue-950/60 border-blue-500/30'
                         : 'text-cyan-400 bg-cyan-950/60 border-cyan-500/30'
                     }`}>
-                      {isFreeFire ? 'FREE FIRE (100 DIAMANTES)' : isCrunchyroll ? 'CRUNCHYROLL GRÁTIS' : isParamount ? 'PARAMOUNT+ GRÁTIS' : 'PRIME VIDEO GRÁTIS'}
+                      {isFreeFire ? 'FREE FIRE (100 DIAMANTES)' : isChatGpt ? 'CHATGPT PRO (GPT-4o)' : isCrunchyroll ? 'CRUNCHYROLL GRÁTIS' : isParamount ? 'PARAMOUNT+ GRÁTIS' : 'PRIME VIDEO GRÁTIS'}
                     </span>
                     <span className="text-[10px] text-slate-400 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -190,6 +195,8 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
                       isFreeFire
                         ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                        : isChatGpt
+                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
                         : isCrunchyroll
                         ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
                         : isParamount
@@ -198,6 +205,8 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     }`}>
                       {isFreeFire ? (
                         <Flame className="w-5 h-5 text-amber-400 fill-amber-400" />
+                      ) : isChatGpt ? (
+                        <Bot className="w-5 h-5 text-emerald-400" />
                       ) : isCrunchyroll ? (
                         <Tv className="w-5 h-5 text-orange-400" />
                       ) : isParamount ? (
@@ -208,10 +217,10 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-white">
-                        {isFreeFire ? 'Codiguin Free Fire' : isCrunchyroll ? 'Crunchyroll VIP' : isParamount ? 'Paramount+' : 'Prime Video VIP'}
+                        {isFreeFire ? 'Codiguin Free Fire' : isChatGpt ? 'ChatGPT Plus / Pro' : isCrunchyroll ? 'Crunchyroll VIP' : isParamount ? 'Paramount+' : 'Prime Video VIP'}
                       </h4>
                       <span className="text-xs text-slate-400">
-                        {isFreeFire ? '100 Diamantes + 10% Bônus' : isCrunchyroll ? 'Animes, Desenhos & Filmes' : 'Acesso Gratuito'}
+                        {isFreeFire ? '100 Diamantes + 10% Bônus' : isChatGpt ? 'Inteligência Artificial GPT-4o' : isCrunchyroll ? 'Animes, Desenhos & Filmes' : 'Acesso Gratuito'}
                       </span>
                     </div>
                   </div>
@@ -254,7 +263,7 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                           <button
                             onClick={() => copyText(`${a.id}_email`, a.credentials.email)}
                             className={`font-mono font-bold hover:underline flex items-center gap-1 ${
-                              isCrunchyroll ? 'text-orange-300' : isParamount ? 'text-blue-300' : 'text-cyan-300'
+                              isChatGpt ? 'text-emerald-300' : isCrunchyroll ? 'text-orange-300' : isParamount ? 'text-blue-300' : 'text-cyan-300'
                             }`}
                           >
                             {a.credentials.email}
@@ -266,7 +275,7 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                           <button
                             onClick={() => copyText(`${a.id}_pwd`, a.credentials.password)}
                             className={`font-mono font-bold hover:underline flex items-center gap-1 ${
-                              isCrunchyroll ? 'text-orange-300' : isParamount ? 'text-blue-300' : 'text-cyan-300'
+                              isChatGpt ? 'text-emerald-300' : isCrunchyroll ? 'text-orange-300' : isParamount ? 'text-blue-300' : 'text-cyan-300'
                             }`}
                           >
                             {a.credentials.password}
@@ -275,7 +284,30 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                         </div>
                       </div>
 
-                      {!isParamount && !isCrunchyroll && <PrimeCountdown createdAt={a.createdAt} />}
+                      {isChatGpt && (
+                        <div className="flex items-center gap-2 pt-1">
+                          <a
+                            href="https://chatgpt.com/auth/login?next=%2F"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 py-1.5 px-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 font-bold text-[11px] flex items-center justify-center gap-1 transition-colors"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            Entrar na Web
+                          </a>
+                          <a
+                            href="https://play.google.com/store/apps/details?id=com.openai.chatgpt"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-[11px] flex items-center justify-center gap-1 transition-colors"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            Play Store App
+                          </a>
+                        </div>
+                      )}
+
+                      {!isParamount && !isCrunchyroll && !isChatGpt && <PrimeCountdown createdAt={a.createdAt} />}
                     </>
                   )}
                 </div>

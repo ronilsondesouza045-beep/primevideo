@@ -8,6 +8,7 @@ import { NotificationsModal } from './NotificationsModal';
 import { PrimeModal } from './PrimeModal';
 import { ParamountModal } from './ParamountModal';
 import { CrunchyrollModal } from './CrunchyrollModal';
+import { ChatGptModal } from './ChatGptModal';
 import { IptvModal } from './IptvModal';
 import { NetflixModal } from './NetflixModal';
 import { FreeFireModal } from './FreeFireModal';
@@ -44,6 +45,9 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
     setParamountCreds,
     crunchyrollCreds,
     setCrunchyrollCreds,
+    chatgptCreds,
+    setChatGptCreds,
+    openChat,
     selectedReviewService,
     setSelectedReviewService,
     freeFireResult,
@@ -58,6 +62,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
       case 'paramount': return 'Paramount+ VIP';
       case 'freefire': return 'Free Fire Codiguin';
       case 'crunchyroll': return 'Crunchyroll Premium';
+      case 'chatgpt': return 'ChatGPT Plus/Pro';
       default: return 'Serviço VIP';
     }
   };
@@ -109,6 +114,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         <ParamountModal
           credentials={paramountCreds}
           onClose={() => setParamountCreds(null)}
+          onOpenChat={openChat}
         />
       )}
 
@@ -116,6 +122,15 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         <CrunchyrollModal
           credentials={crunchyrollCreds}
           onClose={() => setCrunchyrollCreds(null)}
+          onOpenChat={openChat}
+        />
+      )}
+
+      {chatgptCreds && (
+        <ChatGptModal
+          credentials={chatgptCreds}
+          onClose={() => setChatGptCreds(null)}
+          onOpenChat={openChat}
         />
       )}
 

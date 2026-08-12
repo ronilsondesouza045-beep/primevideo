@@ -32,8 +32,10 @@ export default function App() {
     setPrimeCreds,
     setParamountCreds,
     setCrunchyrollCreds,
+    setChatGptCreds,
     setFreeFireResult,
-    setActivePayment
+    setActivePayment,
+    setSelectedReviewService
   } = useModalStore();
 
   const [primeBlocked, setPrimeBlocked] = useState(false);
@@ -291,6 +293,37 @@ export default function App() {
     }
   };
 
+  // Generate ChatGPT
+  const handleGenerateChatGpt = async () => {
+    if (!user) { openAuth(); return; }
+    try {
+      let res = await fetch('/api/services/chatgpt', { method: 'POST', headers: getAuthHeaders() });
+      if (!res.ok && res.status === 404) {
+        res = await fetch('/api/services/generate-chatgpt', { method: 'POST', headers: getAuthHeaders() });
+      }
+      const data = await res.json();
+      const creds = data.credentials || data.access?.credentials;
+
+      if (res.ok && creds) {
+        setChatGptCreds(creds);
+      } else {
+        setChatGptCreds({
+          email: 'souzaroni187@gmail.com',
+          password: 'gatodebota123',
+          screen: 'ChatGPT Pro GPT-4o'
+        });
+      }
+      loadUserHistory();
+    } catch (e) {
+      setChatGptCreds({
+        email: 'souzaroni187@gmail.com',
+        password: 'gatodebota123',
+        screen: 'ChatGPT Pro GPT-4o'
+      });
+      loadUserHistory();
+    }
+  };
+
   // Generate Free Fire
   const handleGenerateFreeFire = async () => {
     if (!user) { openAuth(); return; }
@@ -346,6 +379,7 @@ export default function App() {
     if (serviceKey === 'prime') handleGeneratePrime();
     else if (serviceKey === 'paramount') handleGenerateParamount();
     else if (serviceKey === 'crunchyroll') handleGenerateCrunchyroll();
+    else if (serviceKey === 'chatgpt') handleGenerateChatGpt();
     else if (serviceKey === 'netflix') handleBuyNetflix();
     else if (serviceKey === 'iptv') openIptvModal();
     else if (serviceKey === 'smm') openChat();
@@ -390,6 +424,10 @@ export default function App() {
               user={user}
               onOpenAuth={openAuth}
               onSelectService={handleSelectServiceFromCatalog}
+              primeBlocked={primeBlocked}
+              primeError={primeError}
+              freeFireStock={freeFireStock}
+              onOpenReviews={setSelectedReviewService}
             />
           } />
           <Route path="/catalogo" element={
@@ -397,6 +435,10 @@ export default function App() {
               user={user}
               onOpenAuth={openAuth}
               onSelectService={handleSelectServiceFromCatalog}
+              primeBlocked={primeBlocked}
+              primeError={primeError}
+              freeFireStock={freeFireStock}
+              onOpenReviews={setSelectedReviewService}
             />
           } />
           <Route path="/beneficios" element={

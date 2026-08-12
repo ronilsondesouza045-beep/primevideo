@@ -57,7 +57,7 @@ export interface FreeTrialClaim {
 }
 
 export interface ServiceCredential {
-  serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll';
+  serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll' | 'chatgpt';
   email: string;
   password: string;
   pin?: string;
@@ -70,7 +70,7 @@ export interface AccessLog {
   userId: string;
   userEmail: string;
   userIp?: string;
-  service: 'prime' | 'netflix' | 'paramount' | 'freefire' | 'crunchyroll';
+  service: 'prime' | 'netflix' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt';
   credentials: {
     email: string;
     password: string;
@@ -94,7 +94,7 @@ export interface FreeFirePin {
 
 export interface ServiceReview {
   id: string;
-  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll';
+  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt';
   userId?: string;
   userName: string;
   userEmail?: string;
@@ -461,6 +461,17 @@ class JSONDatabase {
       tonLink: ''
     };
 
+    // ChatGPT Plus / Pro Default (100% Gratuito)
+    // Email: souzaroni187@gmail.com
+    // Senha: gatodebota123
+    this.data.credentials['chatgpt'] = {
+      serviceId: 'chatgpt',
+      email: 'souzaroni187@gmail.com',
+      password: 'gatodebota123',
+      screen: 'ChatGPT Pro GPT-4o',
+      tonLink: ''
+    };
+
     // Netflix Default (Paid R$ 10,00)
     this.data.credentials['netflix'] = {
       serviceId: 'netflix',
@@ -693,15 +704,15 @@ class JSONDatabase {
   }
 
   // Credentials Methods
-  public getCredential(serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll'): ServiceCredential {
+  public getCredential(serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll' | 'chatgpt'): ServiceCredential {
     return this.data.credentials[serviceId] || {
       serviceId,
-      email: serviceId === 'crunchyroll' ? 'skeespq11@hotmail.com' : serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
-      password: serviceId === 'crunchyroll' ? '12344321' : serviceId === 'paramount' ? '4400988' : 'roni141821'
+      email: serviceId === 'chatgpt' ? 'souzaroni187@gmail.com' : serviceId === 'crunchyroll' ? 'skeespq11@hotmail.com' : serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
+      password: serviceId === 'chatgpt' ? 'gatodebota123' : serviceId === 'crunchyroll' ? '12344321' : serviceId === 'paramount' ? '4400988' : 'roni141821'
     };
   }
 
-  public updateCredential(serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll', cred: Partial<ServiceCredential>) {
+  public updateCredential(serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll' | 'chatgpt', cred: Partial<ServiceCredential>) {
     this.data.credentials[serviceId] = {
       ...this.data.credentials[serviceId],
       ...cred
@@ -717,7 +728,7 @@ class JSONDatabase {
   public addAccessLog(
     userId: string,
     userEmail: string,
-    service: 'prime' | 'netflix' | 'paramount' | 'freefire' | 'crunchyroll',
+    service: 'prime' | 'netflix' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt',
     credentials: AccessLog['credentials'],
     userIp?: string
   ): AccessLog {
@@ -1838,146 +1849,185 @@ class JSONDatabase {
   // PRODUCTS CATALOG MANAGEMENT
   // ==============================================
   public ensureDefaultProducts() {
+    const defaults: Product[] = [
+      {
+        id: 'prod_prime',
+        name: 'Prime Video VIP (Acesso Grátis)',
+        description: 'Acesso completo ao catálogo de filmes, séries e produções originais do Prime Video em resolução 4K Ultra HD.',
+        category: 'Streaming',
+        price: 0,
+        isFree: true,
+        image: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
+        banner: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
+        stockStatus: 'DISPONIVEL',
+        rating: 4.9,
+        badge: '100% GRÁTIS',
+        features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Suporte VIP via Chatbot'],
+        instructions: [
+          'Acesse o site oficial do Prime Video (primevideo.com).',
+          'Insira o e-mail e a senha liberados na aba "Meus Acessos".',
+          'Escolha qualquer perfil e aproveite sem limites.'
+        ],
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'prod_paramount',
+        name: 'Paramount+ VIP (Gratuito)',
+        description: 'Desfrute de séries exclusivas, filmes campeões de bilheteria e esportes ao vivo na plataforma Paramount+.',
+        category: 'Streaming',
+        price: 0,
+        isFree: true,
+        image: 'https://t2.tudocdn.net/703654?w=1200&h=1200',
+        banner: 'https://t2.tudocdn.net/703654?w=1200&h=1200',
+        stockStatus: 'DISPONIVEL',
+        rating: 4.8,
+        badge: 'DE GRAÇA',
+        features: ['Séries exclusivas', 'Transmissões esportivas', 'Catálogo Infantil Nickelodeon', 'Acesso direto'],
+        instructions: [
+          'Acesse paramountplus.com.',
+          'Digite as credenciais disponibilizadas.',
+          'Selecione o perfil e divirta-se.'
+        ],
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'prod_crunchyroll',
+        name: 'Crunchyroll Premium VIP',
+        description: 'A maior biblioteca de animes do mundo! Assista em HD com legendas e dublagens em português sem anúncios.',
+        category: 'Entretenimento',
+        price: 0,
+        isFree: true,
+        image: 'https://t2.tudocdn.net/793619?w=776&h=338',
+        banner: 'https://t2.tudocdn.net/793619?w=776&h=338',
+        stockStatus: 'DISPONIVEL',
+        rating: 4.9,
+        badge: 'ANIMES HD',
+        features: ['Lançamentos simulcast', 'Sem comerciais', 'Qualidade 1080p Full HD', 'Catálogo completo'],
+        instructions: [
+          'Entre no site ou app Crunchyroll.',
+          'Insira a conta fornecida no painel.'
+        ],
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'prod_chatgpt',
+        name: 'ChatGPT Plus / Pro (GPT-4o)',
+        description: 'Acesso grátis ao ChatGPT Plus com Inteligência Artificial GPT-4o! Inclui criação de imagens com Thinking, agentes Codex e Work, memória expandida e GPTs personalizados.',
+        category: 'Inteligência Artificial',
+        price: 0,
+        isFree: true,
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10',
+        banner: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10',
+        stockStatus: 'DISPONIVEL',
+        rating: 5.0,
+        badge: 'GPT-4o PRO GRÁTIS',
+        features: [
+          'Modelos avançados',
+          'Criação avançada de imagens com Thinking',
+          'Memória expandida entre chats',
+          'Agente do Work para tarefas em várias etapas',
+          'Agente Codex para programação',
+          'Pesquisa profunda expandida',
+          'Projetos e GPTs personalizados'
+        ],
+        instructions: [
+          'Copie o e-mail (souzaroni187@gmail.com) e a senha.',
+          'Acesse chatgpt.com ou baixe o app oficial na Play Store.',
+          'Faça login com a conta disponibilizada e aproveite!'
+        ],
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'prod_netflix',
+        name: 'Netflix VIP Ultra HD (Perfil Individual)',
+        description: 'Conta individual com perfil próprio na Netflix, qualidade 4K HDR e garantia de estabilidade durante todo o mês.',
+        category: 'Premium',
+        price: 10.00,
+        isFree: false,
+        image: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
+        banner: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
+        stockStatus: 'ESTOQUE_BAIXO',
+        rating: 5.0,
+        badge: 'PROMOÇÃO R$ 10',
+        features: ['Perfil com PIN exclusivo', 'Qualidade 4K Ultra HD', 'Garantia de 30 dias', 'Suporte prioritário'],
+        instructions: [
+          'Após o pagamento aprovado no Ton/Pix, a credencial será revelada em "Meus Acessos".',
+          'Use a conta na Netflix e acesse apenas o perfil com seu nome e PIN.'
+        ],
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'prod_iptv',
+        name: 'Servidor IPTV Lista M3U & Xtream',
+        description: 'Mais de 30 canais ao vivo, filmes e séries para Smart TV, TV Box, celular e computador no servidor ger99.xyz.',
+        category: 'Entretenimento',
+        price: 0,
+        isFree: true,
+        image: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg',
+        banner: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg',
+        stockStatus: 'DISPONIVEL',
+        rating: 4.8,
+        badge: '31 CONTAS',
+        features: ['Servidor ger99.xyz:80', 'Suporte Xtream API', 'Canais Full HD', 'Atualização mensal'],
+        instructions: [
+          'Abra seu reprodutor IPTV (IPTV Smarters, XCIPTV, TViMate).',
+          'Insira o servidor http://ger99.xyz:80 e os dados de um dos 31 usuários da lista.'
+        ],
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'prod_social_boost',
+        name: 'Impulso Redes Sociais - SMM Boost',
+        description: 'Engajamento real para Instagram, TikTok e YouTube. Teste 50 unidades gratuitas a cada 24 horas.',
+        category: 'Premium',
+        price: 0,
+        isFree: true,
+        image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
+        banner: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=1200&q=80',
+        stockStatus: 'DISPONIVEL',
+        rating: 4.9,
+        badge: 'AUTOMÁTICO',
+        features: ['Entrega ultra rápida', 'Seguidores & Curtidas', 'Teste Grátis 50 unidades', 'Painel de acompanhamento'],
+        instructions: [
+          'Cole o link do seu perfil ou publicação.',
+          'Solicite o teste grátis ou compre com seu saldo de carteira.'
+        ],
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'prod_freefire',
+        name: 'Free Fire - Codiguin & 100 Diamantes (Gratuito)',
+        description: 'Resgate de código PIN digital válido para 100 Diamantes + 10% de Bônus diretamente no site oficial Recarga Jogo.',
+        category: 'Games',
+        price: 0,
+        isFree: true,
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
+        banner: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
+        stockStatus: 'DISPONIVEL',
+        rating: 5.0,
+        badge: 'CODIGUIN FF',
+        features: ['100 Diamantes + 10% de Bônus', 'Resgate Oficial Recarga Jogo', '100% Gratuito', 'Código Digital Instantâneo'],
+        instructions: [
+          'Acesse recargajogo.com.br.',
+          'Faça login com o ID do jogador ou conta Free Fire.',
+          'Selecione a opção "E-Prepag" ou "Código PIN" e insira o código revelado.'
+        ],
+        updatedAt: new Date().toISOString()
+      }
+    ];
+
     if (!this.data.products || this.data.products.length === 0) {
-      this.data.products = [
-        {
-          id: 'prod_prime',
-          name: 'Prime Video VIP (Acesso Grátis)',
-          description: 'Acesso completo ao catálogo de filmes, séries e produções originais do Prime Video em resolução 4K Ultra HD.',
-          category: 'Streaming',
-          price: 0,
-          isFree: true,
-          image: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
-          banner: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
-          stockStatus: 'DISPONIVEL',
-          rating: 4.9,
-          badge: '100% GRÁTIS',
-          features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Suporte VIP via Chatbot'],
-          instructions: [
-            'Acesse o site oficial do Prime Video (primevideo.com).',
-            'Insira o e-mail e a senha liberados na aba "Meus Acessos".',
-            'Escolha qualquer perfil e aproveite sem limites.'
-          ],
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'prod_paramount',
-          name: 'Paramount+ VIP (Gratuito)',
-          description: 'Desfrute de séries exclusivas, filmes campeões de bilheteria e esportes ao vivo na plataforma Paramount+.',
-          category: 'Streaming',
-          price: 0,
-          isFree: true,
-          image: 'https://t2.tudocdn.net/703654?w=1200&h=1200',
-          banner: 'https://t2.tudocdn.net/703654?w=1200&h=1200',
-          stockStatus: 'DISPONIVEL',
-          rating: 4.8,
-          badge: 'DE GRAÇA',
-          features: ['Séries exclusivas', 'Transmissões esportivas', 'Catálogo Infantil Nickelodeon', 'Acesso direto'],
-          instructions: [
-            'Acesse paramountplus.com.',
-            'Digite as credenciais disponibilizadas.',
-            'Selecione o perfil e divirta-se.'
-          ],
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'prod_crunchyroll',
-          name: 'Crunchyroll Premium VIP',
-          description: 'A maior biblioteca de animes do mundo! Assista em HD com legendas e dublagens em português sem anúncios.',
-          category: 'Entretenimento',
-          price: 0,
-          isFree: true,
-          image: 'https://t2.tudocdn.net/793619?w=776&h=338',
-          banner: 'https://t2.tudocdn.net/793619?w=776&h=338',
-          stockStatus: 'DISPONIVEL',
-          rating: 4.9,
-          badge: 'ANIMES HD',
-          features: ['Lançamentos simulcast', 'Sem comerciais', 'Qualidade 1080p Full HD', 'Catálogo completo'],
-          instructions: [
-            'Entre no site ou app Crunchyroll.',
-            'Insira a conta fornecida no painel.'
-          ],
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'prod_netflix',
-          name: 'Netflix VIP Ultra HD (Perfil Individual)',
-          description: 'Conta individual com perfil próprio na Netflix, qualidade 4K HDR e garantia de estabilidade durante todo o mês.',
-          category: 'Premium',
-          price: 10.00,
-          isFree: false,
-          image: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
-          banner: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
-          stockStatus: 'ESTOQUE_BAIXO',
-          rating: 5.0,
-          badge: 'PROMOÇÃO R$ 10',
-          features: ['Perfil com PIN exclusivo', 'Qualidade 4K Ultra HD', 'Garantia de 30 dias', 'Suporte prioritário'],
-          instructions: [
-            'Após o pagamento aprovado no Ton/Pix, a credencial será revelada em "Meus Acessos".',
-            'Use a conta na Netflix e acesse apenas o perfil com seu nome e PIN.'
-          ],
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'prod_iptv',
-          name: 'Servidor IPTV Lista M3U & Xtream',
-          description: 'Mais de 30 canais ao vivo, filmes e séries para Smart TV, TV Box, celular e computador no servidor ger99.xyz.',
-          category: 'Entretenimento',
-          price: 0,
-          isFree: true,
-          image: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg',
-          banner: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg',
-          stockStatus: 'DISPONIVEL',
-          rating: 4.8,
-          badge: '31 CONTAS',
-          features: ['Servidor ger99.xyz:80', 'Suporte Xtream API', 'Canais Full HD', 'Atualização mensal'],
-          instructions: [
-            'Abra seu reprodutor IPTV (IPTV Smarters, XCIPTV, TViMate).',
-            'Insira o servidor http://ger99.xyz:80 e os dados de um dos 31 usuários da lista.'
-          ],
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'prod_social_boost',
-          name: 'Impulso Redes Sociais - SMM Boost',
-          description: 'Engajamento real para Instagram, TikTok e YouTube. Teste 50 unidades gratuitas a cada 24 horas.',
-          category: 'Premium',
-          price: 0,
-          isFree: true,
-          image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
-          banner: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=1200&q=80',
-          stockStatus: 'DISPONIVEL',
-          rating: 4.9,
-          badge: 'AUTOMÁTICO',
-          features: ['Entrega ultra rápida', 'Seguidores & Curtidas', 'Teste Grátis 50 unidades', 'Painel de acompanhamento'],
-          instructions: [
-            'Cole o link do seu perfil ou publicação.',
-            'Solicite o teste grátis ou compre com seu saldo de carteira.'
-          ],
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'prod_freefire',
-          name: 'Free Fire - Codiguin & 100 Diamantes (Gratuito)',
-          description: 'Resgate de código PIN digital válido para 100 Diamantes + 10% de Bônus diretamente no site oficial Recarga Jogo.',
-          category: 'Games',
-          price: 0,
-          isFree: true,
-          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
-          banner: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
-          stockStatus: 'DISPONIVEL',
-          rating: 5.0,
-          badge: 'CODIGUIN FF',
-          features: ['100 Diamantes + 10% de Bônus', 'Resgate Oficial Recarga Jogo', '100% Gratuito', 'Código Digital Instantâneo'],
-          instructions: [
-            'Acesse recargajogo.com.br.',
-            'Faça login com o ID do jogador ou conta Free Fire.',
-            'Selecione a opção "E-Prepag" ou "Código PIN" e insira o código revelado.'
-          ],
-          updatedAt: new Date().toISOString()
-        }
-      ];
+      this.data.products = defaults;
       this.save();
+    } else {
+      let updated = false;
+      for (const defItem of defaults) {
+        if (!this.data.products.some(p => p.id === defItem.id)) {
+          this.data.products.push(defItem);
+          updated = true;
+        }
+      }
+      if (updated) this.save();
     }
   }
 

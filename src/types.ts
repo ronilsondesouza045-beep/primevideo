@@ -47,7 +47,7 @@ export interface AccessLog {
   userId: string;
   userEmail: string;
   userIp?: string;
-  service: 'prime' | 'netflix' | 'paramount' | 'freefire' | 'crunchyroll';
+  service: 'prime' | 'netflix' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt';
   credentials: ServiceCredentials;
   createdAt: string;
 }
@@ -129,7 +129,7 @@ export interface ChatMessage {
 
 export interface ServiceReview {
   id: string;
-  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll';
+  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt';
   userId?: string;
   userName: string;
   userEmail?: string;
@@ -142,7 +142,7 @@ export interface ServiceReview {
 }
 
 export interface ServiceReviewStats {
-  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll';
+  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt';
   totalReviews: number;
   workingCount: number;
   notWorkingCount: number;
@@ -236,7 +236,7 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  category: 'Streaming' | 'Entretenimento' | 'Games' | 'Premium' | 'Gratuitos' | 'Outros';
+  category: 'Streaming' | 'Entretenimento' | 'Games' | 'Premium' | 'Gratuitos' | 'Inteligência Artificial' | 'Outros';
   price: number;
   originalPrice?: number;
   promoEndDate?: string; // ISO date for countdown timer

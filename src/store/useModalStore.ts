@@ -12,7 +12,8 @@ interface ModalState {
   primeCreds: ServiceCredentials | null;
   paramountCreds: ServiceCredentials | null;
   crunchyrollCreds: ServiceCredentials | null;
-  selectedReviewService: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | null;
+  chatgptCreds: ServiceCredentials | null;
+  selectedReviewService: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt' | null;
 
   freeFireResult: {
     code?: string;
@@ -49,7 +50,8 @@ interface ModalState {
   setPrimeCreds: (creds: ServiceCredentials | null) => void;
   setParamountCreds: (creds: ServiceCredentials | null) => void;
   setCrunchyrollCreds: (creds: ServiceCredentials | null) => void;
-  setSelectedReviewService: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | null) => void;
+  setChatGptCreds: (creds: ServiceCredentials | null) => void;
+  setSelectedReviewService: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt' | null) => void;
   setFreeFireResult: (result: ModalState['freeFireResult']) => void;
   setActivePayment: (payment: ModalState['activePayment']) => void;
 
@@ -67,6 +69,7 @@ export const useModalStore = create<ModalState>((set) => ({
   primeCreds: null,
   paramountCreds: null,
   crunchyrollCreds: null,
+  chatgptCreds: null,
   selectedReviewService: null,
   freeFireResult: null,
   activePayment: null,
@@ -89,6 +92,7 @@ export const useModalStore = create<ModalState>((set) => ({
   setPrimeCreds: (creds) => set({ primeCreds: creds }),
   setParamountCreds: (creds) => set({ paramountCreds: creds }),
   setCrunchyrollCreds: (creds) => set({ crunchyrollCreds: creds }),
+  setChatGptCreds: (creds) => set({ chatgptCreds: creds }),
   setSelectedReviewService: (service) => set({ selectedReviewService: service }),
   setFreeFireResult: (result) => set({ freeFireResult: result }),
   setActivePayment: (payment) => set({ activePayment: payment }),
@@ -102,6 +106,7 @@ export const useModalStore = create<ModalState>((set) => ({
     primeCreds: null,
     paramountCreds: null,
     crunchyrollCreds: null,
+    chatgptCreds: null,
     selectedReviewService: null,
     freeFireResult: null,
     activePayment: null

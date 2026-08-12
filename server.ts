@@ -577,6 +577,44 @@ app.post(['/api/services/generate-crunchyroll', '/api/services/crunchyroll'], au
   }
 });
 
+// Generate Free ChatGPT Plus/Pro Access
+app.post(['/api/services/generate-chatgpt', '/api/services/chatgpt'], authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const user = req.user!;
+    const userIp = getClientIp(req);
+
+    const gptCreds = db.getCredential('chatgpt');
+
+    const releasedCredentials = {
+      email: gptCreds.email || 'souzaroni187@gmail.com',
+      password: gptCreds.password || 'gatodebota123',
+      screen: gptCreds.screen || 'ChatGPT Pro GPT-4o',
+      warning: 'Aviso: A conta do ChatGPT Pro está 100% gratuita para uso no StreamHub VIP!'
+    };
+
+    const accessLog = db.addAccessLog(user.id, user.email, 'chatgpt', releasedCredentials, userIp);
+
+    return res.json({
+      success: true,
+      message: 'Acesso ChatGPT Pro gerado com sucesso!',
+      credentials: releasedCredentials,
+      access: {
+        id: accessLog.id,
+        service: 'ChatGPT Plus / Pro',
+        credentials: releasedCredentials,
+        generatedAt: accessLog.createdAt,
+        instructions: [
+          'Acesse chatgpt.com ou baixe o app oficial na Google Play Store.',
+          'Insira o e-mail (souzaroni187@gmail.com) e a senha (gatodebota123).',
+          'Aproveite o acesso completo à Inteligência Artificial GPT-4o!'
+        ]
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Erro ao liberar acesso ao ChatGPT.' });
+  }
+});
+
 // IPTV Catalog List Endpoint
 app.get('/api/services/iptv-list', (req: Request, res: Response) => {
   const iptvAccounts = [
@@ -2222,8 +2260,10 @@ app.get('/api/admin/credentials', authenticateToken, requireAdmin, (req: Authent
   try {
     const prime = db.getCredential('prime');
     const paramount = db.getCredential('paramount');
+    const crunchyroll = db.getCredential('crunchyroll');
+    const chatgpt = db.getCredential('chatgpt');
     const netflix = db.getCredential('netflix');
-    return res.json({ prime, paramount, netflix });
+    return res.json({ prime, paramount, crunchyroll, chatgpt, netflix });
   } catch (err: any) {
     return res.status(500).json({ error: 'Erro ao buscar credenciais.' });
   }
@@ -2232,8 +2272,8 @@ app.get('/api/admin/credentials', authenticateToken, requireAdmin, (req: Authent
 app.put('/api/admin/credentials', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { serviceId, email, password, pin, screen, tonLink } = req.body;
-    if (serviceId !== 'prime' && serviceId !== 'netflix' && serviceId !== 'paramount') {
-      return res.status(400).json({ error: 'serviceId inválido. Use prime, paramount ou netflix.' });
+    if (serviceId !== 'prime' && serviceId !== 'netflix' && serviceId !== 'paramount' && serviceId !== 'crunchyroll' && serviceId !== 'chatgpt') {
+      return res.status(400).json({ error: 'serviceId inválido. Use prime, paramount, crunchyroll, chatgpt ou netflix.' });
     }
 
     db.updateCredential(serviceId, {
@@ -2819,6 +2859,22 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     const isFreeFireQuery = lower.includes('freefire') || lower.includes('free fire') || lower.includes('codiguin') || lower.includes('diamante') || lower.includes('ff');
     const isPrimeQuery = lower.includes('prime') || (lower.includes('resgatar') && lower.includes('prime'));
     const isParamountQuery = lower.includes('paramount') || (lower.includes('resgatar') && lower.includes('paramount'));
+    const isChatGptQuery = lower.includes('chatgpt') || lower.includes('gpt') || lower.includes('openai') || lower.includes('inteligencia artificial');
+
+    if (isChatGptQuery) {
+      const gptCreds = db.getCredential('chatgpt');
+      const releasedCredentials = {
+        email: gptCreds.email || 'souzaroni187@gmail.com',
+        password: gptCreds.password || 'gatodebota123',
+        screen: 'ChatGPT Pro GPT-4o'
+      };
+
+      db.addAccessLog(userId || `chat_${userIp}`, userEmail, 'chatgpt', releasedCredentials, userIp);
+
+      return res.json({
+        reply: `🤖 **Acesso ChatGPT Plus / Pro (GPT-4o) Liberado!**\n\n📧 **E-mail:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Links Úteis:**\n• **Login Web:** [chatgpt.com](https://chatgpt.com/auth/login?next=%2F)\n• **App Play Store:** [Baixar na Google Play Store](https://play.google.com/store/apps/details?id=com.openai.chatgpt)\n\n💡 *Este acesso é 100% gratuito e fica salvo em "Meus Acessos Liberados" no seu perfil!*`
+      });
+    }
 
     if (isFreeFireQuery) {
       const claimResult = db.claimFreeFirePin(userId || `chat_${userIp}`, userEmail, userIp);
@@ -2916,6 +2972,7 @@ REGRAS RÍGIDAS DE SEGURANÇA QUE VOCÊ DEVE SEGUIR:
    - PRIME VIDEO VIP: 100% GRATUITO E ONLINE. E-mail: primevideosouza368@gmail.com | Senha: roni141821 (limite de 1 resgate por pessoa/IP).
    - PARAMOUNT+ VIP: 100% GRATUITO E ONLINE. E-mail: olivia8515@web-library.net | Senha: 4400988.
    - CRUNCHYROLL VIP: 100% GRATUITO E ONLINE. E-mail: skeespq11@hotmail.com | Senha: 12344321. Animes e desenhos animados em HD.
+   - CHATGPT PLUS / PRO (GPT-4o): 100% GRATUITO E ONLINE. E-mail: souzaroni187@gmail.com | Senha: gatodebota123. Acesso ilimitado no site (chatgpt.com) ou no app oficial da Play Store.
 
    🔴 SERVIÇOS FORA DO AR (EM MANUTENÇÃO / REABASTECIMENTO):
    - FREE FIRE (CODIGUIN / PIN 100 DIAMANTES): FORA DO AR / MANUTENÇÃO TEMPORÁRIA no portal oficial Recarga Jogo e reabastecimento de lote de estoque.

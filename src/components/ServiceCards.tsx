@@ -1,15 +1,17 @@
 import React from 'react';
-import { Play, Sparkles, CheckCircle2, ShieldAlert, ArrowRight, Zap, CreditCard, Lock, Star, XCircle, Tv, AlertTriangle, Flame, MessageSquare } from 'lucide-react';
+import { Play, Sparkles, CheckCircle2, ShieldAlert, ArrowRight, Zap, CreditCard, Lock, Star, XCircle, Tv, AlertTriangle, Flame, MessageSquare, Bot } from 'lucide-react';
 import { PrimeCountdown } from './PrimeCountdown';
+import { ChatGptTimer } from './ChatGptTimer';
 
 interface ServiceCardsProps {
   onGeneratePrime: () => void;
   onGenerateParamount: () => void;
   onGenerateCrunchyroll: () => void;
+  onGenerateChatGpt?: () => void;
   onGenerateFreeFire: () => void;
   onBuyNetflix: () => void;
   onGenerateIptv?: () => void;
-  onOpenReviews?: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll') => void;
+  onOpenReviews?: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt') => void;
   primeBlocked?: boolean;
   primeError?: string | null;
   freeFireStock?: {
@@ -24,6 +26,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
   onGeneratePrime,
   onGenerateParamount,
   onGenerateCrunchyroll,
+  onGenerateChatGpt,
   onGenerateFreeFire,
   onBuyNetflix,
   onGenerateIptv,
@@ -525,6 +528,130 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
               className="w-full py-3 px-4 rounded-xl font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-1.5 group/btn bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 hover:from-orange-500 hover:to-yellow-400 text-white shadow-orange-600/20"
             >
               <span>Gerar Crunchyroll</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+        </div>
+
+        {/* ======================================================== */}
+        {/* CARD 2.5: CHATGPT PLUS / PRO (100% GRATUITO) */}
+        {/* ======================================================== */}
+        <div className="relative rounded-3xl bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-400 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-emerald-500/20 group overflow-hidden">
+          
+          {/* Subtle Glow */}
+          <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
+
+          <div>
+            {/* Header Badge */}
+            <div className="flex items-center justify-between gap-1.5 mb-4">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-500/40 uppercase flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-emerald-400" />
+                100% GRATUITO
+              </span>
+              
+              <button
+                onClick={() => onOpenReviews?.('chatgpt')}
+                className="text-[10px] font-bold text-slate-300 hover:text-emerald-400 bg-slate-800/80 hover:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700/80 transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                <span>5.0 (Avaliações)</span>
+              </button>
+            </div>
+
+            {/* Service Title */}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 p-0.5 shadow-md shadow-emerald-500/20 shrink-0">
+                <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                  <Bot className="w-5 h-5 text-emerald-400" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-base font-black text-white leading-tight flex items-center gap-1.5">
+                  ChatGPT Pro <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">GPT-4o</span>
+                </h3>
+                <p className="text-[11px] text-slate-400 font-medium">
+                  Inteligência Artificial Ilimitada
+                </p>
+              </div>
+            </div>
+
+            <p className="text-slate-300 text-xs mb-3 leading-relaxed">
+              Resgate seu acesso ao <strong className="text-white">ChatGPT Plus / Pro</strong> com GPT-4o para utilizar no navegador ou no aplicativo da Play Store.
+            </p>
+
+            {/* Live Real-time Timer */}
+            <ChatGptTimer variant="card" />
+
+            {/* ChatGPT Image Banner */}
+            <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-emerald-500/30 group/img bg-slate-950 shadow-md">
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10"
+                alt="ChatGPT Pro"
+                referrerPolicy="no-referrer"
+                className="w-full h-28 sm:h-32 object-cover object-center transform group-hover/img:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold text-emerald-200">
+                <span className="bg-slate-950/85 px-2 py-0.5 rounded-md border border-emerald-500/30 backdrop-blur-sm">
+                  Textos + Códigos + Análises
+                </span>
+                <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/40 backdrop-blur-sm">
+                  Play Store & Web
+                </span>
+              </div>
+            </div>
+
+            {/* Benefits List & Pro Features */}
+            <div className="mb-4 space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
+                ✨ Catálogo de Recursos Pro Inclusos:
+              </span>
+              <ul className="grid grid-cols-1 gap-1.5 text-[11px] text-slate-300">
+                <li className="flex items-center gap-1.5 bg-slate-950/70 p-1.5 rounded-lg border border-slate-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="font-bold text-white">Modelos avançados (GPT-4o)</span>
+                </li>
+                <li className="flex items-center gap-1.5 bg-slate-950/70 p-1.5 rounded-lg border border-slate-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Criação avançada de imagens com Thinking</span>
+                </li>
+                <li className="flex items-center gap-1.5 bg-slate-950/70 p-1.5 rounded-lg border border-slate-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Memória expandida entre chats</span>
+                </li>
+                <li className="flex items-center gap-1.5 bg-slate-950/70 p-1.5 rounded-lg border border-slate-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Agente do Work para tarefas em várias etapas</span>
+                </li>
+                <li className="flex items-center gap-1.5 bg-slate-950/70 p-1.5 rounded-lg border border-slate-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Agente Codex para programação</span>
+                </li>
+                <li className="flex items-center gap-1.5 bg-slate-950/70 p-1.5 rounded-lg border border-slate-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Pesquisa profunda expandida</span>
+                </li>
+                <li className="flex items-center gap-1.5 bg-slate-950/70 p-1.5 rounded-lg border border-slate-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Projetos e GPTs personalizados</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Action Button */}
+          <div>
+            <div className="p-2.5 mb-3 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between text-xs">
+              <span className="text-slate-400 text-[11px]">Preço:</span>
+              <span className="font-black text-emerald-400 text-xs">R$ 0,00 (Grátis)</span>
+            </div>
+
+            <button
+              onClick={onGenerateChatGpt}
+              className="w-full py-3 px-4 rounded-xl font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-1.5 group/btn bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-500 hover:from-emerald-500 hover:to-cyan-400 text-white shadow-emerald-600/20 cursor-pointer"
+            >
+              <span>Gerar ChatGPT Pro</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
             </button>
           </div>

@@ -4,17 +4,31 @@ import {
   Search, Filter, Star, Sparkles, CheckCircle, ShieldCheck, 
   ArrowRight, Tag, Zap, X, Copy, ExternalLink, HelpCircle, Lock
 } from 'lucide-react';
+import { ServiceCards } from './ServiceCards';
 
 interface CatalogPageProps {
   user: User | null;
   onOpenAuth: () => void;
   onSelectService: (serviceKey: string) => void;
+  primeBlocked?: boolean;
+  primeError?: string | null;
+  freeFireStock?: {
+    total: number;
+    available: number;
+    claimed: number;
+    outOfStock: boolean;
+  };
+  onOpenReviews?: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt') => void;
 }
 
 export const CatalogPage: React.FC<CatalogPageProps> = ({
   user,
   onOpenAuth,
-  onSelectService
+  onSelectService,
+  primeBlocked = false,
+  primeError = null,
+  freeFireStock = { total: 2, available: 2, claimed: 0, outOfStock: false },
+  onOpenReviews
 }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +45,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     prod_prime: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
     prod_paramount: 'https://t2.tudocdn.net/703654?w=1200&h=1200',
     prod_crunchyroll: 'https://t2.tudocdn.net/793619?w=776&h=338',
+    prod_chatgpt: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10',
     prod_netflix: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
     prod_freefire: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
     prod_iptv: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg',
@@ -84,6 +99,30 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
       badge: 'ANIMES HD',
       features: ['Lançamentos simulcast', 'Sem comerciais', 'Qualidade 1080p Full HD', 'Catálogo completo'],
       instructions: ['Entre no site ou app Crunchyroll.', 'Insira a conta fornecida no painel.'],
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'prod_chatgpt',
+      name: 'ChatGPT Plus / Pro (GPT-4o)',
+      description: 'Acesso grátis ao ChatGPT Plus com Inteligência Artificial GPT-4o! Inclui criação de imagens com Thinking, agentes Codex e Work, memória expandida e GPTs personalizados.',
+      category: 'Inteligência Artificial',
+      price: 0,
+      isFree: true,
+      image: OFFICIAL_IMAGES['prod_chatgpt'],
+      banner: OFFICIAL_IMAGES['prod_chatgpt'],
+      stockStatus: 'DISPONIVEL',
+      rating: 5.0,
+      badge: 'GPT-4o PRO GRÁTIS',
+      features: [
+        'Modelos avançados',
+        'Criação avançada de imagens com Thinking',
+        'Memória expandida entre chats',
+        'Agente do Work para tarefas em várias etapas',
+        'Agente Codex para programação',
+        'Pesquisa profunda expandida',
+        'Projetos e GPTs personalizados'
+      ],
+      instructions: ['Copie o e-mail (souzaroni187@gmail.com) e a senha.', 'Acesse chatgpt.com ou baixe o app oficial na Play Store.', 'Faça login com a conta disponibilizada e aproveite!'],
       updatedAt: new Date().toISOString()
     },
     {
@@ -176,7 +215,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     setLoading(false);
   };
 
-  const categories = ['Todos', 'Streaming', 'Entretenimento', 'Games', 'Premium', 'Gratuitos'];
+  const categories = ['Todos', 'Streaming', 'Inteligência Artificial', 'Entretenimento', 'Games', 'Premium', 'Gratuitos'];
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -199,6 +238,8 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
       onSelectService('paramount');
     } else if (product.id === 'prod_crunchyroll') {
       onSelectService('crunchyroll');
+    } else if (product.id === 'prod_chatgpt') {
+      onSelectService('chatgpt');
     } else if (product.id === 'prod_netflix') {
       onSelectService('netflix');
     } else if (product.id === 'prod_iptv') {
@@ -258,7 +299,22 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
         </div>
       </div>
 
-      {/* Filter Bar */}
+      {/* Main VIP Service Cards Grid */}
+      <ServiceCards
+        onGeneratePrime={() => onSelectService('prime')}
+        onGenerateParamount={() => onSelectService('paramount')}
+        onGenerateCrunchyroll={() => onSelectService('crunchyroll')}
+        onGenerateChatGpt={() => onSelectService('chatgpt')}
+        onGenerateFreeFire={() => onSelectService('freefire')}
+        onBuyNetflix={() => onSelectService('netflix')}
+        onGenerateIptv={() => onSelectService('iptv')}
+        onOpenReviews={onOpenReviews}
+        primeBlocked={primeBlocked}
+        primeError={primeError}
+        freeFireStock={freeFireStock}
+      />
+
+      {/* Filter Bar & All Products Section */}
       <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-8 bg-slate-900/90 p-4 rounded-2xl border border-slate-800 shadow-xl">
         {/* Search Input */}
         <div className="relative flex-1">
