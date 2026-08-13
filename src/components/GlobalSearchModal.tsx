@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, Package, Ticket as TicketIcon, ShoppingBag, Users, LayoutDashboard, ArrowRight } from 'lucide-react';
+import { Search, X, Package, Ticket as TicketIcon, ShoppingBag, Users, LayoutDashboard, ArrowRight, Layers, Sparkles } from 'lucide-react';
 import { User } from '../types';
+import { FREE_TOOLS_CONFIG, FreeTool } from '../config/freeTools';
 
 interface GlobalSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentUser: User | null;
-  onNavigateTab: (tab: 'home' | 'catalog' | 'benefits' | 'accesses' | 'orders' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites') => void;
+  onNavigateTab: (tab: 'home' | 'catalog' | 'free-tools' | 'benefits' | 'accesses' | 'orders' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites' | any) => void;
   onSelectProduct?: (productId: string) => void;
 }
 
@@ -19,6 +20,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [freeToolsResults, setFreeToolsResults] = useState<FreeTool[]>([]);
   const [results, setResults] = useState<{
     products: any[];
     tickets: any[];
@@ -61,8 +63,25 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
     if (!query.trim()) {
       setResults({ products: [], tickets: [], orders: [], users: [], adminPages: [] });
+      setFreeToolsResults([]);
       return;
     }
+
+    // Match free tools locally
+    const qLower = query.toLowerCase();
+    const matchedTools = FREE_TOOLS_CONFIG.filter(t => 
+      t.enabled && (
+        t.title.toLowerCase().includes(qLower) ||
+        t.description.toLowerCase().includes(qLower) ||
+        t.category.toLowerCase().includes(qLower) ||
+        t.tags?.some(tag => tag.toLowerCase().includes(qLower)) ||
+        'ferramentas gratuitas'.includes(qLower) ||
+        'free'.includes(qLower) ||
+        'gratis'.includes(qLower) ||
+        'grátis'.includes(qLower)
+      )
+    );
+    setFreeToolsResults(matchedTools);
 
     const timer = setTimeout(() => {
       fetchSearchResults(query);
@@ -96,6 +115,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   if (!isOpen) return null;
 
   const hasResults =
+    freeToolsResults.length > 0 ||
     results.products.length > 0 ||
     results.tickets.length > 0 ||
     results.orders.length > 0 ||
@@ -155,6 +175,46 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {!loading && query && !hasResults && (
             <div className="py-8 text-center text-xs text-slate-400">
               Nenhum resultado encontrado para "<span className="text-slate-200">{query}</span>".
+            </div>
+          )}
+
+          {/* FREE TOOLS SECTION */}
+          {freeToolsResults.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-2">
+                <Layers className="w-3.5 h-3.5" />
+                <span>Ferramentas Gratuitas ({freeToolsResults.length})</span>
+              </div>
+              <div className="space-y-1.5">
+                {freeToolsResults.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      onNavigateTab('free-tools');
+                      onClose();
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-800/60 transition flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-slate-200 group-hover:text-emerald-400 transition flex items-center gap-2">
+                          <span>{t.title}</span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30">
+                            {t.badge}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate max-w-md">
+                          {t.category} • {t.provider}
+                        </div>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition" />
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

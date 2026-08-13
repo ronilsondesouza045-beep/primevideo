@@ -1,0 +1,27 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#020617"/>
+      <stop offset="0.55" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#082f49"/>
+    </linearGradient>
+    <radialGradient id="r" cx="0.75" cy="0.2" r="0.6">
+      <stop offset="0" stop-color="#38bdf8" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" rx="48" fill="url(#g)"/>
+  <rect width="1200" height="630" rx="48" fill="url(#r)"/>
+  <g transform="translate(90 112)">
+    <rect width="108" height="108" rx="30" fill="#0ea5e9" fill-opacity="0.15" stroke="#38bdf8" stroke-opacity="0.45"/>
+    <text x="54" y="68" text-anchor="middle" font-family="Arial, sans-serif" font-size="38" font-weight="900" fill="#7dd3fc">IR</text>
+  </g>
+  <text x="90" y="285" font-family="Arial, sans-serif" font-size="32" font-weight="800" letter-spacing="5" fill="#7dd3fc">IMVU ROOM LIVE</text>
+  <text x="90" y="370" font-family="Arial, sans-serif" font-size="74" font-weight="900" fill="#ffffff">ONLINE</text>
+  <text x="90" y="430" font-family="Arial, sans-serif" font-size="28" font-weight="600" fill="#94a3b8">Cole o ID ou URL da sala e acompanhe tudo no site.</text>
+  <g transform="translate(90 492)">
+    <rect width="220" height="54" rx="27" fill="#0ea5e9"/>
+    <circle cx="32" cy="27" r="7" fill="#dcfce7"/>
+    <text x="56" y="35" font-family="Arial, sans-serif" font-size="20" font-weight="800" fill="#020617">CATÁLOGO IMVU</text>
+  </g>
+</svg>

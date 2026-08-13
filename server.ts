@@ -18,6 +18,7 @@ import { UserRole } from './src/types';
 
 // User Request augmentation
 interface AuthenticatedRequest extends Request {
+  authSource?: 'jwt' | 'header';
   user?: {
     id: string;
     email: string;
@@ -49,6 +50,7 @@ const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextF
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as any;
       req.user = decoded;
+      req.authSource = 'jwt';
       return next();
     } catch (err) {
       // Token expired or invalid signature, fallback to header email below
@@ -74,6 +76,7 @@ const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextF
         name: u.name,
         avatarUrl: u.avatarUrl
       };
+      req.authSource = 'header';
       return next();
     } else if (cleanEmail === 'ronisouza495@gmail.com') {
       req.user = {
@@ -83,6 +86,7 @@ const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextF
         name: 'Administrador StreamHub VIP',
         avatarUrl: ''
       };
+      req.authSource = 'header';
       return next();
     }
   }

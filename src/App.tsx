@@ -15,6 +15,7 @@ import { SupportTickets } from './components/SupportTickets';
 import { SystemStatusPage } from './components/SystemStatusPage';
 import { AdminPanel } from './components/AdminPanel';
 import { SupportChatbot } from './components/SupportChatbot';
+import { FreeToolsPage } from './components/FreeToolsPage';
 import { Tv } from 'lucide-react';
 import { AccessLog, PaymentRecord, ServiceCredentials } from './types';
 
@@ -53,6 +54,7 @@ export default function App() {
   const getActiveTab = (): any => {
     const path = location.pathname;
     if (path === '/' || path === '/catalogo') return 'catalog';
+    if (path === '/ferramentas-gratis' || path === '/catalogo-free') return 'free-tools';
     if (path === '/beneficios') return 'benefits';
     if (path === '/meus-acessos' || path === '/pedidos') return 'accesses';
     if (path === '/perfil') return 'profile';
@@ -70,6 +72,11 @@ export default function App() {
       case 'home':
       case 'catalog':
         navigate('/catalogo');
+        break;
+      case 'free-tools':
+      case 'free':
+      case 'ferramentas-gratis':
+        navigate('/ferramentas-gratis');
         break;
       case 'benefits':
         navigate('/beneficios');
@@ -446,6 +453,8 @@ export default function App() {
               onOpenCatalog={() => navigate('/catalogo')}
             />
           } />
+          <Route path="/ferramentas-gratis" element={<FreeToolsPage />} />
+          <Route path="/catalogo-free" element={<FreeToolsPage />} />
           <Route path="/meus-acessos" element={
             <UserAccesses
               accessLogs={userAccessLogs}

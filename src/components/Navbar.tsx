@@ -3,12 +3,12 @@ import { User, SystemNotification } from '../types';
 import { 
   Tv, ShieldCheck, LogIn, LogOut, Sparkles, Grid, Award, 
   User as UserIcon, Bell, CheckCircle2, AlertCircle, ShoppingBag, 
-  ChevronDown, Wallet, Search, Heart, Ticket, Activity
+  ChevronDown, Wallet, Search, Heart, Ticket, Activity, Layers
 } from 'lucide-react';
 
 interface NavbarProps {
   user: User | null;
-  activeTab: 'home' | 'catalog' | 'benefits' | 'accesses' | 'orders' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites';
+  activeTab: 'home' | 'catalog' | 'free-tools' | 'benefits' | 'accesses' | 'orders' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites' | string;
   setActiveTab: (tab: any) => void;
   onOpenAuth: () => void;
   onLogout: () => void;
@@ -105,6 +105,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Grid className="w-3.5 h-3.5 text-red-400" />
               Catálogo VIP
+            </button>
+
+            <button
+              onClick={() => setActiveTab('free-tools')}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                activeTab === 'free-tools'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/30'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Ferramentas Grátis</span>
+              <span className="px-1.5 py-0.2 text-[9px] font-black rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                FREE
+              </span>
             </button>
 
             <button
@@ -232,6 +247,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                       >
                         <UserIcon className="w-4 h-4 text-slate-400" />
                         Minha Conta / Perfil
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setActiveTab('free-tools');
+                          setIsProfileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/70 rounded-xl transition-colors text-left"
+                      >
+                        <Layers className="w-4 h-4 text-emerald-400" />
+                        Ferramentas Gratuitas
+                        <span className="ml-auto text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                          FREE
+                        </span>
                       </button>
 
                       <button
