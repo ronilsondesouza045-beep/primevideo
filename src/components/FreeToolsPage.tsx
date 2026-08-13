@@ -15,7 +15,10 @@ import {
   RotateCw,
   Info,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Globe,
+  Languages,
+  Loader2
 } from 'lucide-react';
 import { FREE_TOOLS_CONFIG, FreeTool, FreeToolCategory } from '../config/freeTools';
 
@@ -25,7 +28,9 @@ export const FreeToolsPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<FreeToolCategory>('TODOS');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
+  const [iframeLoading, setIframeLoading] = useState(true);
   const [iframeLoadFailed, setIframeLoadFailed] = useState(false);
+  const [showTranslateTip, setShowTranslateTip] = useState(false);
 
   // Available enabled tools
   const availableTools = useMemo(() => {
@@ -79,6 +84,7 @@ export const FreeToolsPage: React.FC = () => {
 
   const handleOpenTool = (tool: FreeTool) => {
     setIframeLoadFailed(false);
+    setIframeLoading(true);
     setIframeKey(prev => prev + 1);
     setSelectedTool(tool);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -88,13 +94,18 @@ export const FreeToolsPage: React.FC = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const handleOpenTranslated = (url: string) => {
+    const translateUrl = `https://translate.google.com/translate?sl=auto&tl=pt&u=${encodeURIComponent(url)}`;
+    window.open(translateUrl, '_blank', 'noopener,noreferrer');
+  };
+
   // If a tool is selected, render the dedicated in-app viewer
   if (selectedTool) {
     return (
       <div className={`min-h-screen bg-slate-950 text-slate-100 ${isFullscreen ? 'fixed inset-0 z-50 p-0 m-0' : 'py-6 px-4 max-w-7xl mx-auto'}`}>
         {/* Viewer Header Bar */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-4 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-3 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => {
                 setSelectedTool(null);
@@ -103,7 +114,7 @@ export const FreeToolsPage: React.FC = () => {
               className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold transition flex items-center gap-2 border border-slate-700"
             >
               <ArrowLeft className="w-4 h-4" />
-              VOLTAR AO CATÁLOGO
+              Voltar ao Catálogo
             </button>
 
             <div className="h-6 w-px bg-slate-800 hidden sm:block" />
@@ -113,81 +124,161 @@ export const FreeToolsPage: React.FC = () => {
                 {getToolIcon(selectedTool.iconName)}
               </div>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-base font-extrabold text-white">{selectedTool.title}</h2>
                   <span className="px-2 py-0.5 text-[10px] font-black rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                     {selectedTool.badge}
                   </span>
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1">
+                    <Globe className="w-3 h-3 text-cyan-400" />
+                    Serviço Externo
+                  </span>
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-950/60 text-emerald-300 border border-emerald-800/50 flex items-center gap-1">
+                    🇧🇷 Português
+                  </span>
                 </div>
-                <p className="text-xs text-slate-400">
-                  Serviço externo · <span className="font-semibold text-slate-300">{selectedTool.provider}</span>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Provedor oficial · <span className="font-semibold text-slate-300">{selectedTool.provider}</span>
                 </p>
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 self-end md:self-auto">
+          <div className="flex items-center gap-2 self-stretch sm:self-end lg:self-auto justify-end flex-wrap">
+            <button
+              onClick={() => handleOpenTranslated(selectedTool.url)}
+              className="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition"
+              title="Abrir versão com tradução para Português"
+            >
+              <Languages className="w-3.5 h-3.5" />
+              <span>Traduzir para Português</span>
+            </button>
+
             <button
               onClick={() => {
-                setIframeKey(k => k + 1);
+                setIframeLoading(true);
                 setIframeLoadFailed(false);
+                setIframeKey(k => k + 1);
               }}
-              title="Recarregar Visualizador"
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition"
+              title="Atualizar"
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-bold transition flex items-center gap-1.5"
             >
-              <RotateCw className="w-4 h-4" />
+              <RotateCw className={`w-3.5 h-3.5 ${iframeLoading ? 'animate-spin text-emerald-400' : ''}`} />
+              <span>Atualizar</span>
             </button>
 
             <button
               onClick={() => setIsFullscreen(!isFullscreen)}
-              title={isFullscreen ? 'Sair da Tela Cheia' : 'Tela Cheia'}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition hidden sm:block"
+              title={isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-bold transition hidden sm:flex items-center gap-1.5"
             >
-              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              {isFullscreen ? (
+                <>
+                  <Minimize2 className="w-3.5 h-3.5" />
+                  <span>Sair da tela cheia</span>
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  <span>Tela cheia</span>
+                </>
+              )}
             </button>
 
             <button
               onClick={() => handleOpenExternal(selectedTool.url)}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black shadow-lg shadow-emerald-900/30 flex items-center gap-2 transition"
+              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold transition flex items-center gap-1.5"
             >
-              <ExternalLink className="w-4 h-4" />
-              ABRIR NO SITE OFICIAL
+              <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+              <span>Abrir em nova guia</span>
             </button>
           </div>
         </div>
 
-        {/* Security & Frame Disclaimer Banner */}
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl px-4 py-2.5 mb-4 text-xs text-slate-400 flex items-center justify-between gap-3">
+        {/* Security & Language Disclaimer */}
+        <div className="bg-slate-900/50 border border-slate-800/80 rounded-xl px-4 py-2 mb-3 text-[11px] text-slate-400 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Info className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <Info className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
             <span>
-              Você está acessando a ferramenta gratuita oficial disponibilizada por <strong>{selectedTool.provider}</strong>.
+              Esta ferramenta é fornecida por um serviço externo. Alguns textos podem permanecer no idioma original caso o provedor não disponibilize tradução nativa.
             </span>
           </div>
-          <span className="text-[11px] text-slate-500 hidden md:inline">
-            Caso o navegador restrinja a exibição interna (CSP/X-Frame), use o botão oficial.
-          </span>
+          <button
+            onClick={() => setShowTranslateTip(!showTranslateTip)}
+            className="text-emerald-400 hover:text-emerald-300 font-semibold underline underline-offset-2 whitespace-nowrap flex-shrink-0"
+          >
+            {showTranslateTip ? 'Ocultar dica' : 'Dica do navegador'}
+          </button>
         </div>
+
+        {/* Browser Translation Tip Drawer */}
+        {showTranslateTip && (
+          <div className="bg-slate-900 border border-emerald-500/30 rounded-xl p-3 mb-3 text-xs text-slate-300 animate-fadeIn flex items-start gap-3">
+            <Languages className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-bold text-white mb-1">Como traduzir no seu navegador:</p>
+              <p className="text-slate-400 text-[11px] leading-relaxed">
+                No Google Chrome, Edge ou Safari, clique com o botão direito sobre a página externa ou na barra de endereço e escolha <strong>"Traduzir para o português"</strong>. Se preferir, use o botão <strong>"Traduzir para Português"</strong> acima para abrir diretamente traduzido.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowTranslateTip(false)}
+              className="text-slate-500 hover:text-slate-300 text-xs px-2 py-1"
+            >
+              Fechar
+            </button>
+          </div>
+        )}
 
         {/* Iframe Viewport or Fallback */}
         <div className="relative bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl min-h-[600px] md:min-h-[750px] flex flex-col">
+          {iframeLoading && !iframeLoadFailed && (
+            <div className="absolute inset-0 z-10 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+              <Loader2 className="w-8 h-8 text-emerald-400 animate-spin mb-3" />
+              <p className="text-sm font-bold text-white">Carregando ferramenta...</p>
+              <p className="text-xs text-slate-400 mt-1">Conectando aos servidores oficiais do {selectedTool.provider}</p>
+            </div>
+          )}
+
           {iframeLoadFailed ? (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-950">
               <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-4 text-amber-400">
                 <ShieldAlert className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Abrir ferramenta</h3>
-              <p className="text-sm text-slate-400 max-w-md mb-6">
-                Esta ferramenta precisa ser aberta diretamente no serviço oficial devido a políticas de segurança do provedor.
+              <h3 className="text-xl font-bold text-white mb-2">Erro ao carregar ferramenta</h3>
+              <p className="text-sm text-slate-400 max-w-md mb-6 leading-relaxed">
+                Esta ferramenta externa precisa ser aberta diretamente no serviço oficial ou com tradução automática devido a políticas de segurança do provedor.
               </p>
-              <button
-                onClick={() => handleOpenExternal(selectedTool.url)}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-xl shadow-emerald-900/40 flex items-center gap-2 transition transform hover:scale-105"
-              >
-                <ExternalLink className="w-4 h-4" />
-                ABRIR FERRAMENTA OFICIAL
-              </button>
+              <div className="flex items-center gap-3 flex-wrap justify-center">
+                <button
+                  onClick={() => {
+                    setIframeLoadFailed(false);
+                    setIframeLoading(true);
+                    setIframeKey(k => k + 1);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition flex items-center gap-2"
+                >
+                  <RotateCw className="w-4 h-4" />
+                  Tentar novamente
+                </button>
+
+                <button
+                  onClick={() => handleOpenTranslated(selectedTool.url)}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs shadow-xl shadow-emerald-900/40 flex items-center gap-2 transition"
+                >
+                  <Languages className="w-4 h-4" />
+                  Abrir Traduzido (Português)
+                </button>
+
+                <button
+                  onClick={() => handleOpenExternal(selectedTool.url)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs border border-slate-800 flex items-center gap-2 transition"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Abrir em nova guia
+                </button>
+              </div>
             </div>
           ) : (
             <>
@@ -197,22 +288,35 @@ export const FreeToolsPage: React.FC = () => {
                 title={selectedTool.title}
                 className="w-full flex-1 min-h-[650px] md:min-h-[800px] border-0"
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
-                onError={() => setIframeLoadFailed(true)}
+                onLoad={() => setIframeLoading(false)}
+                onError={() => {
+                  setIframeLoading(false);
+                  setIframeLoadFailed(true);
+                }}
               />
 
               {/* Fallback helper bottom card */}
               <div className="p-3 bg-slate-950 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                  URL Carregada: <code className="text-slate-300 font-mono text-[11px]">{selectedTool.url}</code>
+                  URL carregada: <code className="text-slate-300 font-mono text-[11px]">{selectedTool.url}</code>
                 </span>
-                <button
-                  onClick={() => handleOpenExternal(selectedTool.url)}
-                  className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 underline underline-offset-2"
-                >
-                  Não está carregando ou ficou em branco? Abrir diretamente na aba oficial
-                  <ExternalLink className="w-3 h-3" />
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleOpenTranslated(selectedTool.url)}
+                    className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 underline underline-offset-2"
+                  >
+                    <Languages className="w-3 h-3" />
+                    Traduzir para Português
+                  </button>
+                  <button
+                    onClick={() => handleOpenExternal(selectedTool.url)}
+                    className="text-slate-300 hover:text-white font-bold flex items-center gap-1 underline underline-offset-2"
+                  >
+                    Abrir em nova guia
+                    <ExternalLink className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
             </>
           )}
@@ -330,7 +434,7 @@ export const FreeToolsPage: React.FC = () => {
                           {isLive && (
                             <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-extrabold animate-pulse">
                               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-                              LIVE
+                              AO VIVO
                             </span>
                           )}
                         </div>
@@ -366,11 +470,11 @@ export const FreeToolsPage: React.FC = () => {
                     </span>
                     <button
                       onClick={() => handleOpenExternal(tool.url)}
-                      title="Abrir diretamente em nova aba"
+                      title="Abrir diretamente em nova guia"
                       className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition text-xs flex items-center gap-1 font-semibold"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
-                      <span className="text-[10px]">Aba externa</span>
+                      <span className="text-[10px]">Nova guia</span>
                     </button>
                   </div>
 
@@ -388,7 +492,7 @@ export const FreeToolsPage: React.FC = () => {
                       className="w-full py-3 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-bold border border-slate-800 hover:border-slate-700 flex items-center justify-center gap-2 transition"
                     >
                       <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                      ABRIR NO CATVU
+                      ABRIR NO SITE OFICIAL
                     </button>
                   </div>
                 </div>
@@ -417,3 +521,4 @@ export const FreeToolsPage: React.FC = () => {
     </div>
   );
 };
+

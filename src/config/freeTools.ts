@@ -5,7 +5,7 @@ export interface FreeTool {
   title: string;
   description: string;
   url: string;
-  badge: 'GRÁTIS' | 'FREE · LIMITADO';
+  badge: 'GRÁTIS' | 'GRÁTIS · LIMITADO' | 'FREE · LIMITADO';
   category: 'Rastreamento' | 'Ao Vivo' | 'Salas' | 'Outros';
   provider: string;
   buttonText: string;
@@ -30,13 +30,13 @@ export const FREE_TOOLS_CONFIG: FreeTool[] = [
     enabled: true,
     featured: true,
     allowIframe: true,
-    tags: ['salas', 'rastreador', 'imvu', 'online', 'catvu', 'busca']
+    tags: ['salas', 'rastreador', 'imvu', 'online', 'catvu', 'busca', 'gratis', 'gratuito']
   },
   {
     id: 'live-watch',
     title: 'Live Watch',
     url: 'https://catvu.live/live-watch',
-    badge: 'FREE · LIMITADO',
+    badge: 'GRÁTIS · LIMITADO',
     category: 'Ao Vivo',
     provider: 'Catvu',
     description: 'Acompanhe a atividade de uma sala utilizando o acesso gratuito/limitado disponibilizado pelo Catvu.',
@@ -45,6 +45,6 @@ export const FREE_TOOLS_CONFIG: FreeTool[] = [
     enabled: true,
     featured: true,
     allowIframe: true,
-    tags: ['ao vivo', 'live', 'watch', 'monitor', 'tempo real', 'catvu']
+    tags: ['ao vivo', 'live', 'watch', 'monitor', 'tempo real', 'catvu', 'gratis', 'limitado']
   }
 ];
