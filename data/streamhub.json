@@ -38,9 +38,30 @@
       "pin": "1418",
       "screen": "Perfil VIP #1 (Rede Souza)",
       "tonLink": "https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO"
+    },
+    "chatgpt": {
+      "serviceId": "chatgpt",
+      "email": "souzaroni187@gmail.com",
+      "password": "gatodebota123",
+      "screen": "ChatGPT Pro GPT-4o",
+      "tonLink": ""
     }
   },
   "accessLogs": [
+    {
+      "id": "acc_1786737142288_ubs3g",
+      "userId": "chat_2804:d41:c585:5e00:1dd3:90cf:4403:450d",
+      "userEmail": "cliente_chat@streamhub.vip",
+      "userIp": "2804:d41:c585:5e00:1dd3:90cf:4403:450d",
+      "service": "prime",
+      "credentials": {
+        "email": "primevideosouza368@gmail.com",
+        "password": "roni141821",
+        "pin": "Sem PIN",
+        "screen": "Livre / Escolha qualquer perfil"
+      },
+      "createdAt": "2026-08-14T19:52:22.288Z"
+    },
     {
       "id": "acc_1786250168436_1r74i",
       "userId": "usr_1785269546550_1kr92",
@@ -72,6 +93,42 @@
   ],
   "payments": [],
   "visitorLogs": [
+    {
+      "id": "vis_1786737414390_w054",
+      "ip": "2804:d41:c585:5e00:1dd3:90cf:4403:450d",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-14T19:56:54.390Z"
+    },
+    {
+      "id": "vis_1786737414385_mxrx",
+      "ip": "2804:d41:c585:5e00:1dd3:90cf:4403:450d",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-14T19:56:54.385Z"
+    },
+    {
+      "id": "vis_1786737101036_rqfx",
+      "ip": "2804:d41:c585:5e00:1dd3:90cf:4403:450d",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-14T19:51:41.036Z"
+    },
+    {
+      "id": "vis_1786737101020_rod3",
+      "ip": "2804:d41:c585:5e00:1dd3:90cf:4403:450d",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-14T19:51:41.020Z"
+    },
     {
       "id": "vis_1786301301364_aeet",
       "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
@@ -9035,42 +9092,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:45:52.543Z"
-    },
-    {
-      "id": "vis_1786301152304_nqu0",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:52.305Z"
-    },
-    {
-      "id": "vis_1786301152169_7o65",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:52.169Z"
-    },
-    {
-      "id": "vis_1786301152040_u2nk",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:52.040Z"
-    },
-    {
-      "id": "vis_1786301151694_84p6",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:51.694Z"
     }
   ],
   "supportMessages": [
@@ -9082,6 +9103,16 @@
       "sender": "user",
       "text": "Olá admin! Fiz o pagamento da Netflix via PIX Ton, como faço para pegar a senha da tela?",
       "createdAt": "2026-08-09T04:04:10.987Z",
+      "readByAdmin": false
+    },
+    {
+      "id": "msg_1786737142118_se1g",
+      "userId": "guest",
+      "userName": "Cliente VIP",
+      "userEmail": "visitante@streamhub.com",
+      "sender": "user",
+      "text": "Como resgatar meu Prime Video grátis?",
+      "createdAt": "2026-08-14T19:52:22.118Z",
       "readByAdmin": false
     }
   ],
@@ -9583,6 +9614,60 @@
         "Selecione a opção \"E-Prepag\" ou \"Código PIN\" e insira o código revelado."
       ],
       "updatedAt": "2026-08-09T04:34:10.981Z"
+    },
+    {
+      "id": "prod_chatgpt",
+      "name": "ChatGPT Plus / Pro (GPT-4o)",
+      "description": "Acesso grátis ao ChatGPT Plus com Inteligência Artificial GPT-4o! Inclui criação de imagens com Thinking, agentes Codex e Work, memória expandida e GPTs personalizados.",
+      "category": "Inteligência Artificial",
+      "price": 0,
+      "isFree": true,
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10",
+      "banner": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10",
+      "stockStatus": "DISPONIVEL",
+      "rating": 5,
+      "badge": "GPT-4o PRO GRÁTIS",
+      "features": [
+        "Modelos avançados",
+        "Criação avançada de imagens com Thinking",
+        "Memória expandida entre chats",
+        "Agente do Work para tarefas em várias etapas",
+        "Agente Codex para programação",
+        "Pesquisa profunda expandida",
+        "Projetos e GPTs personalizados"
+      ],
+      "instructions": [
+        "Copie o e-mail (souzaroni187@gmail.com) e a senha.",
+        "Acesse chatgpt.com ou baixe o app oficial na Play Store.",
+        "Faça login com a conta disponibilizada e aproveite!"
+      ],
+      "updatedAt": "2026-08-14T19:51:36.079Z"
+    },
+    {
+      "id": "prod_tiktok_live",
+      "name": "Monitor TikTok Live (Chat & Presentes em Tempo Real)",
+      "description": "Monitore chat ao vivo, mensagens de viewers, contagem de espectadores, envio de presentes (gifts), curtidas e engajamento em tempo real pelo navegador.",
+      "category": "Ao Vivo",
+      "price": 0,
+      "isFree": true,
+      "image": "https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg",
+      "banner": "https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg",
+      "stockStatus": "DISPONIVEL",
+      "rating": 5,
+      "badge": "AO VIVO · 100% GRÁTIS",
+      "features": [
+        "Chat ao vivo instantâneo sem delay",
+        "Detecção de presentes (gifts) e doações",
+        "Contador de espectadores e curtidas",
+        "Monitoramento de qualquer streamer do TikTok",
+        "Acesso web direto integrado"
+      ],
+      "instructions": [
+        "Clique em \"Resgatar\" ou \"Acessar Monitor\".",
+        "No monitor, digite o @username do streamer que está em live no TikTok.",
+        "Clique em Conectar e acompanhe todas as mensagens, gifts e métricas ao vivo!"
+      ],
+      "updatedAt": "2026-08-14T19:56:45.239Z"
     }
   ],
   "userPresence": [

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Sparkles, CheckCircle2, ShieldAlert, ArrowRight, Zap, CreditCard, Lock, Star, XCircle, Tv, AlertTriangle, Flame, MessageSquare, Bot } from 'lucide-react';
+import { Play, Sparkles, CheckCircle2, ShieldAlert, ArrowRight, Zap, CreditCard, Lock, Star, XCircle, Tv, AlertTriangle, Flame, MessageSquare, Bot, Radio, Activity, Gift, Users } from 'lucide-react';
 import { PrimeCountdown } from './PrimeCountdown';
 import { ChatGptTimer } from './ChatGptTimer';
 
@@ -11,6 +11,7 @@ interface ServiceCardsProps {
   onGenerateFreeFire: () => void;
   onBuyNetflix: () => void;
   onGenerateIptv?: () => void;
+  onOpenTikTokLive?: () => void;
   onOpenReviews?: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt') => void;
   primeBlocked?: boolean;
   primeError?: string | null;
@@ -30,6 +31,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
   onGenerateFreeFire,
   onBuyNetflix,
   onGenerateIptv,
+  onOpenTikTokLive,
   onOpenReviews,
   primeBlocked = false,
   primeError = null,
@@ -150,6 +152,104 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             >
               <Sparkles className="w-4 h-4 text-cyan-200 animate-spin" />
               <span>GERAR IPTV / VER CATÁLOGO</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+        </div>
+
+        {/* ======================================================== */}
+        {/* CARD TIKTOK: MONITOR DE CHAT & LIVE DO TIKTOK EM TEMPO REAL */}
+        {/* ======================================================== */}
+        <div className="relative rounded-3xl bg-gradient-to-b from-slate-900 via-pink-950/20 to-slate-900 border-2 border-pink-500/40 hover:border-pink-400 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-pink-500/20 group overflow-hidden">
+          
+          {/* Glow */}
+          <div className="absolute top-0 right-0 w-44 h-44 bg-pink-500/15 rounded-full blur-3xl pointer-events-none group-hover:bg-pink-500/25 transition-all" />
+
+          <div>
+            {/* Header Badge */}
+            <div className="flex items-center justify-between gap-1.5 mb-4">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider text-pink-300 bg-pink-500/20 border border-pink-500/40 uppercase flex items-center gap-1">
+                <Radio className="w-3 h-3 text-pink-400 animate-pulse" />
+                TEMPO REAL · GRÁTIS
+              </span>
+              <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+                Online 24/7
+              </span>
+            </div>
+
+            {/* Service Title & Logo Branding */}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-600 to-cyan-400 p-0.5 shadow-lg shadow-pink-500/30 shrink-0">
+                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                  <Tv className="w-6 h-6 text-pink-400" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-white leading-tight flex items-center gap-1.5">
+                  Monitor TikTok Live <span className="text-[10px] font-bold text-pink-400 bg-pink-500/10 px-1.5 py-0.5 rounded border border-pink-500/30">Chat & Gifts</span>
+                </h3>
+                <p className="text-[11px] text-slate-300 font-medium">
+                  Monitoramento de Lives em Tempo Real
+                </p>
+              </div>
+            </div>
+
+            <p className="text-slate-300 text-xs mb-3 leading-relaxed">
+              Acompanhe o <strong className="text-white">chat ao vivo, contagem de espectadores, presentes (gifts) e curtidas</strong> de qualquer transmissão do TikTok.
+            </p>
+
+            {/* TikTok Live Banner */}
+            <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-pink-500/40 group/img bg-slate-950 shadow-md">
+              <img
+                src="https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg"
+                alt="Monitor TikTok Live"
+                referrerPolicy="no-referrer"
+                className="w-full h-32 sm:h-36 object-cover object-center transform group-hover/img:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold text-pink-200">
+                <span className="bg-slate-950/85 px-2 py-0.5 rounded-md border border-pink-500/40 backdrop-blur-sm">
+                  Chat & Presentes
+                </span>
+                <span className="bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-md border border-pink-500/40 backdrop-blur-sm">
+                  100% Gratuito
+                </span>
+              </div>
+            </div>
+
+            {/* Benefits List */}
+            <ul className="space-y-2 mb-4 text-[11px] text-slate-300">
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-pink-400 shrink-0" />
+                <span>Chat em tempo real sem atrasos</span>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Notificação de Presentes & Doações</span>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>Contador de Espectadores & Curtidas</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Action Button */}
+          <div>
+            <div className="p-2.5 mb-3 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between text-xs">
+              <span className="text-slate-400 text-[11px]">Serviço:</span>
+              <span className="font-black text-pink-400 text-xs">
+                Acesso Imediato
+              </span>
+            </div>
+
+            <button
+              onClick={onOpenTikTokLive}
+              className="w-full py-3.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm shadow-xl shadow-pink-500/20 transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-pink-600 via-rose-600 to-cyan-500 hover:from-pink-500 hover:to-cyan-400 text-white cursor-pointer transform active:scale-98"
+            >
+              <Radio className="w-4 h-4 text-pink-200 animate-pulse" />
+              <span>MONITORAR LIVE TIKTOK</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

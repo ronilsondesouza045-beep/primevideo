@@ -18,6 +18,21 @@ export interface FreeTool {
 
 export const FREE_TOOLS_CONFIG: FreeTool[] = [
   {
+    id: 'tiktok-live-monitor',
+    title: 'Monitor de Chat & Live TikTok',
+    url: 'https://tiktoklivewebvercelv43viewersgiftsl.vercel.app/',
+    badge: 'GRÁTIS',
+    category: 'Ao Vivo',
+    provider: 'TikTok Live Web',
+    description: 'Monitore chat ao vivo, contagem de espectadores, presentes (gifts), curtidas e eventos de lives do TikTok em tempo real.',
+    buttonText: 'MONITORAR LIVE TIKTOK',
+    iconName: 'Tv',
+    enabled: true,
+    featured: true,
+    allowIframe: true,
+    tags: ['tiktok', 'live', 'chat', 'monitor', 'tempo real', 'presentes', 'gifts', 'viewers', 'espectadores', 'gratis']
+  },
+  {
     id: 'private-room',
     title: 'Rastreador de Salas',
     url: 'https://catvu.live/live-private-room',

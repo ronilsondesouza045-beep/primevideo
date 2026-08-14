@@ -1,48 +1,58 @@
-import React, { useEffect, useState } from 'react';
-import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import { useModalStore } from './store/useModalStore';
-import { ModalManager } from './components/ModalManager';
 import { Navbar } from './components/Navbar';
+import { Hero } from './components/Hero';
+import { ServiceCards } from './components/ServiceCards';
+import { CatalogPage } from './components/CatalogPage';
+import { FreeToolsPage } from './components/FreeToolsPage';
+import { BenefitsPage } from './components/BenefitsPage';
+import { UserAccesses } from './components/UserAccesses';
+import { UserProfile } from './components/UserProfile';
+import { AdminPanel } from './components/AdminPanel';
+import { SystemStatusPage } from './components/SystemStatusPage';
+import { SupportTickets } from './components/SupportTickets';
+import { FavoritesPage } from './components/FavoritesPage';
+import { ModalManager } from './components/ModalManager';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { OfflineBanner } from './components/OfflineBanner';
-import { CatalogPage } from './components/CatalogPage';
-import { BenefitsPage } from './components/BenefitsPage';
-import { UserProfile } from './components/UserProfile';
-import { UserAccesses } from './components/UserAccesses';
-import { FavoritesPage } from './components/FavoritesPage';
-import { SupportTickets } from './components/SupportTickets';
-import { SystemStatusPage } from './components/SystemStatusPage';
-import { AdminPanel } from './components/AdminPanel';
-import { SupportChatbot } from './components/SupportChatbot';
-import { FreeToolsPage } from './components/FreeToolsPage';
-import { Tv } from 'lucide-react';
-import { AccessLog, PaymentRecord, ServiceCredentials } from './types';
+import { Product } from './types';
+import { Tv, ShieldCheck, Heart, Sparkles, Flame, Radio } from 'lucide-react';
 
 export default function App() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { 
+    user, 
+    userAccessLogs, 
+    userPayments, 
+    setUser, 
+    setUserAccessLogs, 
+    setUserPayments, 
+    checkSession, 
+    logout 
+  } = useAuthStore();
 
-  const { user, userAccessLogs, userPayments, setUserAccessLogs, setUserPayments, checkSession, logout, setUser } = useAuthStore();
   const {
     openAuth,
     openSearch,
     openNotifs,
-    openChat,
     openIptvModal,
+    openTikTokLiveModal,
+    isChatOpen,
+    openChat,
+    toggleChat,
     setPrimeCreds,
     setParamountCreds,
     setCrunchyrollCreds,
     setChatGptCreds,
+    setSelectedReviewService,
     setFreeFireResult,
-    setActivePayment,
-    setSelectedReviewService
+    setActivePayment
   } = useModalStore();
 
+  const [activeTab, setActiveTab] = useState<'home' | 'catalog' | 'free-tools' | 'benefits' | 'accesses' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites'>('home');
   const [primeBlocked, setPrimeBlocked] = useState(false);
   const [primeError, setPrimeError] = useState<string | null>(null);
-
-  // Free Fire Stock State
+  const [products, setProducts] = useState<Product[]>([]);
   const [freeFireStock, setFreeFireStock] = useState({
     total: 2,
     available: 2,
@@ -50,368 +60,286 @@ export default function App() {
     outOfStock: false
   });
 
-  // Calculate activeTab based on current pathname
-  const getActiveTab = (): any => {
-    const path = location.pathname;
-    if (path === '/' || path === '/catalogo') return 'catalog';
-    if (path === '/ferramentas-gratis' || path === '/catalogo-free') return 'free-tools';
-    if (path === '/beneficios') return 'benefits';
-    if (path === '/meus-acessos' || path === '/pedidos') return 'accesses';
-    if (path === '/perfil') return 'profile';
-    if (path === '/favoritos') return 'favorites';
-    if (path.startsWith('/suporte')) return 'tickets';
-    if (path === '/status') return 'status';
-    if (path.startsWith('/admin')) return 'admin';
-    return 'catalog';
-  };
-
-  const activeTab = getActiveTab();
-
-  const setActiveTab = (tab: string) => {
-    switch (tab) {
-      case 'home':
-      case 'catalog':
-        navigate('/catalogo');
-        break;
-      case 'free-tools':
-      case 'free':
-      case 'ferramentas-gratis':
-        navigate('/ferramentas-gratis');
-        break;
-      case 'benefits':
-        navigate('/beneficios');
-        break;
-      case 'accesses':
-      case 'orders':
-        navigate('/meus-acessos');
-        break;
-      case 'profile':
-        navigate('/perfil');
-        break;
-      case 'favorites':
-        navigate('/favoritos');
-        break;
-      case 'tickets':
-        navigate('/suporte');
-        break;
-      case 'status':
-        navigate('/status');
-        break;
-      case 'admin':
-        navigate('/admin');
-        break;
-      default:
-        navigate('/catalogo');
-    }
-  };
-
-  // Check Session & Presence on Mount
+  // Track visit and check user session on mount
   useEffect(() => {
     checkSession();
-    checkPrimeStatus();
+    fetchUserAccesses();
+    fetchProducts();
     trackVisit();
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        openSearch();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
-    trackUserPresence();
-    const presenceInterval = setInterval(trackUserPresence, 20000);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      clearInterval(presenceInterval);
-    };
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      loadUserHistory();
-    }
-  }, [user]);
-
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('streamhub_token');
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    return headers;
-  };
-
-  const trackUserPresence = async () => {
-    try {
-      const headers = getAuthHeaders();
-      if (user?.email) headers['x-user-email'] = user.email;
-
-      await fetch('/api/track-presence', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          userId: user?.id || 'guest',
-          userName: user?.name || 'Visitante',
-          userEmail: user?.email || 'visitante@streamhub.com',
-          role: user?.role || 'client'
-        })
-      });
-    } catch (e) {}
-  };
 
   const trackVisit = async () => {
     try {
       await fetch('/api/track-visit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: location.pathname })
+        body: JSON.stringify({ path: window.location.pathname })
       });
     } catch (e) {}
   };
 
-  const checkPrimeStatus = async () => {
-    setPrimeBlocked(false);
-    setPrimeError(null);
+  const fetchProducts = async () => {
     try {
-      await fetch('/api/services/prime-status');
-    } catch (err) {}
-  };
-
-  const loadUserHistory = async () => {
-    const userEmailKey = user?.email ? user.email.toLowerCase() : 'guest';
-    let logs: AccessLog[] = [];
-    let pymts: PaymentRecord[] = [];
-
-    const localLogsRaw = localStorage.getItem(`streamhub_logs_${userEmailKey}`);
-    if (localLogsRaw) {
-      try { logs = JSON.parse(localLogsRaw); } catch (e) {}
-    }
-
-    const localPymtsRaw = localStorage.getItem(`streamhub_payments_${userEmailKey}`);
-    if (localPymtsRaw) {
-      try { pymts = JSON.parse(localPymtsRaw); } catch (e) {}
-    }
-
-    try {
-      const res = await fetch('/api/user/accesses', { headers: getAuthHeaders() });
+      const res = await fetch('/api/products');
       if (res.ok) {
         const data = await res.json();
-        if (data.accesses && data.accesses.length > 0) logs = data.accesses;
-        if (data.payments && data.payments.length > 0) pymts = data.payments;
+        if (data.products) setProducts(data.products);
       }
     } catch (e) {}
-
-    setUserAccessLogs(logs);
-    setUserPayments(pymts);
   };
 
-  // Generate Prime
+  const fetchUserAccesses = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('streamhub_token');
+      if (!token) return;
+
+      const res = await fetch('/api/services/user-accesses', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.accessLogs) setUserAccessLogs(data.accessLogs);
+        if (data.payments) setUserPayments(data.payments);
+        if (data.primeBlocked !== undefined) setPrimeBlocked(data.primeBlocked);
+      }
+    } catch (e) {
+      console.error('Erro ao carregar histórico de acessos:', e);
+    }
+  }, [setUserAccessLogs, setUserPayments]);
+
+  // Check Prime limits / status
+  const checkPrimeStatus = async () => {
+    try {
+      const res = await fetch('/api/services/prime-status');
+      if (res.ok) {
+        const data = await res.json();
+        setPrimeBlocked(data.blocked || false);
+        setPrimeError(data.errorMessage || null);
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    checkPrimeStatus();
+  }, [user]);
+
+  // Service generation handlers
   const handleGeneratePrime = async () => {
-    if (!user) { openAuth(); return; }
-    try {
-      let res = await fetch('/api/services/prime', { method: 'POST', headers: getAuthHeaders() });
-      if (!res.ok && res.status === 404) {
-        res = await fetch('/api/services/generate-prime', { method: 'POST', headers: getAuthHeaders() });
-      }
-      const data = await res.json();
-      const creds = data.credentials || data.access?.credentials;
-
-      if (res.ok && creds) {
-        setPrimeCreds(creds);
-      } else {
-        setPrimeCreds({
-          email: 'primevideosouza368@gmail.com',
-          password: 'roni141821',
-          pin: 'Sem PIN',
-          screen: 'Livre / Escolha qualquer perfil'
-        });
-      }
-      loadUserHistory();
-    } catch (e) {
-      setPrimeCreds({
-        email: 'primevideosouza368@gmail.com',
-        password: 'roni141821',
-        pin: 'Sem PIN',
-        screen: 'Livre / Escolha qualquer perfil'
-      });
-      loadUserHistory();
+    if (!user) {
+      openAuth();
+      return;
     }
-  };
 
-  // Generate Paramount
-  const handleGenerateParamount = async () => {
-    if (!user) { openAuth(); return; }
     try {
-      let res = await fetch('/api/services/paramount', { method: 'POST', headers: getAuthHeaders() });
-      if (!res.ok && res.status === 404) {
-        res = await fetch('/api/services/generate-paramount', { method: 'POST', headers: getAuthHeaders() });
-      }
-      const data = await res.json();
-      const creds = data.credentials || data.access?.credentials;
-
-      if (res.ok && creds) {
-        setParamountCreds(creds);
-      } else {
-        setParamountCreds({
-          email: 'olivia8515@web-library.net',
-          password: '4400988',
-          screen: 'Perfil Livre / Gratuito'
-        });
-      }
-      loadUserHistory();
-    } catch (e) {
-      setParamountCreds({
-        email: 'olivia8515@web-library.net',
-        password: '4400988',
-        screen: 'Perfil Livre / Gratuito'
-      });
-      loadUserHistory();
-    }
-  };
-
-  // Generate Crunchyroll
-  const handleGenerateCrunchyroll = async () => {
-    if (!user) { openAuth(); return; }
-    try {
-      let res = await fetch('/api/services/crunchyroll', { method: 'POST', headers: getAuthHeaders() });
-      if (!res.ok && res.status === 404) {
-        res = await fetch('/api/services/generate-crunchyroll', { method: 'POST', headers: getAuthHeaders() });
-      }
-      const data = await res.json();
-      const creds = data.credentials || data.access?.credentials;
-
-      if (res.ok && creds) {
-        setCrunchyrollCreds(creds);
-      } else {
-        setCrunchyrollCreds({
-          email: 'skeespq11@hotmail.com',
-          password: '12344321',
-          screen: 'Perfil Livre / Gratuito'
-        });
-      }
-      loadUserHistory();
-    } catch (e) {
-      setCrunchyrollCreds({
-        email: 'skeespq11@hotmail.com',
-        password: '12344321',
-        screen: 'Perfil Livre / Gratuito'
-      });
-      loadUserHistory();
-    }
-  };
-
-  // Generate ChatGPT
-  const handleGenerateChatGpt = async () => {
-    if (!user) { openAuth(); return; }
-    try {
-      let res = await fetch('/api/services/chatgpt', { method: 'POST', headers: getAuthHeaders() });
-      if (!res.ok && res.status === 404) {
-        res = await fetch('/api/services/generate-chatgpt', { method: 'POST', headers: getAuthHeaders() });
-      }
-      const data = await res.json();
-      const creds = data.credentials || data.access?.credentials;
-
-      if (res.ok && creds) {
-        setChatGptCreds(creds);
-      } else {
-        setChatGptCreds({
-          email: 'souzaroni187@gmail.com',
-          password: 'gatodebota123',
-          screen: 'ChatGPT Pro GPT-4o'
-        });
-      }
-      loadUserHistory();
-    } catch (e) {
-      setChatGptCreds({
-        email: 'souzaroni187@gmail.com',
-        password: 'gatodebota123',
-        screen: 'ChatGPT Pro GPT-4o'
-      });
-      loadUserHistory();
-    }
-  };
-
-  // Generate Free Fire
-  const handleGenerateFreeFire = async () => {
-    if (!user) { openAuth(); return; }
-    try {
-      const res = await fetch('/api/services/freefire', { method: 'POST', headers: getAuthHeaders() });
-      const data = await res.json();
-
-      setFreeFireResult({
-        code: data.code,
-        message: data.message || data.error,
-        success: res.ok && data.success,
-        outOfStock: data.outOfStock,
-        alreadyClaimed: data.alreadyClaimed
-      });
-      loadUserHistory();
-    } catch (e) {
-      setFreeFireResult({
-        message: 'Erro de conexão ao solicitar CODIGUIN Free Fire.',
-        success: false
-      });
-    }
-  };
-
-  // Buy Netflix
-  const handleBuyNetflix = async () => {
-    if (!user) { openAuth(); return; }
-    try {
-      const res = await fetch('/api/payments/create', {
+      const token = localStorage.getItem('streamhub_token');
+      const res = await fetch('/api/services/generate-prime', {
         method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ amount: 10.00 })
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
       });
-      const data = await res.json();
 
-      if (res.ok && data.payment) {
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPrimeCreds(data.credentials);
+        fetchUserAccesses();
+      } else {
+        alert(data.error || 'Não foi possível liberar o acesso ao Prime Video no momento.');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao gerar acesso ao Prime Video.');
+    }
+  };
+
+  const handleGenerateParamount = async () => {
+    if (!user) {
+      openAuth();
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('streamhub_token');
+      const res = await fetch('/api/services/generate-paramount', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setParamountCreds(data.credentials);
+        fetchUserAccesses();
+      } else {
+        alert(data.error || 'Não foi possível liberar o acesso ao Paramount+.');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao gerar acesso ao Paramount+.');
+    }
+  };
+
+  const handleGenerateCrunchyroll = async () => {
+    if (!user) {
+      openAuth();
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('streamhub_token');
+      const res = await fetch('/api/services/generate-crunchyroll', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCrunchyrollCreds(data.credentials);
+        fetchUserAccesses();
+      } else {
+        alert(data.error || 'Não foi possível liberar o acesso ao Crunchyroll.');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao gerar acesso ao Crunchyroll.');
+    }
+  };
+
+  const handleGenerateChatGpt = async () => {
+    if (!user) {
+      openAuth();
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('streamhub_token');
+      const res = await fetch('/api/services/generate-chatgpt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setChatGptCreds(data.credentials);
+        fetchUserAccesses();
+      } else {
+        alert(data.error || 'Não foi possível liberar o acesso ao ChatGPT.');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao gerar acesso ao ChatGPT.');
+    }
+  };
+
+  const handleBuyNetflix = async () => {
+    if (!user) {
+      openAuth();
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('streamhub_token');
+      const res = await fetch('/api/payments/create-netflix-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
         setActivePayment({
-          id: data.payment.id,
-          status: data.payment.status,
-          tonLink: data.tonLink || 'https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO',
-          pixCode: data.pixCode || '',
-          credentials: data.payment.credentials || null
+          id: data.paymentId,
+          status: data.status,
+          tonLink: data.tonPaymentLink,
+          pixCode: data.pixCode,
+          credentials: null
         });
-        loadUserHistory();
+        fetchUserAccesses();
       } else {
         alert(data.error || 'Erro ao gerar pedido de pagamento.');
       }
     } catch (err) {
-      alert('Erro ao processar solicitação de pagamento.');
+      alert('Erro ao conectar ao servidor de pagamentos.');
+    }
+  };
+
+  const handleGenerateFreeFire = async () => {
+    if (!user) {
+      openAuth();
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('streamhub_token');
+      const res = await fetch('/api/services/generate-freefire', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+
+      const data = await res.json();
+      setFreeFireResult(data);
+      fetchUserAccesses();
+    } catch (err) {
+      setFreeFireResult({
+        success: false,
+        message: 'Erro ao resgatar PIN do Free Fire.'
+      });
     }
   };
 
   const handleSelectServiceFromCatalog = (serviceKey: string) => {
-    if (serviceKey === 'prime') handleGeneratePrime();
+    if (serviceKey === 'tiktok-live') openTikTokLiveModal();
+    else if (serviceKey === 'prime') handleGeneratePrime();
     else if (serviceKey === 'paramount') handleGenerateParamount();
     else if (serviceKey === 'crunchyroll') handleGenerateCrunchyroll();
     else if (serviceKey === 'chatgpt') handleGenerateChatGpt();
-    else if (serviceKey === 'netflix') handleBuyNetflix();
     else if (serviceKey === 'iptv') openIptvModal();
-    else if (serviceKey === 'smm') openChat();
+    else if (serviceKey === 'netflix') handleBuyNetflix();
     else if (serviceKey === 'freefire') handleGenerateFreeFire();
+    else if (serviceKey === 'free-tools') setActiveTab('free-tools');
   };
 
-  const handleOpenExistingPaymentModal = (p: PaymentRecord) => {
-    setActivePayment({
-      id: p.id,
-      status: p.status,
-      tonLink: 'https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO',
-      pixCode: p.pixCode || '',
-      credentials: p.credentials || null
-    });
-  };
+  const handleToggleFavorite = async (productId: string) => {
+    if (!user) {
+      openAuth();
+      return;
+    }
+    const curFavs = user.favorites || [];
+    const updated = curFavs.includes(productId)
+      ? curFavs.filter(id => id !== productId)
+      : [...curFavs, productId];
 
-  const isAdmin = user?.email?.toLowerCase() === 'ronisouza495@gmail.com' || ['admin', 'super_admin'].includes(user?.role || '');
+    const updatedUser = { ...user, favorites: updated };
+    setUser(updatedUser);
+
+    try {
+      const token = localStorage.getItem('streamhub_token');
+      await fetch('/api/user/favorites', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ favorites: updated })
+      });
+    } catch (e) {}
+  };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-red-500 selection:text-white flex flex-col justify-between">
-      
-      {/* Connectivity Banner */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white pb-16 md:pb-0">
       <OfflineBanner />
 
-      {/* Top Navbar */}
+      {/* Main Top Navigation */}
       <Navbar
         user={user}
         activeTab={activeTab}
@@ -423,87 +351,107 @@ export default function App() {
         onOpenNotifs={openNotifs}
       />
 
-      {/* Main Content Body */}
-      <main className="flex-1 pb-20 md:pb-8">
-        <Routes>
-          <Route path="/" element={
-            <CatalogPage
-              user={user}
-              onOpenAuth={openAuth}
-              onSelectService={handleSelectServiceFromCatalog}
+      {/* Main Content View Switcher */}
+      <main className="flex-1">
+        {activeTab === 'home' && (
+          <div>
+            <Hero 
+              onGeneratePrime={handleGeneratePrime}
+              onBuyNetflix={handleBuyNetflix}
+            />
+            <ServiceCards
+              onGeneratePrime={handleGeneratePrime}
+              onGenerateParamount={handleGenerateParamount}
+              onGenerateCrunchyroll={handleGenerateCrunchyroll}
+              onGenerateChatGpt={handleGenerateChatGpt}
+              onGenerateFreeFire={handleGenerateFreeFire}
+              onBuyNetflix={handleBuyNetflix}
+              onGenerateIptv={openIptvModal}
+              onOpenTikTokLive={openTikTokLiveModal}
+              onOpenReviews={(service) => setSelectedReviewService(service)}
               primeBlocked={primeBlocked}
               primeError={primeError}
               freeFireStock={freeFireStock}
-              onOpenReviews={setSelectedReviewService}
             />
-          } />
-          <Route path="/catalogo" element={
-            <CatalogPage
-              user={user}
-              onOpenAuth={openAuth}
-              onSelectService={handleSelectServiceFromCatalog}
-              primeBlocked={primeBlocked}
-              primeError={primeError}
-              freeFireStock={freeFireStock}
-              onOpenReviews={setSelectedReviewService}
-            />
-          } />
-          <Route path="/beneficios" element={
-            <BenefitsPage
-              onOpenCatalog={() => navigate('/catalogo')}
-            />
-          } />
-          <Route path="/ferramentas-gratis" element={<FreeToolsPage />} />
-          <Route path="/catalogo-free" element={<FreeToolsPage />} />
-          <Route path="/meus-acessos" element={
-            <UserAccesses
-              accessLogs={userAccessLogs}
-              payments={userPayments}
-              onRefresh={loadUserHistory}
-              onOpenNetflixModal={handleOpenExistingPaymentModal}
-            />
-          } />
-          <Route path="/perfil" element={
-            user ? (
-              <UserProfile
-                user={user}
-                onUpdateUser={(updated) => setUser(updated)}
-              />
-            ) : (
-              <Navigate to="/catalogo" replace />
-            )
-          } />
-          <Route path="/favoritos" element={
-            <FavoritesPage
-              currentUser={user}
-              onSelectService={handleSelectServiceFromCatalog}
-            />
-          } />
-          <Route path="/suporte" element={<SupportTickets currentUser={user} />} />
-          <Route path="/suporte/:id" element={<SupportTickets currentUser={user} />} />
-          <Route path="/status" element={<SystemStatusPage />} />
-          
-          {/* Protected Admin Route */}
-          <Route path="/admin/*" element={
-            isAdmin ? <AdminPanel currentUser={user} /> : <Navigate to="/catalogo" replace />
-          } />
+          </div>
+        )}
 
-          <Route path="*" element={<Navigate to="/catalogo" replace />} />
-        </Routes>
+        {activeTab === 'catalog' && (
+          <CatalogPage
+            user={user}
+            onOpenAuth={openAuth}
+            onSelectService={handleSelectServiceFromCatalog}
+            primeBlocked={primeBlocked}
+            primeError={primeError}
+            freeFireStock={freeFireStock}
+            onOpenReviews={(service) => setSelectedReviewService(service)}
+          />
+        )}
+
+        {activeTab === 'free-tools' && (
+          <FreeToolsPage />
+        )}
+
+        {activeTab === 'benefits' && (
+          <BenefitsPage onOpenCatalog={() => setActiveTab('catalog')} />
+        )}
+
+        {activeTab === 'accesses' && (
+          <UserAccesses
+            accessLogs={userAccessLogs}
+            payments={userPayments}
+            onRefresh={fetchUserAccesses}
+            onOpenNetflixModal={(payment) => {
+              setActivePayment({
+                id: payment.id,
+                status: payment.status,
+                tonLink: payment.tonTransactionId || '',
+                pixCode: payment.pixCode || '',
+                credentials: payment.credentials || null
+              });
+            }}
+          />
+        )}
+
+        {activeTab === 'profile' && user && (
+          <UserProfile
+            user={user}
+            onUpdateUser={(updated) => setUser(updated)}
+          />
+        )}
+
+        {activeTab === 'admin' && (
+          <AdminPanel user={user} />
+        )}
+
+        {activeTab === 'status' && (
+          <SystemStatusPage />
+        )}
+
+        {activeTab === 'tickets' && (
+          <SupportTickets currentUser={user} />
+        )}
+
+        {activeTab === 'favorites' && (
+          <FavoritesPage
+            currentUser={user}
+            products={products}
+            onSelectProduct={() => setActiveTab('catalog')}
+            onNavigateTab={(tab) => setActiveTab(tab)}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        )}
       </main>
 
-      {/* Global Modal Manager */}
+      {/* Global Modals Manager */}
       <ModalManager
-        onNavigate={setActiveTab}
+        onNavigate={(tab) => setActiveTab(tab as any)}
         primeBlocked={primeBlocked}
         primeError={primeError}
         freeFireStock={freeFireStock}
       />
 
-      {/* Support Chatbot */}
-      <SupportChatbot />
-
-      {/* Mobile Bottom Navigation Bar */}
+      {/* Mobile Bottom Navigation */}
       <MobileBottomNav
         user={user}
         activeTab={activeTab}
@@ -512,15 +460,29 @@ export default function App() {
       />
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/90 py-8 px-4 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Tv className="w-5 h-5 text-red-500" />
-            <span className="font-black text-slate-300">STREAMHUB VIP 2.0</span>
-            <span>- Seu portal exclusivo de streaming e entretenimento.</span>
+      <footer className="border-t border-slate-800/60 bg-slate-950/80 py-10 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+          <div className="flex items-center justify-center gap-2">
+            <div className="p-2 rounded-xl bg-gradient-to-tr from-red-600 to-rose-500 text-white shadow-lg shadow-red-600/30">
+              <Tv className="w-5 h-5" />
+            </div>
+            <span className="text-lg font-black tracking-tight text-white">
+              STREAMHUB <span className="text-red-500">VIP</span>
+            </span>
           </div>
-          <div>
-            © 2026 STREAMHUB VIP 2.0. Todos os direitos reservados. Suporte: <span className="text-slate-300 font-bold">ronisouza495@gmail.com</span>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            Plataforma de entretenimento, streaming e ferramentas com liberação instantânea de acessos.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
+            <button onClick={() => setActiveTab('home')} className="hover:text-white transition-colors">Início</button>
+            <button onClick={() => setActiveTab('catalog')} className="hover:text-white transition-colors">Catálogo VIP</button>
+            <button onClick={() => setActiveTab('free-tools')} className="hover:text-white transition-colors">Ferramentas Gratuitas</button>
+            <button onClick={() => setActiveTab('benefits')} className="hover:text-white transition-colors">Benefícios & FAQ</button>
+            <button onClick={() => setActiveTab('status')} className="hover:text-white transition-colors">Status do Sistema</button>
+          </div>
+          <div className="text-[11px] text-slate-400 pt-4 border-t border-slate-900 flex items-center justify-center gap-2">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+            <span>© 2026 StreamHub VIP — Todos os direitos reservados.</span>
           </div>
         </div>
       </footer>

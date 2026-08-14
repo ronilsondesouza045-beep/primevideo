@@ -236,7 +236,7 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  category: 'Streaming' | 'Entretenimento' | 'Games' | 'Premium' | 'Gratuitos' | 'Inteligência Artificial' | 'Outros';
+  category: 'Streaming' | 'Entretenimento' | 'Games' | 'Premium' | 'Gratuitos' | 'Inteligência Artificial' | 'Ao Vivo' | 'Outros';
   price: number;
   originalPrice?: number;
   promoEndDate?: string; // ISO date for countdown timer

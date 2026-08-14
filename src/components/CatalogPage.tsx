@@ -49,10 +49,37 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     prod_netflix: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
     prod_freefire: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
     prod_iptv: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg',
-    prod_social_boost: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80'
+    prod_social_boost: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
+    prod_tiktok_live: 'https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg'
   };
 
   const FALLBACK_PRODUCTS: Product[] = [
+    {
+      id: 'prod_tiktok_live',
+      name: 'Monitor TikTok Live (Chat & Presentes em Tempo Real)',
+      description: 'Monitore chat ao vivo, mensagens de viewers, contagem de espectadores, envio de presentes (gifts), curtidas e engajamento em tempo real pelo navegador.',
+      category: 'Ao Vivo',
+      price: 0,
+      isFree: true,
+      image: OFFICIAL_IMAGES['prod_tiktok_live'],
+      banner: OFFICIAL_IMAGES['prod_tiktok_live'],
+      stockStatus: 'DISPONIVEL',
+      rating: 5.0,
+      badge: 'AO VIVO · 100% GRÁTIS',
+      features: [
+        'Chat ao vivo instantâneo sem delay',
+        'Detecção de presentes (gifts) e doações',
+        'Contador de espectadores e curtidas',
+        'Monitoramento de qualquer streamer do TikTok',
+        'Acesso web direto integrado'
+      ],
+      instructions: [
+        'Clique em "Resgatar" ou "Acessar Monitor".',
+        'No monitor, digite o @username do streamer que está em live no TikTok.',
+        'Clique em Conectar e acompanhe todas as mensagens, gifts e métricas ao vivo!'
+      ],
+      updatedAt: new Date().toISOString()
+    },
     {
       id: 'prod_prime',
       name: 'Prime Video VIP (Acesso Grátis)',
@@ -232,7 +259,9 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
   });
 
   const handleActionClick = (product: Product) => {
-    if (product.id === 'prod_prime') {
+    if (product.id === 'prod_tiktok_live') {
+      onSelectService('tiktok-live');
+    } else if (product.id === 'prod_prime') {
       onSelectService('prime');
     } else if (product.id === 'prod_paramount') {
       onSelectService('paramount');
@@ -308,6 +337,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
         onGenerateFreeFire={() => onSelectService('freefire')}
         onBuyNetflix={() => onSelectService('netflix')}
         onGenerateIptv={() => onSelectService('iptv')}
+        onOpenTikTokLive={() => onSelectService('tiktok-live')}
         onOpenReviews={onOpenReviews}
         primeBlocked={primeBlocked}
         primeError={primeError}

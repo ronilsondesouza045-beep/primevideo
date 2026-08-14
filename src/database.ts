@@ -1851,6 +1851,32 @@ class JSONDatabase {
   public ensureDefaultProducts() {
     const defaults: Product[] = [
       {
+        id: 'prod_tiktok_live',
+        name: 'Monitor TikTok Live (Chat & Presentes em Tempo Real)',
+        description: 'Monitore chat ao vivo, mensagens de viewers, contagem de espectadores, envio de presentes (gifts), curtidas e engajamento em tempo real pelo navegador.',
+        category: 'Ao Vivo',
+        price: 0,
+        isFree: true,
+        image: 'https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg',
+        banner: 'https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg',
+        stockStatus: 'DISPONIVEL',
+        rating: 5.0,
+        badge: 'AO VIVO · 100% GRÁTIS',
+        features: [
+          'Chat ao vivo instantâneo sem delay',
+          'Detecção de presentes (gifts) e doações',
+          'Contador de espectadores e curtidas',
+          'Monitoramento de qualquer streamer do TikTok',
+          'Acesso web direto integrado'
+        ],
+        instructions: [
+          'Clique em "Resgatar" ou "Acessar Monitor".',
+          'No monitor, digite o @username do streamer que está em live no TikTok.',
+          'Clique em Conectar e acompanhe todas as mensagens, gifts e métricas ao vivo!'
+        ],
+        updatedAt: new Date().toISOString()
+      },
+      {
         id: 'prod_prime',
         name: 'Prime Video VIP (Acesso Grátis)',
         description: 'Acesso completo ao catálogo de filmes, séries e produções originais do Prime Video em resolução 4K Ultra HD.',
