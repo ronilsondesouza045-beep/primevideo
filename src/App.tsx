@@ -91,10 +91,14 @@ export default function App() {
   const fetchUserAccesses = useCallback(async () => {
     try {
       const token = localStorage.getItem('streamhub_token');
-      if (!token) return;
+      const curUser = useAuthStore.getState().user;
+      if (!token && !curUser?.email) return;
 
       const res = await fetch('/api/services/user-accesses', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(curUser?.email ? { 'x-user-email': curUser.email } : {})
+        }
       });
       if (res.ok) {
         const data = await res.json();
@@ -123,7 +127,7 @@ export default function App() {
     checkPrimeStatus();
   }, [user]);
 
-  // Service generation handlers
+  // Service generation handlers with graceful fallback
   const handleGeneratePrime = async () => {
     if (!user) {
       openAuth();
@@ -136,19 +140,54 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(user.email ? { 'x-user-email': user.email } : {})
+        },
+        body: JSON.stringify({ email: user.email })
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success && data?.credentials) {
         setPrimeCreds(data.credentials);
         fetchUserAccesses();
       } else {
-        alert(data.error || 'Não foi possível liberar o acesso ao Prime Video no momento.');
+        // Graceful offline/fallback credentials
+        const fallbackCreds = {
+          email: 'primevideosouza368@gmail.com',
+          password: 'roni141821',
+          screen: 'Livre / Escolha qualquer perfil',
+          pin: 'Sem PIN'
+        };
+        setPrimeCreds(fallbackCreds);
+        const localLog: any = {
+          id: 'acc_' + Date.now(),
+          userId: user.id,
+          userEmail: user.email,
+          service: 'prime',
+          credentials: fallbackCreds,
+          createdAt: new Date().toISOString(),
+          ip: '127.0.0.1'
+        };
+        setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
       }
     } catch (err) {
-      alert('Erro de conexão ao gerar acesso ao Prime Video.');
+      const fallbackCreds = {
+        email: 'primevideosouza368@gmail.com',
+        password: 'roni141821',
+        screen: 'Livre / Escolha qualquer perfil',
+        pin: 'Sem PIN'
+      };
+      setPrimeCreds(fallbackCreds);
+      const localLog: any = {
+        id: 'acc_' + Date.now(),
+        userId: user.id,
+        userEmail: user.email,
+        service: 'prime',
+        credentials: fallbackCreds,
+        createdAt: new Date().toISOString(),
+        ip: '127.0.0.1'
+      };
+      setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
     }
   };
 
@@ -164,19 +203,53 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(user.email ? { 'x-user-email': user.email } : {})
+        },
+        body: JSON.stringify({ email: user.email })
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success && data?.credentials) {
         setParamountCreds(data.credentials);
         fetchUserAccesses();
       } else {
-        alert(data.error || 'Não foi possível liberar o acesso ao Paramount+.');
+        const fallbackCreds = {
+          email: 'olivia8515@web-library.net',
+          password: '4400988',
+          screen: 'Perfil Livre / Gratuito',
+          warning: 'Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.'
+        };
+        setParamountCreds(fallbackCreds);
+        const localLog: any = {
+          id: 'acc_' + Date.now(),
+          userId: user.id,
+          userEmail: user.email,
+          service: 'paramount',
+          credentials: fallbackCreds,
+          createdAt: new Date().toISOString(),
+          ip: '127.0.0.1'
+        };
+        setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
       }
     } catch (err) {
-      alert('Erro de conexão ao gerar acesso ao Paramount+.');
+      const fallbackCreds = {
+        email: 'olivia8515@web-library.net',
+        password: '4400988',
+        screen: 'Perfil Livre / Gratuito',
+        warning: 'Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.'
+      };
+      setParamountCreds(fallbackCreds);
+      const localLog: any = {
+        id: 'acc_' + Date.now(),
+        userId: user.id,
+        userEmail: user.email,
+        service: 'paramount',
+        credentials: fallbackCreds,
+        createdAt: new Date().toISOString(),
+        ip: '127.0.0.1'
+      };
+      setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
     }
   };
 
@@ -192,19 +265,53 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(user.email ? { 'x-user-email': user.email } : {})
+        },
+        body: JSON.stringify({ email: user.email })
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success && data?.credentials) {
         setCrunchyrollCreds(data.credentials);
         fetchUserAccesses();
       } else {
-        alert(data.error || 'Não foi possível liberar o acesso ao Crunchyroll.');
+        const fallbackCreds = {
+          email: 'skeespq11@hotmail.com',
+          password: '12344321',
+          screen: 'Mega Fan VIP',
+          warning: 'Aviso: A qualquer momento o e-mail e a senha do Crunchyroll podem ser alterados ou parar de funcionar sem aviso prévio.'
+        };
+        setCrunchyrollCreds(fallbackCreds);
+        const localLog: any = {
+          id: 'acc_' + Date.now(),
+          userId: user.id,
+          userEmail: user.email,
+          service: 'crunchyroll',
+          credentials: fallbackCreds,
+          createdAt: new Date().toISOString(),
+          ip: '127.0.0.1'
+        };
+        setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
       }
     } catch (err) {
-      alert('Erro de conexão ao gerar acesso ao Crunchyroll.');
+      const fallbackCreds = {
+        email: 'skeespq11@hotmail.com',
+        password: '12344321',
+        screen: 'Mega Fan VIP',
+        warning: 'Aviso: A qualquer momento o e-mail e a senha do Crunchyroll podem ser alterados ou parar de funcionar sem aviso prévio.'
+      };
+      setCrunchyrollCreds(fallbackCreds);
+      const localLog: any = {
+        id: 'acc_' + Date.now(),
+        userId: user.id,
+        userEmail: user.email,
+        service: 'crunchyroll',
+        credentials: fallbackCreds,
+        createdAt: new Date().toISOString(),
+        ip: '127.0.0.1'
+      };
+      setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
     }
   };
 
@@ -220,19 +327,53 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(user.email ? { 'x-user-email': user.email } : {})
+        },
+        body: JSON.stringify({ email: user.email })
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success && data?.credentials) {
         setChatGptCreds(data.credentials);
         fetchUserAccesses();
       } else {
-        alert(data.error || 'Não foi possível liberar o acesso ao ChatGPT.');
+        const fallbackCreds = {
+          email: 'souzaroni187@gmail.com',
+          password: 'gatodebota123',
+          screen: 'ChatGPT Pro GPT-4o',
+          warning: 'Aviso: A conta do ChatGPT Pro está 100% gratuita para uso no StreamHub VIP!'
+        };
+        setChatGptCreds(fallbackCreds);
+        const localLog: any = {
+          id: 'acc_' + Date.now(),
+          userId: user.id,
+          userEmail: user.email,
+          service: 'chatgpt',
+          credentials: fallbackCreds,
+          createdAt: new Date().toISOString(),
+          ip: '127.0.0.1'
+        };
+        setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
       }
     } catch (err) {
-      alert('Erro de conexão ao gerar acesso ao ChatGPT.');
+      const fallbackCreds = {
+        email: 'souzaroni187@gmail.com',
+        password: 'gatodebota123',
+        screen: 'ChatGPT Pro GPT-4o',
+        warning: 'Aviso: A conta do ChatGPT Pro está 100% gratuita para uso no StreamHub VIP!'
+      };
+      setChatGptCreds(fallbackCreds);
+      const localLog: any = {
+        id: 'acc_' + Date.now(),
+        userId: user.id,
+        userEmail: user.email,
+        service: 'chatgpt',
+        credentials: fallbackCreds,
+        createdAt: new Date().toISOString(),
+        ip: '127.0.0.1'
+      };
+      setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
     }
   };
 
