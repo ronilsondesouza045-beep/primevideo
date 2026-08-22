@@ -596,10 +596,10 @@ app.post(['/api/services/generate-chatgpt', '/api/services/chatgpt'], authentica
     const gptCreds = db.getCredential('chatgpt');
 
     const releasedCredentials = {
-      email: gptCreds.email || 'souzaroni187@gmail.com',
-      password: gptCreds.password || 'gatodebota123',
-      screen: gptCreds.screen || 'ChatGPT Pro GPT-4o',
-      warning: 'Aviso: A conta do ChatGPT Pro está 100% gratuita para uso no StreamHub VIP!'
+      email: gptCreds.email || 'gatomemu22@gmail.com',
+      password: gptCreds.password || '14182131r',
+      screen: gptCreds.screen || 'ChatGPT Pro GPT-4o (Login Google)',
+      warning: 'Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo "Continuar com o Google".'
     };
 
     const accessLog = db.addAccessLog(user.id, user.email, 'chatgpt', releasedCredentials, userIp);
@@ -615,7 +615,8 @@ app.post(['/api/services/generate-chatgpt', '/api/services/chatgpt'], authentica
         generatedAt: accessLog.createdAt,
         instructions: [
           'Acesse chatgpt.com ou baixe o app oficial na Google Play Store.',
-          'Insira o e-mail (souzaroni187@gmail.com) e a senha (gatodebota123).',
+          'Selecione a opção "Continuar com o Google" (Log in with Google).',
+          'Insira o e-mail (gatomemu22@gmail.com) e a senha (14182131r).',
           'Aproveite o acesso completo à Inteligência Artificial GPT-4o!'
         ]
       }
@@ -2874,15 +2875,15 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     if (isChatGptQuery) {
       const gptCreds = db.getCredential('chatgpt');
       const releasedCredentials = {
-        email: gptCreds.email || 'souzaroni187@gmail.com',
-        password: gptCreds.password || 'gatodebota123',
-        screen: 'ChatGPT Pro GPT-4o'
+        email: gptCreds.email || 'gatomemu22@gmail.com',
+        password: gptCreds.password || '14182131r',
+        screen: 'ChatGPT Pro GPT-4o (Login Google)'
       };
 
       db.addAccessLog(userId || `chat_${userIp}`, userEmail, 'chatgpt', releasedCredentials, userIp);
 
       return res.json({
-        reply: `🤖 **Acesso ChatGPT Plus / Pro (GPT-4o) Liberado!**\n\n📧 **E-mail:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Links Úteis:**\n• **Login Web:** [chatgpt.com](https://chatgpt.com/auth/login?next=%2F)\n• **App Play Store:** [Baixar na Google Play Store](https://play.google.com/store/apps/details?id=com.openai.chatgpt)\n\n💡 *Este acesso é 100% gratuito e fica salvo em "Meus Acessos Liberados" no seu perfil!*`
+        reply: `🤖 **Acesso ChatGPT Plus / Pro (GPT-4o) Liberado!**\n\n⚡ **IMPORTANTE:** Esta conta é vinculada ao Google. Para entrar, acesse o site ou app, selecione **"Continuar com o Google"** e insira as credenciais:\n\n📧 **E-mail Google:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Links Úteis:**\n• **Login Web:** [chatgpt.com](https://chatgpt.com/auth/login?next=%2F)\n• **App Play Store:** [Baixar na Google Play Store](https://play.google.com/store/apps/details?id=com.openai.chatgpt)\n\n💡 *Este acesso é 100% gratuito e fica salvo em "Meus Acessos Liberados" no seu perfil!*`
       });
     }
 
@@ -2982,7 +2983,7 @@ REGRAS RÍGIDAS DE SEGURANÇA QUE VOCÊ DEVE SEGUIR:
    - PRIME VIDEO VIP: 100% GRATUITO E ONLINE. E-mail: primevideosouza368@gmail.com | Senha: roni141821 (limite de 1 resgate por pessoa/IP).
    - PARAMOUNT+ VIP: 100% GRATUITO E ONLINE. E-mail: olivia8515@web-library.net | Senha: 4400988.
    - CRUNCHYROLL VIP: 100% GRATUITO E ONLINE. E-mail: skeespq11@hotmail.com | Senha: 12344321. Animes e desenhos animados em HD.
-   - CHATGPT PLUS / PRO (GPT-4o): 100% GRATUITO E ONLINE. E-mail: souzaroni187@gmail.com | Senha: gatodebota123. Acesso ilimitado no site (chatgpt.com) ou no app oficial da Play Store.
+   - CHATGPT PLUS / PRO (GPT-4o): 100% GRATUITO E ONLINE. E-mail Google: gatomemu22@gmail.com | Senha: 14182131r. ATENÇÃO: Esta conta é vinculada ao Google, portanto o login deve ser feito escolhendo "Continuar com o Google" no chatgpt.com ou no app da Play Store. Validade ativa até 22/09/2026.
 
    🔴 SERVIÇOS FORA DO AR (EM MANUTENÇÃO / REABASTECIMENTO):
    - FREE FIRE (CODIGUIN / PIN 100 DIAMANTES): FORA DO AR / MANUTENÇÃO TEMPORÁRIA no portal oficial Recarga Jogo e reabastecimento de lote de estoque.

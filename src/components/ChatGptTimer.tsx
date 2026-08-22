@@ -6,10 +6,10 @@ interface ChatGptTimerProps {
 }
 
 export const ChatGptTimer: React.FC<ChatGptTimerProps> = ({ variant = 'card' }) => {
-  const startDate = '11/08/2026';
-  const endDate = '11/09/2026';
-  // Target expiration: 11 de Setembro de 2026 às 23:59:59
-  const targetTimestamp = new Date('2026-09-11T23:59:59').getTime();
+  const startDate = '22/08/2026';
+  const endDate = '22/09/2026';
+  // Target expiration: 22 de Setembro de 2026 às 23:59:59
+  const targetTimestamp = new Date('2026-09-22T23:59:59').getTime();
 
   const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft());
 

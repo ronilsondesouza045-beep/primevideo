@@ -41,9 +41,9 @@
     },
     "chatgpt": {
       "serviceId": "chatgpt",
-      "email": "souzaroni187@gmail.com",
-      "password": "gatodebota123",
-      "screen": "ChatGPT Pro GPT-4o",
+      "email": "gatomemu22@gmail.com",
+      "password": "14182131r",
+      "screen": "ChatGPT Pro GPT-4o (Login Google)",
       "tonLink": ""
     }
   },
@@ -93,6 +93,24 @@
   ],
   "payments": [],
   "visitorLogs": [
+    {
+      "id": "vis_1787419200087_kao3",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:20:00.087Z"
+    },
+    {
+      "id": "vis_1787419200027_l9ym",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:20:00.027Z"
+    },
     {
       "id": "vis_1786737414390_w054",
       "ip": "2804:d41:c585:5e00:1dd3:90cf:4403:450d",
@@ -9074,24 +9092,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:45:52.824Z"
-    },
-    {
-      "id": "vis_1786301152682_st3b",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:52.682Z"
-    },
-    {
-      "id": "vis_1786301152543_h1rn",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:52.543Z"
     }
   ],
   "supportMessages": [
@@ -9637,9 +9637,9 @@
         "Projetos e GPTs personalizados"
       ],
       "instructions": [
-        "Copie o e-mail (souzaroni187@gmail.com) e a senha.",
-        "Acesse chatgpt.com ou baixe o app oficial na Play Store.",
-        "Faça login com a conta disponibilizada e aproveite!"
+        "Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131r).",
+        "Acesse o ChatGPT e selecione \"Continuar com o Google\".",
+        "Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!"
       ],
       "updatedAt": "2026-08-14T19:51:36.079Z"
     },

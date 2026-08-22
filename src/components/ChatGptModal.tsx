@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { ServiceCredentials } from '../types';
 import { 
   X, Copy, Check, Bot, ExternalLink, Smartphone, Sparkles, AlertTriangle,
-  Cpu, Image, Brain, Briefcase, Code2, Search, FolderKanban, CheckCircle2
+  Cpu, Image, Brain, Briefcase, Code2, Search, FolderKanban, CheckCircle2, Share2
 } from 'lucide-react';
 import { ChatGptTimer } from './ChatGptTimer';
+import { useModalStore } from '../store/useModalStore';
 
 interface ChatGptModalProps {
   credentials: ServiceCredentials | null;
@@ -86,13 +87,15 @@ export const ChatGptModal: React.FC<ChatGptModalProps> = ({
         {/* Real-time Expiration Timer */}
         <ChatGptTimer variant="modal" />
 
-        {/* Info/Warning Banner */}
-        <div className="p-4 rounded-2xl bg-amber-950/50 border border-amber-500/40 text-amber-200 text-xs font-semibold leading-relaxed mb-6 flex items-start gap-3 shadow-inner">
+        {/* Info/Warning Banner - Google Login Requirement */}
+        <div className="p-4 rounded-2xl bg-amber-950/60 border border-amber-500/50 text-amber-200 text-xs font-semibold leading-relaxed mb-6 flex items-start gap-3 shadow-inner">
           <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-amber-300 font-bold mb-1">💡 COMO UTILIZAR SEU CHATGPT PRO</p>
-            <p className="text-amber-200/90">
-              Copie o e-mail e a senha abaixo. Você pode usar diretamente no navegador do seu celular/PC ou baixando o app oficial do ChatGPT na Google Play Store.
+          <div className="space-y-1">
+            <p className="text-amber-300 font-black flex items-center gap-1.5 uppercase tracking-wide">
+              ⚡ IMPORTANTE: LOGIN EXCLUSIVO VIA GOOGLE
+            </p>
+            <p className="text-amber-100/90 leading-normal">
+              Esta conta <strong>ChatGPT Plus / Pro</strong> deve ser acessada clicando na opção <strong>&quot;Continuar com o Google&quot;</strong> (Log in with Google). Insira o e-mail e a senha do Google disponibilizados abaixo.
             </p>
           </div>
         </div>
@@ -103,7 +106,7 @@ export const ChatGptModal: React.FC<ChatGptModalProps> = ({
           {/* Email Field */}
           <div>
             <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-              E-mail do ChatGPT
+              E-mail Google (ChatGPT Plus)
             </label>
             <div className="flex items-center gap-2 bg-slate-900 border border-slate-700/80 rounded-xl p-2.5">
               <input
@@ -125,7 +128,7 @@ export const ChatGptModal: React.FC<ChatGptModalProps> = ({
           {/* Password Field */}
           <div>
             <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-              Senha do ChatGPT
+              Senha Google (ChatGPT Plus)
             </label>
             <div className="flex items-center gap-2 bg-slate-900 border border-slate-700/80 rounded-xl p-2.5">
               <input
@@ -225,27 +228,38 @@ export const ChatGptModal: React.FC<ChatGptModalProps> = ({
             <ExternalLink className="w-4 h-4" />
           </a>
 
-          <a
-            href="https://play.google.com/store/apps/details?id=com.openai.chatgpt"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
-          >
-            <Smartphone className="w-4 h-4 text-emerald-400" />
-            <span>Baixar App ChatGPT na Google Play Store</span>
-          </a>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.openai.chatgpt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="py-3 px-3 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Smartphone className="w-4 h-4 text-emerald-400" />
+              <span>App Play Store</span>
+            </a>
+
+            <button
+              onClick={() => useModalStore.getState().openShare()}
+              className="py-3 px-3 rounded-xl font-bold text-xs bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 hover:text-white flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
+            >
+              <Share2 className="w-4 h-4 text-emerald-400" />
+              <span>Enviar Link / Foto</span>
+            </button>
+          </div>
         </div>
 
         {/* Instructions */}
         <div className="bg-slate-950/60 rounded-2xl p-4 border border-slate-800/80 text-xs text-slate-400 space-y-2">
           <p className="font-bold text-white flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            Passo a passo rápido:
+            Passo a passo para login com Google:
           </p>
-          <ol className="list-decimal list-inside space-y-1 text-slate-300">
-            <li>Copie o e-mail e a senha exibidos acima.</li>
-            <li>Clique no botão &quot;Entrar no ChatGPT Web&quot; ou abra o aplicativo no celular.</li>
-            <li>Faça login com a conta disponibilizada e use à vontade!</li>
+          <ol className="list-decimal list-inside space-y-1.5 text-slate-300">
+            <li>Copie o e-mail (<code className="text-emerald-300 font-mono">gatomemu22@gmail.com</code>) e a senha (<code className="text-emerald-300 font-mono">14182131r</code>).</li>
+            <li>Clique no botão &quot;Entrar no ChatGPT Web&quot; ou abra o aplicativo oficial no celular.</li>
+            <li>Na tela de login do ChatGPT, selecione <strong>&quot;Continuar com o Google&quot;</strong>.</li>
+            <li>Insira o e-mail e a senha do Google fornecidos e aproveite os recursos do GPT-4o Plus/Pro!</li>
           </ol>
         </div>
 

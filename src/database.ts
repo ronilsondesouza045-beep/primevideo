@@ -461,14 +461,14 @@ class JSONDatabase {
       tonLink: ''
     };
 
-    // ChatGPT Plus / Pro Default (100% Gratuito)
-    // Email: souzaroni187@gmail.com
-    // Senha: gatodebota123
+    // ChatGPT Plus / Pro Default (100% Gratuito - Login Google)
+    // Email: gatomemu22@gmail.com
+    // Senha: 14182131r
     this.data.credentials['chatgpt'] = {
       serviceId: 'chatgpt',
-      email: 'souzaroni187@gmail.com',
-      password: 'gatodebota123',
-      screen: 'ChatGPT Pro GPT-4o',
+      email: 'gatomemu22@gmail.com',
+      password: '14182131r',
+      screen: 'ChatGPT Pro GPT-4o (Login Google)',
       tonLink: ''
     };
 
@@ -707,8 +707,8 @@ class JSONDatabase {
   public getCredential(serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll' | 'chatgpt'): ServiceCredential {
     return this.data.credentials[serviceId] || {
       serviceId,
-      email: serviceId === 'chatgpt' ? 'souzaroni187@gmail.com' : serviceId === 'crunchyroll' ? 'skeespq11@hotmail.com' : serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
-      password: serviceId === 'chatgpt' ? 'gatodebota123' : serviceId === 'crunchyroll' ? '12344321' : serviceId === 'paramount' ? '4400988' : 'roni141821'
+      email: serviceId === 'chatgpt' ? 'gatomemu22@gmail.com' : serviceId === 'crunchyroll' ? 'skeespq11@hotmail.com' : serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
+      password: serviceId === 'chatgpt' ? '14182131r' : serviceId === 'crunchyroll' ? '12344321' : serviceId === 'paramount' ? '4400988' : 'roni141821'
     };
   }
 
@@ -1957,9 +1957,9 @@ class JSONDatabase {
           'Projetos e GPTs personalizados'
         ],
         instructions: [
-          'Copie o e-mail (souzaroni187@gmail.com) e a senha.',
-          'Acesse chatgpt.com ou baixe o app oficial na Play Store.',
-          'Faça login com a conta disponibilizada e aproveite!'
+          'Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131r).',
+          'Acesse o ChatGPT e selecione "Continuar com o Google".',
+          'Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!'
         ],
         updatedAt: new Date().toISOString()
       },

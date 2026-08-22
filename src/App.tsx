@@ -339,10 +339,10 @@ export default function App() {
         fetchUserAccesses();
       } else {
         const fallbackCreds = {
-          email: 'souzaroni187@gmail.com',
-          password: 'gatodebota123',
-          screen: 'ChatGPT Pro GPT-4o',
-          warning: 'Aviso: A conta do ChatGPT Pro está 100% gratuita para uso no StreamHub VIP!'
+          email: 'gatomemu22@gmail.com',
+          password: '14182131r',
+          screen: 'ChatGPT Pro GPT-4o (Login Google)',
+          warning: 'Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo "Continuar com o Google".'
         };
         setChatGptCreds(fallbackCreds);
         const localLog: any = {
@@ -358,10 +358,10 @@ export default function App() {
       }
     } catch (err) {
       const fallbackCreds = {
-        email: 'souzaroni187@gmail.com',
-        password: 'gatodebota123',
-        screen: 'ChatGPT Pro GPT-4o',
-        warning: 'Aviso: A conta do ChatGPT Pro está 100% gratuita para uso no StreamHub VIP!'
+        email: 'gatomemu22@gmail.com',
+        password: '14182131r',
+        screen: 'ChatGPT Pro GPT-4o (Login Google)',
+        warning: 'Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo "Continuar com o Google".'
       };
       setChatGptCreds(fallbackCreds);
       const localLog: any = {
