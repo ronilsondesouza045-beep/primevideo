@@ -149,7 +149,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
         'Pesquisa profunda expandida',
         'Projetos e GPTs personalizados'
       ],
-      instructions: ['Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131r).', 'Acesse o ChatGPT e selecione "Continuar com o Google".', 'Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!'],
+      instructions: ['Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131rr).', 'Acesse o ChatGPT e selecione "Continuar com o Google".', 'Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!'],
       updatedAt: new Date().toISOString()
     },
     {

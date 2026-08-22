@@ -245,7 +245,7 @@ export const ChatGptModal: React.FC<ChatGptModalProps> = ({
             Passo a passo para login com Google:
           </p>
           <ol className="list-decimal list-inside space-y-1.5 text-slate-300">
-            <li>Copie o e-mail (<code className="text-emerald-300 font-mono">gatomemu22@gmail.com</code>) e a senha (<code className="text-emerald-300 font-mono">14182131r</code>).</li>
+            <li>Copie o e-mail (<code className="text-emerald-300 font-mono">gatomemu22@gmail.com</code>) e a senha (<code className="text-emerald-300 font-mono">14182131rr</code>).</li>
             <li>Clique no botão &quot;Entrar no ChatGPT Web&quot; ou abra o aplicativo oficial no celular.</li>
             <li>Na tela de login do ChatGPT, selecione <strong>&quot;Continuar com o Google&quot;</strong>.</li>
             <li>Insira o e-mail e a senha do Google fornecidos e aproveite os recursos do GPT-4o Plus/Pro!</li>

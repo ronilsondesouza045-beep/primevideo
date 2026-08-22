@@ -340,7 +340,7 @@ export default function App() {
       } else {
         const fallbackCreds = {
           email: 'gatomemu22@gmail.com',
-          password: '14182131r',
+          password: '14182131rr',
           screen: 'ChatGPT Pro GPT-4o (Login Google)',
           warning: 'Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo "Continuar com o Google".'
         };
@@ -359,7 +359,7 @@ export default function App() {
     } catch (err) {
       const fallbackCreds = {
         email: 'gatomemu22@gmail.com',
-        password: '14182131r',
+        password: '14182131rr',
         screen: 'ChatGPT Pro GPT-4o (Login Google)',
         warning: 'Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo "Continuar com o Google".'
       };

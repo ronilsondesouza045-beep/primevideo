@@ -463,11 +463,11 @@ class JSONDatabase {
 
     // ChatGPT Plus / Pro Default (100% Gratuito - Login Google)
     // Email: gatomemu22@gmail.com
-    // Senha: 14182131r
+    // Senha: 14182131rr
     this.data.credentials['chatgpt'] = {
       serviceId: 'chatgpt',
       email: 'gatomemu22@gmail.com',
-      password: '14182131r',
+      password: '14182131rr',
       screen: 'ChatGPT Pro GPT-4o (Login Google)',
       tonLink: ''
     };
@@ -708,7 +708,7 @@ class JSONDatabase {
     return this.data.credentials[serviceId] || {
       serviceId,
       email: serviceId === 'chatgpt' ? 'gatomemu22@gmail.com' : serviceId === 'crunchyroll' ? 'skeespq11@hotmail.com' : serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
-      password: serviceId === 'chatgpt' ? '14182131r' : serviceId === 'crunchyroll' ? '12344321' : serviceId === 'paramount' ? '4400988' : 'roni141821'
+      password: serviceId === 'chatgpt' ? '14182131rr' : serviceId === 'crunchyroll' ? '12344321' : serviceId === 'paramount' ? '4400988' : 'roni141821'
     };
   }
 
@@ -1957,7 +1957,7 @@ class JSONDatabase {
           'Projetos e GPTs personalizados'
         ],
         instructions: [
-          'Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131r).',
+          'Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131rr).',
           'Acesse o ChatGPT e selecione "Continuar com o Google".',
           'Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!'
         ],

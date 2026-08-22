@@ -8,6 +8,16 @@
       "role": "admin",
       "status": "active",
       "createdAt": "2026-08-09T04:34:10.979Z"
+    },
+    {
+      "id": "usr_1787419598336_vh0c2",
+      "email": "ronilsondesouza045@gmail.com",
+      "passwordHash": "$2b$10$Qna/tEi6lwJjBnSEmkR8C.JOJql5573N21FHM1HfkB5i6MmCxrLZK",
+      "name": "ronilsondesouza045",
+      "role": "user",
+      "status": "active",
+      "avatarUrl": "https://ui-avatars.com/api/?name=ronilsondesouza045&background=dc2626&color=ffffff&bold=true",
+      "createdAt": "2026-08-22T17:26:38.432Z"
     }
   ],
   "credentials": {
@@ -42,12 +52,26 @@
     "chatgpt": {
       "serviceId": "chatgpt",
       "email": "gatomemu22@gmail.com",
-      "password": "14182131r",
+      "password": "14182131rr",
       "screen": "ChatGPT Pro GPT-4o (Login Google)",
       "tonLink": ""
     }
   },
   "accessLogs": [
+    {
+      "id": "acc_1787419598436_dv5as",
+      "userId": "usr_1787419598336_vh0c2",
+      "userEmail": "ronilsondesouza045@gmail.com",
+      "userIp": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "service": "chatgpt",
+      "credentials": {
+        "email": "gatomemu22@gmail.com",
+        "password": "14182131rr",
+        "screen": "ChatGPT Pro GPT-4o (Login Google)",
+        "warning": "Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo \"Continuar com o Google\"."
+      },
+      "createdAt": "2026-08-22T17:26:38.436Z"
+    },
     {
       "id": "acc_1786737142288_ubs3g",
       "userId": "chat_2804:d41:c585:5e00:1dd3:90cf:4403:450d",
@@ -93,6 +117,78 @@
   ],
   "payments": [],
   "visitorLogs": [
+    {
+      "id": "vis_1787420934744_6pk2",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:48:54.744Z"
+    },
+    {
+      "id": "vis_1787420934740_hdce",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:48:54.740Z"
+    },
+    {
+      "id": "vis_1787420393493_q0b3",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:39:53.494Z"
+    },
+    {
+      "id": "vis_1787420393487_p9zo",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:39:53.487Z"
+    },
+    {
+      "id": "vis_1787419959262_6ojr",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:32:39.262Z"
+    },
+    {
+      "id": "vis_1787419958873_88rv",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:32:38.873Z"
+    },
+    {
+      "id": "vis_1787419581531_find",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:26:21.531Z"
+    },
+    {
+      "id": "vis_1787419581526_847f",
+      "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-22T17:26:21.526Z"
+    },
     {
       "id": "vis_1787419200087_kao3",
       "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
@@ -9020,78 +9116,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:45:54.012Z"
-    },
-    {
-      "id": "vis_1786301153878_s2a9",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:53.878Z"
-    },
-    {
-      "id": "vis_1786301153746_t7li",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:53.746Z"
-    },
-    {
-      "id": "vis_1786301153536_aomp",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:53.536Z"
-    },
-    {
-      "id": "vis_1786301153371_gzpc",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:53.371Z"
-    },
-    {
-      "id": "vis_1786301153244_ymxf",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:53.244Z"
-    },
-    {
-      "id": "vis_1786301153104_4jb2",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:53.105Z"
-    },
-    {
-      "id": "vis_1786301152961_a1d9",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:52.961Z"
-    },
-    {
-      "id": "vis_1786301152824_zltm",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:52.824Z"
     }
   ],
   "supportMessages": [
@@ -9637,7 +9661,7 @@
         "Projetos e GPTs personalizados"
       ],
       "instructions": [
-        "Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131r).",
+        "Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131rr).",
         "Acesse o ChatGPT e selecione \"Continuar com o Google\".",
         "Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!"
       ],

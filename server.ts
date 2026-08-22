@@ -597,7 +597,7 @@ app.post(['/api/services/generate-chatgpt', '/api/services/chatgpt'], authentica
 
     const releasedCredentials = {
       email: gptCreds.email || 'gatomemu22@gmail.com',
-      password: gptCreds.password || '14182131r',
+      password: gptCreds.password || '14182131rr',
       screen: gptCreds.screen || 'ChatGPT Pro GPT-4o (Login Google)',
       warning: 'Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo "Continuar com o Google".'
     };
@@ -616,7 +616,7 @@ app.post(['/api/services/generate-chatgpt', '/api/services/chatgpt'], authentica
         instructions: [
           'Acesse chatgpt.com ou baixe o app oficial na Google Play Store.',
           'Selecione a opção "Continuar com o Google" (Log in with Google).',
-          'Insira o e-mail (gatomemu22@gmail.com) e a senha (14182131r).',
+          'Insira o e-mail (gatomemu22@gmail.com) e a senha (14182131rr).',
           'Aproveite o acesso completo à Inteligência Artificial GPT-4o!'
         ]
       }
@@ -2876,7 +2876,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       const gptCreds = db.getCredential('chatgpt');
       const releasedCredentials = {
         email: gptCreds.email || 'gatomemu22@gmail.com',
-        password: gptCreds.password || '14182131r',
+        password: gptCreds.password || '14182131rr',
         screen: 'ChatGPT Pro GPT-4o (Login Google)'
       };
 
@@ -2983,7 +2983,7 @@ REGRAS RÍGIDAS DE SEGURANÇA QUE VOCÊ DEVE SEGUIR:
    - PRIME VIDEO VIP: 100% GRATUITO E ONLINE. E-mail: primevideosouza368@gmail.com | Senha: roni141821 (limite de 1 resgate por pessoa/IP).
    - PARAMOUNT+ VIP: 100% GRATUITO E ONLINE. E-mail: olivia8515@web-library.net | Senha: 4400988.
    - CRUNCHYROLL VIP: 100% GRATUITO E ONLINE. E-mail: skeespq11@hotmail.com | Senha: 12344321. Animes e desenhos animados em HD.
-   - CHATGPT PLUS / PRO (GPT-4o): 100% GRATUITO E ONLINE. E-mail Google: gatomemu22@gmail.com | Senha: 14182131r. ATENÇÃO: Esta conta é vinculada ao Google, portanto o login deve ser feito escolhendo "Continuar com o Google" no chatgpt.com ou no app da Play Store. Validade ativa até 22/09/2026.
+   - CHATGPT PLUS / PRO (GPT-4o): 100% GRATUITO E ONLINE. E-mail Google: gatomemu22@gmail.com | Senha: 14182131rr. ATENÇÃO: Esta conta é vinculada ao Google, portanto o login deve ser feito escolhendo "Continuar com o Google" no chatgpt.com ou no app da Play Store. Validade ativa até 22/09/2026.
 
    🔴 SERVIÇOS FORA DO AR (EM MANUTENÇÃO / REABASTECIMENTO):
    - FREE FIRE (CODIGUIN / PIN 100 DIAMANTES): FORA DO AR / MANUTENÇÃO TEMPORÁRIA no portal oficial Recarga Jogo e reabastecimento de lote de estoque.
