@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Product, User } from '../types';
 import { 
   Search, Filter, Star, Sparkles, CheckCircle, ShieldCheck, 
-  ArrowRight, Tag, Zap, X, Copy, ExternalLink, HelpCircle, Lock, Share2
+  ArrowRight, Tag, Zap, X, Copy, ExternalLink, HelpCircle, Lock
 } from 'lucide-react';
 import { ServiceCards } from './ServiceCards';
-import { useModalStore } from '../store/useModalStore';
 
 interface CatalogPageProps {
   user: User | null;
@@ -306,16 +305,6 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
           <p className="text-slate-300 text-sm sm:text-base mt-3 leading-relaxed">
             Resgate acessos gratuitos de <strong className="text-emerald-400">ChatGPT Plus/Pro (GPT-4o)</strong>, <strong className="text-cyan-400">Prime Video</strong>, <strong className="text-blue-400">Paramount+</strong>, <strong className="text-orange-400">Crunchyroll</strong>, códigos <strong className="text-amber-400">Free Fire</strong> e servidores <strong className="text-emerald-400">IPTV</strong> com liberação instantânea 24/7.
           </p>
-
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => useModalStore.getState().openShare()}
-              className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
-            >
-              <Share2 className="w-4 h-4 text-slate-950" />
-              <span>Compartilhar Link com Foto do Catálogo</span>
-            </button>
-          </div>
 
           {/* Trust Badges */}
           <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-slate-400 text-xs font-semibold">

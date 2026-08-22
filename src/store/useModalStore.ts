@@ -9,7 +9,6 @@ interface ModalState {
   isIptvModalOpen: boolean;
   isTikTokLiveOpen: boolean;
   isChatOpen: boolean;
-  isShareOpen: boolean;
 
   primeCreds: ServiceCredentials | null;
   paramountCreds: ServiceCredentials | null;
@@ -47,8 +46,6 @@ interface ModalState {
   closeIptvModal: () => void;
   openTikTokLiveModal: () => void;
   closeTikTokLiveModal: () => void;
-  openShare: () => void;
-  closeShare: () => void;
   openChat: () => void;
   closeChat: () => void;
   toggleChat: () => void;
@@ -72,7 +69,6 @@ export const useModalStore = create<ModalState>((set) => ({
   isIptvModalOpen: false,
   isTikTokLiveOpen: false,
   isChatOpen: false,
-  isShareOpen: false,
 
   primeCreds: null,
   paramountCreds: null,
@@ -95,8 +91,6 @@ export const useModalStore = create<ModalState>((set) => ({
   closeIptvModal: () => set({ isIptvModalOpen: false }),
   openTikTokLiveModal: () => set({ isTikTokLiveOpen: true }),
   closeTikTokLiveModal: () => set({ isTikTokLiveOpen: false }),
-  openShare: () => set({ isShareOpen: true }),
-  closeShare: () => set({ isShareOpen: false }),
   openChat: () => set({ isChatOpen: true }),
   closeChat: () => set({ isChatOpen: false }),
   toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
@@ -116,7 +110,6 @@ export const useModalStore = create<ModalState>((set) => ({
     isNotifsOpen: false,
     isIptvModalOpen: false,
     isTikTokLiveOpen: false,
-    isShareOpen: false,
     primeCreds: null,
     paramountCreds: null,
     crunchyrollCreds: null,

@@ -3,9 +3,8 @@ import { User, SystemNotification } from '../types';
 import { 
   Tv, ShieldCheck, LogIn, LogOut, Sparkles, Grid, Award, 
   User as UserIcon, Bell, CheckCircle2, AlertCircle, ShoppingBag, 
-  ChevronDown, Wallet, Search, Heart, Ticket, Activity, Layers, Share2
+  ChevronDown, Wallet, Search, Heart, Ticket, Activity, Layers
 } from 'lucide-react';
-import { useModalStore } from '../store/useModalStore';
 
 interface NavbarProps {
   user: User | null;
@@ -31,7 +30,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const isAdmin = user?.email?.toLowerCase() === 'ronisouza495@gmail.com' || ['admin', 'super_admin'].includes(user?.role || '');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const { openShare } = useModalStore();
 
   useEffect(() => {
     fetchUnreadCount();
@@ -179,16 +177,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <kbd className="hidden lg:inline-block text-[9px] font-mono font-bold bg-slate-800 px-1.5 py-0.5 rounded text-slate-400 border border-slate-700">
                 Ctrl K
               </kbd>
-            </button>
-
-            {/* Share Link Button */}
-            <button
-              onClick={openShare}
-              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-gradient-to-r from-emerald-950/80 to-cyan-950/80 border border-emerald-500/40 text-emerald-300 hover:text-white hover:border-emerald-400 hover:bg-emerald-900/60 transition flex items-center gap-1.5 shadow-sm shadow-emerald-500/10"
-              title="Compartilhar Link do Catálogo"
-            >
-              <Share2 className="w-4 h-4 text-emerald-400" />
-              <span className="hidden md:inline text-xs font-bold text-emerald-300">Compartilhar</span>
             </button>
 
             {user ? (

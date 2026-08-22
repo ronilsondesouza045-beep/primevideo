@@ -14,7 +14,6 @@ import { NetflixModal } from './NetflixModal';
 import { FreeFireModal } from './FreeFireModal';
 import { TikTokLiveModal } from './TikTokLiveModal';
 import { ServiceReviewsModal } from './ServiceReviewsModal';
-import { ShareAppModal } from './ShareAppModal';
 
 interface ModalManagerProps {
   onNavigate?: (tab: string) => void;
@@ -57,9 +56,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
     freeFireResult,
     setFreeFireResult,
     activePayment,
-    setActivePayment,
-    isShareOpen,
-    closeShare
+    setActivePayment
   } = useModalStore();
 
   const getServiceName = (id: string | null) => {
@@ -175,11 +172,6 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
           serviceName={getServiceName(selectedReviewService)}
         />
       )}
-
-      <ShareAppModal
-        isOpen={isShareOpen}
-        onClose={closeShare}
-      />
     </>
   );
 };

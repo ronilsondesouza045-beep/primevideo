@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { ServiceCredentials } from '../types';
 import { 
   X, Copy, Check, Bot, ExternalLink, Smartphone, Sparkles, AlertTriangle,
-  Cpu, Image, Brain, Briefcase, Code2, Search, FolderKanban, CheckCircle2, Share2
+  Cpu, Image, Brain, Briefcase, Code2, Search, FolderKanban, CheckCircle2
 } from 'lucide-react';
 import { ChatGptTimer } from './ChatGptTimer';
-import { useModalStore } from '../store/useModalStore';
 
 interface ChatGptModalProps {
   credentials: ServiceCredentials | null;
@@ -228,25 +227,15 @@ export const ChatGptModal: React.FC<ChatGptModalProps> = ({
             <ExternalLink className="w-4 h-4" />
           </a>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <a
-              href="https://play.google.com/store/apps/details?id=com.openai.chatgpt"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="py-3 px-3 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <Smartphone className="w-4 h-4 text-emerald-400" />
-              <span>App Play Store</span>
-            </a>
-
-            <button
-              onClick={() => useModalStore.getState().openShare()}
-              className="py-3 px-3 rounded-xl font-bold text-xs bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 hover:text-white flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
-            >
-              <Share2 className="w-4 h-4 text-emerald-400" />
-              <span>Enviar Link / Foto</span>
-            </button>
-          </div>
+          <a
+            href="https://play.google.com/store/apps/details?id=com.openai.chatgpt"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 transition-all cursor-pointer"
+          >
+            <Smartphone className="w-4 h-4 text-emerald-400" />
+            <span>Baixar App ChatGPT na Google Play Store</span>
+          </a>
         </div>
 
         {/* Instructions */}
