@@ -33,22 +33,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           <span className="text-[10px]">Catálogo</span>
         </button>
 
-        {/* Ferramentas Gratuitas */}
-        <button
-          onClick={() => setActiveTab('free-tools')}
-          className={`flex flex-col items-center gap-0.5 py-1 px-1.5 rounded-xl transition-all ${
-            activeTab === 'free-tools'
-              ? 'text-emerald-400 font-bold scale-105'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <div className="relative">
-            <Layers className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          </div>
-          <span className="text-[10px]">Grátis</span>
-        </button>
-
         {/* Benefícios */}
         <button
           onClick={() => setActiveTab('benefits')}

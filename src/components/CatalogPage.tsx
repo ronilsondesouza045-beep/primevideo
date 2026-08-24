@@ -2,33 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Product, User } from '../types';
 import { 
   Search, Filter, Star, Sparkles, CheckCircle, ShieldCheck, 
-  ArrowRight, Tag, Zap, X, Copy, ExternalLink, HelpCircle, Lock
+  ArrowRight, Tag, Zap, X, Copy, ExternalLink, HelpCircle, Lock, AlertTriangle
 } from 'lucide-react';
-import { ServiceCards } from './ServiceCards';
 
 interface CatalogPageProps {
   user: User | null;
   onOpenAuth: () => void;
   onSelectService: (serviceKey: string) => void;
-  primeBlocked?: boolean;
-  primeError?: string | null;
-  freeFireStock?: {
-    total: number;
-    available: number;
-    claimed: number;
-    outOfStock: boolean;
-  };
-  onOpenReviews?: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt') => void;
 }
 
 export const CatalogPage: React.FC<CatalogPageProps> = ({
   user,
   onOpenAuth,
-  onSelectService,
-  primeBlocked = false,
-  primeError = null,
-  freeFireStock = { total: 2, available: 2, claimed: 0, outOfStock: false },
-  onOpenReviews
+  onSelectService
 }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,52 +34,27 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     prod_chatgpt: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10',
     prod_netflix: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
     prod_freefire: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
-    prod_iptv: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg',
-    prod_social_boost: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
-    prod_tiktok_live: 'https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg'
+    prod_iptv: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg'
   };
 
   const FALLBACK_PRODUCTS: Product[] = [
     {
-      id: 'prod_tiktok_live',
-      name: 'Monitor TikTok Live (Chat & Presentes em Tempo Real)',
-      description: 'Monitore chat ao vivo, mensagens de viewers, contagem de espectadores, envio de presentes (gifts), curtidas e engajamento em tempo real pelo navegador.',
-      category: 'Ao Vivo',
-      price: 0,
-      isFree: true,
-      image: OFFICIAL_IMAGES['prod_tiktok_live'],
-      banner: OFFICIAL_IMAGES['prod_tiktok_live'],
-      stockStatus: 'DISPONIVEL',
-      rating: 5.0,
-      badge: 'AO VIVO · 100% GRÁTIS',
-      features: [
-        'Chat ao vivo instantâneo sem delay',
-        'Detecção de presentes (gifts) e doações',
-        'Contador de espectadores e curtidas',
-        'Monitoramento de qualquer streamer do TikTok',
-        'Acesso web direto integrado'
-      ],
-      instructions: [
-        'Clique em "Resgatar" ou "Acessar Monitor".',
-        'No monitor, digite o @username do streamer que está em live no TikTok.',
-        'Clique em Conectar e acompanhe todas as mensagens, gifts e métricas ao vivo!'
-      ],
-      updatedAt: new Date().toISOString()
-    },
-    {
       id: 'prod_prime',
       name: 'Prime Video VIP (Acesso Grátis)',
-      description: 'Acesso completo ao catálogo de filmes, séries e produções originais do Prime Video em resolução 4K Ultra HD.',
+      description: 'Acesso ao catálogo de filmes, séries e produções originais do Prime Video. (Temporariamente suspenso para manutenção).',
       category: 'Streaming',
       price: 0,
       isFree: true,
       image: OFFICIAL_IMAGES['prod_prime'],
       banner: OFFICIAL_IMAGES['prod_prime'],
-      stockStatus: 'DISPONIVEL',
+      stockStatus: 'SUSPENSO',
       rating: 4.9,
-      badge: '100% GRÁTIS',
+      badge: 'TEMPORARIAMENTE SUSPENSO',
       features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Suporte VIP via Chatbot'],
-      instructions: ['Acesse o site oficial do Prime Video (primevideo.com).', 'Insira o e-mail e a senha liberados na aba "Meus Acessos".', 'Escolha qualquer perfil e aproveite sem limites.'],
+      instructions: [
+        'Aviso: O serviço Prime Video está temporariamente suspenso no momento.',
+        'Em breve novas contas serão adicionadas.'
+      ],
       updatedAt: new Date().toISOString()
     },
     {
@@ -185,22 +146,6 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
       updatedAt: new Date().toISOString()
     },
     {
-      id: 'prod_social_boost',
-      name: 'Impulso Redes Sociais - SMM Boost',
-      description: 'Engajamento real para Instagram, TikTok e YouTube. Teste 50 unidades gratuitas a cada 24 horas.',
-      category: 'Premium',
-      price: 0,
-      isFree: true,
-      image: OFFICIAL_IMAGES['prod_social_boost'],
-      banner: OFFICIAL_IMAGES['prod_social_boost'],
-      stockStatus: 'DISPONIVEL',
-      rating: 4.9,
-      badge: 'AUTOMÁTICO',
-      features: ['Entrega ultra rápida', 'Seguidores & Curtidas', 'Teste Grátis 50 unidades', 'Painel de acompanhamento'],
-      instructions: ['Cole o link do seu perfil ou publicação.', 'Solicite o teste grátis ou compre com seu saldo de carteira.'],
-      updatedAt: new Date().toISOString()
-    },
-    {
       id: 'prod_freefire',
       name: 'Free Fire - Codiguin & 100 Diamantes (Gratuito)',
       description: 'Resgate de códigos promocionais e recargas de diamantes diretamente na sua conta Free Fire.',
@@ -225,11 +170,13 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
       if (res.ok) {
         const data = await res.json();
         if (data.products && Array.isArray(data.products) && data.products.length > 0) {
-          const normalized = data.products.map((p: Product) => ({
-            ...p,
-            image: OFFICIAL_IMAGES[p.id] || p.image,
-            banner: OFFICIAL_IMAGES[p.id] || p.banner || p.image
-          }));
+          const normalized = data.products
+            .filter((p: Product) => p.id !== 'prod_social_boost' && p.id !== 'prod_tiktok_live')
+            .map((p: Product) => ({
+              ...p,
+              image: OFFICIAL_IMAGES[p.id] || p.image,
+              banner: OFFICIAL_IMAGES[p.id] || p.banner || p.image
+            }));
           setProducts(normalized);
           setLoading(false);
           return;
@@ -259,9 +206,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
   });
 
   const handleActionClick = (product: Product) => {
-    if (product.id === 'prod_tiktok_live') {
-      onSelectService('tiktok-live');
-    } else if (product.id === 'prod_prime') {
+    if (product.id === 'prod_prime') {
       onSelectService('prime');
     } else if (product.id === 'prod_paramount') {
       onSelectService('paramount');
@@ -273,8 +218,6 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
       onSelectService('netflix');
     } else if (product.id === 'prod_iptv') {
       onSelectService('iptv');
-    } else if (product.id === 'prod_social_boost') {
-      onSelectService('smm');
     } else if (product.id === 'prod_freefire') {
       onSelectService('freefire');
     } else {
@@ -327,22 +270,6 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Main VIP Service Cards Grid */}
-      <ServiceCards
-        onGeneratePrime={() => onSelectService('prime')}
-        onGenerateParamount={() => onSelectService('paramount')}
-        onGenerateCrunchyroll={() => onSelectService('crunchyroll')}
-        onGenerateChatGpt={() => onSelectService('chatgpt')}
-        onGenerateFreeFire={() => onSelectService('freefire')}
-        onBuyNetflix={() => onSelectService('netflix')}
-        onGenerateIptv={() => onSelectService('iptv')}
-        onOpenTikTokLive={() => onSelectService('tiktok-live')}
-        onOpenReviews={onOpenReviews}
-        primeBlocked={primeBlocked}
-        primeError={primeError}
-        freeFireStock={freeFireStock}
-      />
 
       {/* Filter Bar & All Products Section */}
       <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-8 bg-slate-900/90 p-4 rounded-2xl border border-slate-800 shadow-xl">
@@ -441,9 +368,17 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
                     ? 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40'
                     : product.stockStatus === 'ESTOQUE_BAIXO'
                     ? 'text-amber-400 bg-amber-500/20 border-amber-500/40'
+                    : product.stockStatus === 'SUSPENSO'
+                    ? 'text-amber-300 bg-amber-500/20 border-amber-500/40'
                     : 'text-red-400 bg-red-500/20 border-red-500/40'
                 }`}>
-                  {product.stockStatus === 'DISPONIVEL' ? '● Disponível' : product.stockStatus === 'ESTOQUE_BAIXO' ? '⚠️ Estoque Baixo' : '🔒 Em Breve'}
+                  {product.stockStatus === 'DISPONIVEL'
+                    ? '● Disponível'
+                    : product.stockStatus === 'ESTOQUE_BAIXO'
+                    ? '⚠️ Estoque Baixo'
+                    : product.stockStatus === 'SUSPENSO'
+                    ? '⚠️ Suspenso'
+                    : '🔒 Em Breve'}
                 </span>
               </div>
 
@@ -495,10 +430,23 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
 
                     <button
                       onClick={() => handleActionClick(product)}
-                      className="px-4 py-2.5 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-md shadow-red-600/20 active:scale-95 transition-all flex items-center gap-1.5"
+                      className={`px-4 py-2.5 rounded-xl text-xs font-extrabold text-white shadow-md active:scale-95 transition-all flex items-center gap-1.5 ${
+                        product.stockStatus === 'SUSPENSO'
+                          ? 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 shadow-amber-600/20'
+                          : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-600/20'
+                      }`}
                     >
-                      <span>{product.isFree ? 'Resgatar' : 'Adquirir'}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      {product.stockStatus === 'SUSPENSO' ? (
+                        <>
+                          <span>Suspenso</span>
+                          <AlertTriangle className="w-3.5 h-3.5" />
+                        </>
+                      ) : (
+                        <>
+                          <span>{product.isFree ? 'Resgatar' : 'Adquirir'}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

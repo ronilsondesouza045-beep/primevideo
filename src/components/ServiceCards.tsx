@@ -11,7 +11,6 @@ interface ServiceCardsProps {
   onGenerateFreeFire: () => void;
   onBuyNetflix: () => void;
   onGenerateIptv?: () => void;
-  onOpenTikTokLive?: () => void;
   onOpenReviews?: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt') => void;
   primeBlocked?: boolean;
   primeError?: string | null;
@@ -31,7 +30,6 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
   onGenerateFreeFire,
   onBuyNetflix,
   onGenerateIptv,
-  onOpenTikTokLive,
   onOpenReviews,
   primeBlocked = false,
   primeError = null,
@@ -159,132 +157,30 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         </div>
 
         {/* ======================================================== */}
-        {/* CARD TIKTOK: MONITOR DE CHAT & LIVE DO TIKTOK EM TEMPO REAL */}
+        {/* CARD 1: PRIME VIDEO (SUSPENSO TEMPORARIAMENTE) */}
         {/* ======================================================== */}
-        <div className="relative rounded-3xl bg-gradient-to-b from-slate-900 via-pink-950/20 to-slate-900 border-2 border-pink-500/40 hover:border-pink-400 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-pink-500/20 group overflow-hidden">
-          
-          {/* Glow */}
-          <div className="absolute top-0 right-0 w-44 h-44 bg-pink-500/15 rounded-full blur-3xl pointer-events-none group-hover:bg-pink-500/25 transition-all" />
-
-          <div>
-            {/* Header Badge */}
-            <div className="flex items-center justify-between gap-1.5 mb-4">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider text-pink-300 bg-pink-500/20 border border-pink-500/40 uppercase flex items-center gap-1">
-                <Radio className="w-3 h-3 text-pink-400 animate-pulse" />
-                TEMPO REAL · GRÁTIS
-              </span>
-              <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
-                Online 24/7
-              </span>
-            </div>
-
-            {/* Service Title & Logo Branding */}
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-600 to-cyan-400 p-0.5 shadow-lg shadow-pink-500/30 shrink-0">
-                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                  <Tv className="w-6 h-6 text-pink-400" />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-black text-white leading-tight flex items-center gap-1.5">
-                  Monitor TikTok Live <span className="text-[10px] font-bold text-pink-400 bg-pink-500/10 px-1.5 py-0.5 rounded border border-pink-500/30">Chat & Gifts</span>
-                </h3>
-                <p className="text-[11px] text-slate-300 font-medium">
-                  Monitoramento de Lives em Tempo Real
-                </p>
-              </div>
-            </div>
-
-            <p className="text-slate-300 text-xs mb-3 leading-relaxed">
-              Acompanhe o <strong className="text-white">chat ao vivo, contagem de espectadores, presentes (gifts) e curtidas</strong> de qualquer transmissão do TikTok.
-            </p>
-
-            {/* TikTok Live Banner */}
-            <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-pink-500/40 group/img bg-slate-950 shadow-md">
-              <img
-                src="https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg"
-                alt="Monitor TikTok Live"
-                referrerPolicy="no-referrer"
-                className="w-full h-32 sm:h-36 object-cover object-center transform group-hover/img:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
-              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold text-pink-200">
-                <span className="bg-slate-950/85 px-2 py-0.5 rounded-md border border-pink-500/40 backdrop-blur-sm">
-                  Chat & Presentes
-                </span>
-                <span className="bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-md border border-pink-500/40 backdrop-blur-sm">
-                  100% Gratuito
-                </span>
-              </div>
-            </div>
-
-            {/* Benefits List */}
-            <ul className="space-y-2 mb-4 text-[11px] text-slate-300">
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-pink-400 shrink-0" />
-                <span>Chat em tempo real sem atrasos</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span>Notificação de Presentes & Doações</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>Contador de Espectadores & Curtidas</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Action Button */}
-          <div>
-            <div className="p-2.5 mb-3 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between text-xs">
-              <span className="text-slate-400 text-[11px]">Serviço:</span>
-              <span className="font-black text-pink-400 text-xs">
-                Acesso Imediato
-              </span>
-            </div>
-
-            <button
-              onClick={onOpenTikTokLive}
-              className="w-full py-3.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm shadow-xl shadow-pink-500/20 transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-pink-600 via-rose-600 to-cyan-500 hover:from-pink-500 hover:to-cyan-400 text-white cursor-pointer transform active:scale-98"
-            >
-              <Radio className="w-4 h-4 text-pink-200 animate-pulse" />
-              <span>MONITORAR LIVE TIKTOK</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-        </div>
-
-        {/* ======================================================== */}
-        {/* CARD 1: PRIME VIDEO (100% GRATUITO) */}
-
-        
-        {/* ======================================================== */}
-        {/* CARD 1: PRIME VIDEO (100% GRATUITO) */}
-        {/* ======================================================== */}
-        <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-cyan-950/50 group overflow-hidden">
+        <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-amber-950/30 group overflow-hidden">
           
           {/* Subtle Glow */}
-          <div className="absolute top-0 right-0 w-36 h-36 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/20 transition-all" />
+          <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
 
           <div>
             {/* Header Badge */}
             <div className="flex items-center justify-between gap-1.5 mb-4">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 uppercase flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-cyan-400" />
-                100% GRÁTIS
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider text-amber-300 bg-amber-500/15 border border-amber-500/30 uppercase flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3 text-amber-400" />
+                TEMPORARIAMENTE SUSPENSO
               </span>
-              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                Imediato
+              <span className="text-[10px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                Manutenção
               </span>
             </div>
 
             {/* Service Title & Logo Branding */}
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 p-0.5 shadow-lg shadow-cyan-500/20 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-yellow-500 p-0.5 shadow-lg shadow-amber-500/20 shrink-0">
                 <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                  <Play className="w-5 h-5 text-cyan-400 fill-cyan-400" />
+                  <Play className="w-5 h-5 text-amber-400 fill-amber-400" />
                 </div>
               </div>
               <div>
@@ -298,24 +194,24 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             </div>
 
             <p className="text-slate-300 text-xs mb-3 leading-relaxed">
-              Acesso <strong className="text-white">gratuito</strong> para assistir a filmes, séries e esportes originais do Prime Video.
+              Acesso <strong className="text-amber-300">temporariamente suspenso</strong> para manutenção preventiva e atualização de contas.
             </p>
 
-            {/* Prime Video Catalog Banner / Banner de Séries e Filmes */}
-            <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-cyan-500/30 group/img bg-slate-950 shadow-md">
+            {/* Prime Video Catalog Banner */}
+            <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-amber-500/30 group/img bg-slate-950 shadow-md">
               <img
                 src="https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg"
                 alt="Catálogo Prime Video"
                 referrerPolicy="no-referrer"
-                className="w-full h-32 sm:h-36 object-cover object-center transform group-hover/img:scale-105 transition-transform duration-300"
+                className="w-full h-32 sm:h-36 object-cover object-center grayscale-[40%] transform group-hover/img:scale-105 transition-transform duration-300"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold text-cyan-200">
-                <span className="bg-slate-950/85 px-2 py-0.5 rounded-md border border-cyan-500/30 backdrop-blur-sm">
-                  Catálogo Prime Video
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold text-amber-200">
+                <span className="bg-slate-950/85 px-2 py-0.5 rounded-md border border-amber-500/30 backdrop-blur-sm">
+                  Prime Video
                 </span>
-                <span className="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-md border border-cyan-500/40 backdrop-blur-sm">
-                  Ultra HD 4K
+                <span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-md border border-amber-500/40 backdrop-blur-sm">
+                  Suspenso
                 </span>
               </div>
             </div>
@@ -324,16 +220,16 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             {onOpenReviews && (
               <button
                 onClick={() => onOpenReviews('prime')}
-                className="w-full mb-3 p-2 rounded-xl bg-slate-950/90 border border-slate-800 hover:border-cyan-500/40 text-left transition-all flex items-center justify-between group/rev"
+                className="w-full mb-3 p-2 rounded-xl bg-slate-950/90 border border-slate-800 hover:border-amber-500/40 text-left transition-all flex items-center justify-between group/rev"
               >
                 <div className="flex items-center gap-1.5">
                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                   <span className="text-xs font-black text-white">4.9/5.0</span>
-                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                    98% Chrome
+                  <span className="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                    Manutenção
                   </span>
                 </div>
-                <span className="text-[10px] font-bold text-cyan-400 group-hover/rev:underline flex items-center gap-1">
+                <span className="text-[10px] font-bold text-amber-400 group-hover/rev:underline flex items-center gap-1">
                   <MessageSquare className="w-3 h-3" />
                   Avaliações
                 </span>
@@ -342,17 +238,17 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
 
             {/* Benefits List */}
             <ul className="space-y-2 mb-4 text-[11px] text-slate-300">
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span>Sem cartão de crédito</span>
+              <li className="flex items-center gap-1.5 text-amber-300/90">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>Suspenso por enquanto para ajustes</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span>E-mail e senha na hora</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                <span className="text-slate-400">Novas contas em breve</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span>Qualidade Full HD</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                <span className="text-slate-400">Utilize Paramount+ ou Crunchyroll</span>
               </li>
             </ul>
 
@@ -364,16 +260,16 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
           {/* Action Button */}
           <div>
             <div className="p-2.5 mb-3 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between text-xs">
-              <span className="text-slate-400 text-[11px]">Preço:</span>
-              <span className="font-black text-cyan-400 text-xs">R$ 0,00 (Grátis)</span>
+              <span className="text-slate-400 text-[11px]">Status:</span>
+              <span className="font-black text-amber-400 text-xs">Suspenso Temporariamente</span>
             </div>
 
             <button
               onClick={onGeneratePrime}
-              className="w-full py-3 px-4 rounded-xl font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-1.5 group/btn bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-cyan-600/20"
+              className="w-full py-3 px-4 rounded-xl font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-1.5 group/btn bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white shadow-amber-600/20"
             >
-              <span>Gerar Prime Video</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Temporariamente Suspenso</span>
             </button>
           </div>
 

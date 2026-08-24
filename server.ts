@@ -461,10 +461,10 @@ app.get('/api/services/prime-status', (req: Request, res: Response) => {
   try {
     const userIp = getClientIp(req);
     return res.json({
-      blocked: false,
-      reason: null,
+      blocked: true,
+      reason: 'SUSPENSO',
       clientIp: userIp,
-      errorMessage: null
+      errorMessage: 'O serviço Prime Video está temporariamente suspenso para manutenção e atualização. Novos acessos serão liberados em breve!'
     });
   } catch (err) {
     return res.status(500).json({ error: 'Erro ao verificar status.' });
@@ -473,41 +473,10 @@ app.get('/api/services/prime-status', (req: Request, res: Response) => {
 
 // Generate Free Prime Video Access (supports both route aliases)
 app.post(['/api/services/generate-prime', '/api/services/prime'], authenticateToken, (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const user = req.user!;
-    const userIp = getClientIp(req);
-
-    const primeCreds = db.getCredential('prime');
-
-    const releasedCredentials = {
-      email: primeCreds.email || 'primevideosouza368@gmail.com',
-      password: primeCreds.password || 'roni141821',
-      pin: 'Sem PIN',
-      screen: 'Livre / Escolha qualquer perfil'
-    };
-
-    const accessLog = db.addAccessLog(user.id, user.email, 'prime', releasedCredentials, userIp);
-
-    return res.json({
-      success: true,
-      message: 'Acesso Prime Video gerado com sucesso!',
-      credentials: releasedCredentials,
-      access: {
-        id: accessLog.id,
-        service: 'Prime Video VIP (Gratuito)',
-        credentials: releasedCredentials,
-        generatedAt: accessLog.createdAt,
-        instructions: [
-          'Acesse o site ou app oficial do Prime Video (primevideo.com).',
-          'Insira o e-mail e a senha fornecidos acima.',
-          'Escolha qualquer perfil de usuário disponível e aproveite seus filmes e séries sem limites.',
-          'Dúvidas? Fale com nosso Chatbot no canto inferior da tela.'
-        ]
-      }
-    });
-  } catch (err: any) {
-    return res.status(500).json({ error: 'Erro ao liberar acesso ao Prime Video.' });
-  }
+  return res.status(403).json({
+    success: false,
+    error: 'O serviço Prime Video está temporariamente suspenso por enquanto. Por favor, utilize os outros serviços disponíveis (Paramount+, Crunchyroll, ChatGPT, IPTV)!'
+  });
 });
 
 // Generate Free Paramount+ Access (supports both route aliases)

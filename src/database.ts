@@ -1851,48 +1851,21 @@ class JSONDatabase {
   public ensureDefaultProducts() {
     const defaults: Product[] = [
       {
-        id: 'prod_tiktok_live',
-        name: 'Monitor TikTok Live (Chat & Presentes em Tempo Real)',
-        description: 'Monitore chat ao vivo, mensagens de viewers, contagem de espectadores, envio de presentes (gifts), curtidas e engajamento em tempo real pelo navegador.',
-        category: 'Ao Vivo',
-        price: 0,
-        isFree: true,
-        image: 'https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg',
-        banner: 'https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg',
-        stockStatus: 'DISPONIVEL',
-        rating: 5.0,
-        badge: 'AO VIVO · 100% GRÁTIS',
-        features: [
-          'Chat ao vivo instantâneo sem delay',
-          'Detecção de presentes (gifts) e doações',
-          'Contador de espectadores e curtidas',
-          'Monitoramento de qualquer streamer do TikTok',
-          'Acesso web direto integrado'
-        ],
-        instructions: [
-          'Clique em "Resgatar" ou "Acessar Monitor".',
-          'No monitor, digite o @username do streamer que está em live no TikTok.',
-          'Clique em Conectar e acompanhe todas as mensagens, gifts e métricas ao vivo!'
-        ],
-        updatedAt: new Date().toISOString()
-      },
-      {
         id: 'prod_prime',
         name: 'Prime Video VIP (Acesso Grátis)',
-        description: 'Acesso completo ao catálogo de filmes, séries e produções originais do Prime Video em resolução 4K Ultra HD.',
+        description: 'Acesso ao catálogo de filmes, séries e produções originais do Prime Video. (Temporariamente suspenso para manutenção).',
         category: 'Streaming',
         price: 0,
         isFree: true,
         image: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
         banner: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
-        stockStatus: 'DISPONIVEL',
+        stockStatus: 'SUSPENSO',
         rating: 4.9,
-        badge: '100% GRÁTIS',
+        badge: 'TEMPORARIAMENTE SUSPENSO',
         features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Suporte VIP via Chatbot'],
         instructions: [
-          'Acesse o site oficial do Prime Video (primevideo.com).',
-          'Insira o e-mail e a senha liberados na aba "Meus Acessos".',
-          'Escolha qualquer perfil e aproveite sem limites.'
+          'Aviso: O serviço Prime Video está temporariamente suspenso no momento.',
+          'Em breve novas contas serão adicionadas.'
         ],
         updatedAt: new Date().toISOString()
       },
@@ -1998,25 +1971,6 @@ class JSONDatabase {
         instructions: [
           'Abra seu reprodutor IPTV (IPTV Smarters, XCIPTV, TViMate).',
           'Insira o servidor http://ger99.xyz:80 e os dados de um dos 31 usuários da lista.'
-        ],
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'prod_social_boost',
-        name: 'Impulso Redes Sociais - SMM Boost',
-        description: 'Engajamento real para Instagram, TikTok e YouTube. Teste 50 unidades gratuitas a cada 24 horas.',
-        category: 'Premium',
-        price: 0,
-        isFree: true,
-        image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
-        banner: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=1200&q=80',
-        stockStatus: 'DISPONIVEL',
-        rating: 4.9,
-        badge: 'AUTOMÁTICO',
-        features: ['Entrega ultra rápida', 'Seguidores & Curtidas', 'Teste Grátis 50 unidades', 'Painel de acompanhamento'],
-        instructions: [
-          'Cole o link do seu perfil ou publicação.',
-          'Solicite o teste grátis ou compre com seu saldo de carteira.'
         ],
         updatedAt: new Date().toISOString()
       },

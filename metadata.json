@@ -1,6 +1,6 @@
 {
   "name": "STREAMHUB VIP 2.0",
-  "description": "Plataforma VIP de Streaming, IPTV, Ferramentas Gratuitas e Entretenimento com Gerador de Acessos.",
+  "description": "Plataforma VIP de Streaming, IPTV e Entretenimento com Gerador de Acessos.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

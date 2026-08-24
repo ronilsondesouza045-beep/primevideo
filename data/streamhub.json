@@ -59,10 +59,24 @@
   },
   "accessLogs": [
     {
+      "id": "acc_1787611162101_l7b9s",
+      "userId": "usr_1787419598336_vh0c2",
+      "userEmail": "ronilsondesouza045@gmail.com",
+      "userIp": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
+      "service": "paramount",
+      "credentials": {
+        "email": "olivia8515@web-library.net",
+        "password": "4400988",
+        "screen": "Perfil Livre / Gratuito",
+        "warning": "Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio."
+      },
+      "createdAt": "2026-08-24T22:39:22.101Z"
+    },
+    {
       "id": "acc_1787419598436_dv5as",
       "userId": "usr_1787419598336_vh0c2",
       "userEmail": "ronilsondesouza045@gmail.com",
-      "userIp": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
+      "userIp": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
       "service": "chatgpt",
       "credentials": {
         "email": "gatomemu22@gmail.com",
@@ -117,6 +131,78 @@
   ],
   "payments": [],
   "visitorLogs": [
+    {
+      "id": "vis_1787612568183_g0ex",
+      "ip": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-24T23:02:48.183Z"
+    },
+    {
+      "id": "vis_1787612568174_pxae",
+      "ip": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-24T23:02:48.174Z"
+    },
+    {
+      "id": "vis_1787611273973_wwi9",
+      "ip": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-24T22:41:13.973Z"
+    },
+    {
+      "id": "vis_1787611273965_hrpq",
+      "ip": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-24T22:41:13.965Z"
+    },
+    {
+      "id": "vis_1787610959900_o14x",
+      "ip": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-24T22:35:59.900Z"
+    },
+    {
+      "id": "vis_1787610959891_lib8",
+      "ip": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-24T22:35:59.891Z"
+    },
+    {
+      "id": "vis_1787610689883_lb2v",
+      "ip": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-24T22:31:29.883Z"
+    },
+    {
+      "id": "vis_1787610689874_slt5",
+      "ip": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-08-24T22:31:29.874Z"
+    },
     {
       "id": "vis_1787420934744_6pk2",
       "ip": "2804:d41:c57a:300:f862:d2aa:2058:e83b",
@@ -9044,78 +9130,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:45:55.135Z"
-    },
-    {
-      "id": "vis_1786301154995_4t3v",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:54.995Z"
-    },
-    {
-      "id": "vis_1786301154854_edu6",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:54.854Z"
-    },
-    {
-      "id": "vis_1786301154709_i09l",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:54.709Z"
-    },
-    {
-      "id": "vis_1786301154572_tm8b",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:54.572Z"
-    },
-    {
-      "id": "vis_1786301154440_56er",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:54.440Z"
-    },
-    {
-      "id": "vis_1786301154301_e9tk",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:54.301Z"
-    },
-    {
-      "id": "vis_1786301154167_kfmi",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:54.167Z"
-    },
-    {
-      "id": "vis_1786301154012_ud7p",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:54.012Z"
     }
   ],
   "supportMessages": [
@@ -9471,15 +9485,15 @@
     {
       "id": "prod_prime",
       "name": "Prime Video VIP (Acesso Grátis)",
-      "description": "Acesso completo ao catálogo de filmes, séries e produções originais do Prime Video em resolução 4K Ultra HD.",
+      "description": "Acesso ao catálogo de filmes, séries e produções originais do Prime Video. (Temporariamente suspenso para manutenção).",
       "category": "Streaming",
       "price": 0,
       "isFree": true,
       "image": "https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg",
       "banner": "https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg",
-      "stockStatus": "DISPONIVEL",
+      "stockStatus": "SUSPENSO",
       "rating": 4.9,
-      "badge": "100% GRÁTIS",
+      "badge": "TEMPORARIAMENTE SUSPENSO",
       "features": [
         "Qualidade 4K Ultra HD",
         "Multi-perfis liberados",
@@ -9487,11 +9501,10 @@
         "Suporte VIP via Chatbot"
       ],
       "instructions": [
-        "Acesse o site oficial do Prime Video (primevideo.com).",
-        "Insira o e-mail e a senha liberados na aba \"Meus Acessos\".",
-        "Escolha qualquer perfil e aproveite sem limites."
+        "Aviso: O serviço Prime Video está temporariamente suspenso no momento.",
+        "Em breve novas contas serão adicionadas."
       ],
-      "updatedAt": "2026-08-09T04:34:10.981Z"
+      "updatedAt": "2026-08-24T19:00:00.000Z"
     },
     {
       "id": "prod_paramount",
@@ -9591,30 +9604,6 @@
       "updatedAt": "2026-08-09T04:34:10.981Z"
     },
     {
-      "id": "prod_social_boost",
-      "name": "Impulso Redes Sociais - SMM Boost",
-      "description": "Engajamento real para Instagram, TikTok e YouTube. Teste 50 unidades gratuitas a cada 24 horas.",
-      "category": "Premium",
-      "price": 0,
-      "isFree": true,
-      "image": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80",
-      "banner": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=1200&q=80",
-      "stockStatus": "DISPONIVEL",
-      "rating": 4.9,
-      "badge": "AUTOMÁTICO",
-      "features": [
-        "Entrega ultra rápida",
-        "Seguidores & Curtidas",
-        "Teste Grátis 50 unidades",
-        "Painel de acompanhamento"
-      ],
-      "instructions": [
-        "Cole o link do seu perfil ou publicação.",
-        "Solicite o teste grátis ou compre com seu saldo de carteira."
-      ],
-      "updatedAt": "2026-08-09T04:34:10.981Z"
-    },
-    {
       "id": "prod_freefire",
       "name": "Free Fire - Codiguin & 100 Diamantes (Gratuito)",
       "description": "Resgate de código PIN digital válido para 100 Diamantes + 10% de Bônus diretamente no site oficial Recarga Jogo.",
@@ -9666,32 +9655,6 @@
         "Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!"
       ],
       "updatedAt": "2026-08-14T19:51:36.079Z"
-    },
-    {
-      "id": "prod_tiktok_live",
-      "name": "Monitor TikTok Live (Chat & Presentes em Tempo Real)",
-      "description": "Monitore chat ao vivo, mensagens de viewers, contagem de espectadores, envio de presentes (gifts), curtidas e engajamento em tempo real pelo navegador.",
-      "category": "Ao Vivo",
-      "price": 0,
-      "isFree": true,
-      "image": "https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg",
-      "banner": "https://opalcodigital.com.br/site/wp-content/uploads/2019/11/tiktok.jpg",
-      "stockStatus": "DISPONIVEL",
-      "rating": 5,
-      "badge": "AO VIVO · 100% GRÁTIS",
-      "features": [
-        "Chat ao vivo instantâneo sem delay",
-        "Detecção de presentes (gifts) e doações",
-        "Contador de espectadores e curtidas",
-        "Monitoramento de qualquer streamer do TikTok",
-        "Acesso web direto integrado"
-      ],
-      "instructions": [
-        "Clique em \"Resgatar\" ou \"Acessar Monitor\".",
-        "No monitor, digite o @username do streamer que está em live no TikTok.",
-        "Clique em Conectar e acompanhe todas as mensagens, gifts e métricas ao vivo!"
-      ],
-      "updatedAt": "2026-08-14T19:56:45.239Z"
     }
   ],
   "userPresence": [
@@ -9759,5 +9722,38 @@
       "prod_crunchyroll",
       "prod_iptv"
     ]
-  }
+  },
+  "autoUpdateState": {
+    "enabled": true,
+    "intervalDays": 2,
+    "lastRunAt": "2026-08-24T22:37:35.506Z",
+    "version": "v2.5.57",
+    "history": [
+      {
+        "id": "upd_1787611055506",
+        "version": "v2.5.57",
+        "timestamp": "2026-08-24T22:37:35.506Z",
+        "status": "SUCCESS",
+        "details": "Varredura automática concluída: Catálogo VIP verificado (100% online), cache de imagens otimizado e banco de dados desfragmentado sem erros."
+      },
+      {
+        "id": "upd_init",
+        "version": "v2.5.0-AutoHeal",
+        "timestamp": "2026-08-24T22:37:35.502Z",
+        "status": "SUCCESS",
+        "details": "Atualização automática do sistema ativada. Verificação de integridade do catálogo VIP e otimização de cache concluída."
+      }
+    ]
+  },
+  "notifications": [
+    {
+      "id": "notif_1787611055506_150",
+      "title": "🤖 Atualização Automática de Sistema (v2.5.57)",
+      "message": "O sistema executou a manutenção automática periódica com sucesso! O catálogo VIP, contas de streaming, gerador IPTV e gateway de pagamento estão 100% operacionais e otimizados.",
+      "read": false,
+      "type": "success",
+      "link": "/status",
+      "createdAt": "2026-08-24T22:37:35.506Z"
+    }
+  ]
 }

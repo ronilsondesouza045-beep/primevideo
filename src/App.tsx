@@ -5,7 +5,6 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ServiceCards } from './components/ServiceCards';
 import { CatalogPage } from './components/CatalogPage';
-import { FreeToolsPage } from './components/FreeToolsPage';
 import { BenefitsPage } from './components/BenefitsPage';
 import { UserAccesses } from './components/UserAccesses';
 import { UserProfile } from './components/UserProfile';
@@ -36,7 +35,6 @@ export default function App() {
     openSearch,
     openNotifs,
     openIptvModal,
-    openTikTokLiveModal,
     isChatOpen,
     openChat,
     toggleChat,
@@ -49,7 +47,7 @@ export default function App() {
     setActivePayment
   } = useModalStore();
 
-  const [activeTab, setActiveTab] = useState<'home' | 'catalog' | 'free-tools' | 'benefits' | 'accesses' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'catalog' | 'benefits' | 'accesses' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites'>('home');
   const [primeBlocked, setPrimeBlocked] = useState(false);
   const [primeError, setPrimeError] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -134,6 +132,11 @@ export default function App() {
       return;
     }
 
+    if (primeBlocked) {
+      alert(primeError || 'O serviço Prime Video está temporariamente suspenso por enquanto.');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('streamhub_token');
       const res = await fetch('/api/services/generate-prime', {
@@ -151,43 +154,10 @@ export default function App() {
         setPrimeCreds(data.credentials);
         fetchUserAccesses();
       } else {
-        // Graceful offline/fallback credentials
-        const fallbackCreds = {
-          email: 'primevideosouza368@gmail.com',
-          password: 'roni141821',
-          screen: 'Livre / Escolha qualquer perfil',
-          pin: 'Sem PIN'
-        };
-        setPrimeCreds(fallbackCreds);
-        const localLog: any = {
-          id: 'acc_' + Date.now(),
-          userId: user.id,
-          userEmail: user.email,
-          service: 'prime',
-          credentials: fallbackCreds,
-          createdAt: new Date().toISOString(),
-          ip: '127.0.0.1'
-        };
-        setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
+        alert(data?.error || primeError || 'O serviço Prime Video está temporariamente suspenso por enquanto.');
       }
     } catch (err) {
-      const fallbackCreds = {
-        email: 'primevideosouza368@gmail.com',
-        password: 'roni141821',
-        screen: 'Livre / Escolha qualquer perfil',
-        pin: 'Sem PIN'
-      };
-      setPrimeCreds(fallbackCreds);
-      const localLog: any = {
-        id: 'acc_' + Date.now(),
-        userId: user.id,
-        userEmail: user.email,
-        service: 'prime',
-        credentials: fallbackCreds,
-        createdAt: new Date().toISOString(),
-        ip: '127.0.0.1'
-      };
-      setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
+      alert(primeError || 'O serviço Prime Video está temporariamente suspenso por enquanto.');
     }
   };
 
@@ -439,15 +409,13 @@ export default function App() {
   };
 
   const handleSelectServiceFromCatalog = (serviceKey: string) => {
-    if (serviceKey === 'tiktok-live') openTikTokLiveModal();
-    else if (serviceKey === 'prime') handleGeneratePrime();
+    if (serviceKey === 'prime') handleGeneratePrime();
     else if (serviceKey === 'paramount') handleGenerateParamount();
     else if (serviceKey === 'crunchyroll') handleGenerateCrunchyroll();
     else if (serviceKey === 'chatgpt') handleGenerateChatGpt();
     else if (serviceKey === 'iptv') openIptvModal();
     else if (serviceKey === 'netflix') handleBuyNetflix();
     else if (serviceKey === 'freefire') handleGenerateFreeFire();
-    else if (serviceKey === 'free-tools') setActiveTab('free-tools');
   };
 
   const handleToggleFavorite = async (productId: string) => {
@@ -508,7 +476,6 @@ export default function App() {
               onGenerateFreeFire={handleGenerateFreeFire}
               onBuyNetflix={handleBuyNetflix}
               onGenerateIptv={openIptvModal}
-              onOpenTikTokLive={openTikTokLiveModal}
               onOpenReviews={(service) => setSelectedReviewService(service)}
               primeBlocked={primeBlocked}
               primeError={primeError}
@@ -522,15 +489,7 @@ export default function App() {
             user={user}
             onOpenAuth={openAuth}
             onSelectService={handleSelectServiceFromCatalog}
-            primeBlocked={primeBlocked}
-            primeError={primeError}
-            freeFireStock={freeFireStock}
-            onOpenReviews={(service) => setSelectedReviewService(service)}
           />
-        )}
-
-        {activeTab === 'free-tools' && (
-          <FreeToolsPage />
         )}
 
         {activeTab === 'benefits' && (
@@ -612,12 +571,11 @@ export default function App() {
             </span>
           </div>
           <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Plataforma de entretenimento, streaming e ferramentas com liberação instantânea de acessos.
+            Plataforma VIP de entretenimento e streaming com liberação instantânea de acessos.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
             <button onClick={() => setActiveTab('home')} className="hover:text-white transition-colors">Início</button>
             <button onClick={() => setActiveTab('catalog')} className="hover:text-white transition-colors">Catálogo VIP</button>
-            <button onClick={() => setActiveTab('free-tools')} className="hover:text-white transition-colors">Ferramentas Gratuitas</button>
             <button onClick={() => setActiveTab('benefits')} className="hover:text-white transition-colors">Benefícios & FAQ</button>
             <button onClick={() => setActiveTab('status')} className="hover:text-white transition-colors">Status do Sistema</button>
           </div>

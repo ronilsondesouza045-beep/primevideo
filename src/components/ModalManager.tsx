@@ -12,7 +12,6 @@ import { ChatGptModal } from './ChatGptModal';
 import { IptvModal } from './IptvModal';
 import { NetflixModal } from './NetflixModal';
 import { FreeFireModal } from './FreeFireModal';
-import { TikTokLiveModal } from './TikTokLiveModal';
 import { ServiceReviewsModal } from './ServiceReviewsModal';
 
 interface ModalManagerProps {
@@ -40,8 +39,6 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
     closeNotifs,
     isIptvModalOpen,
     closeIptvModal,
-    isTikTokLiveOpen,
-    closeTikTokLiveModal,
     primeCreds,
     setPrimeCreds,
     paramountCreds,
@@ -140,11 +137,6 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
       <IptvModal
         isOpen={isIptvModalOpen}
         onClose={closeIptvModal}
-      />
-
-      <TikTokLiveModal
-        isOpen={isTikTokLiveOpen}
-        onClose={closeTikTokLiveModal}
       />
 
       {activePayment && (

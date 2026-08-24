@@ -245,7 +245,7 @@ export interface Product {
   banner?: string;
   stockCount?: number;
   minStockThreshold?: number;
-  stockStatus: 'DISPONIVEL' | 'ESTOQUE_BAIXO' | 'ESGOTADO' | 'EM_BREVE';
+  stockStatus: 'DISPONIVEL' | 'ESTOQUE_BAIXO' | 'ESGOTADO' | 'EM_BREVE' | 'SUSPENSO';
   rating?: number;
   ratingCount?: number;
   features?: string[];
