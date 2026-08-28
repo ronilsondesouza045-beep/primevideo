@@ -230,7 +230,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen = true, onClose, on
             type="button"
             onClick={handleDirectGoogleLogin}
             disabled={loading}
-            className="w-full py-3 px-4 rounded-full bg-[#131314] hover:bg-[#1f1f20] border border-[#444746] text-[#e3e3e3] text-xs font-semibold flex items-center justify-center gap-3 transition-all shadow-md active:scale-[0.98]"
+            className="w-full py-3 px-4 rounded-xl bg-[#131314] hover:bg-[#1f1f20] border border-[#444746] text-[#e3e3e3] text-xs font-semibold flex items-center justify-center gap-3 transition-all shadow-md active:scale-[0.98]"
           >
             <div className="p-1 rounded-lg bg-white flex items-center justify-center">
               <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -252,27 +252,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen = true, onClose, on
                 />
               </svg>
             </div>
-            <span>{loading ? 'Conectando conta...' : 'Fazer Login com o Google'}</span>
+            <span>{loading ? 'Conectando conta...' : 'Continuar com o Google'}</span>
           </button>
-
-          {/* Quick Google Account Shortcut selector for instant access */}
-          <div className="flex items-center justify-center gap-2 mt-1">
-            <button
-              type="button"
-              onClick={() => handleSocialLogin(undefined, 'Ronilson Souza (Admin)', 'ronisouza495@gmail.com')}
-              className="text-[10px] text-slate-400 hover:text-amber-400 underline font-medium transition-colors"
-            >
-              Entrar como Admin Google
-            </button>
-            <span className="text-slate-600 text-[10px]">•</span>
-            <button
-              type="button"
-              onClick={() => handleSocialLogin(undefined, 'Cliente Google VIP', email || `google_vip_${Math.floor(1000 + Math.random() * 9000)}@gmail.com`)}
-              className="text-[10px] text-slate-400 hover:text-red-400 underline font-medium transition-colors"
-            >
-              Entrar como Cliente Google
-            </button>
-          </div>
         </div>
 
         <div className="relative flex py-2 items-center mb-4">

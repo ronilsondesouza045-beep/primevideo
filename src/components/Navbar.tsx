@@ -65,7 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 shadow-2xl">
+      <header className="sticky top-0 z-40 bg-[#030712]/80 backdrop-blur-xl border-b border-white/10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
           
           {/* Brand Logo STREAMHUB VIP 2.0 */}
@@ -73,8 +73,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('catalog')}
             className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none"
           >
-            <div className="relative flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-purple-600 p-0.5 shadow-lg shadow-red-600/20 group-hover:scale-105 transition-transform">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+            <div className="relative flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 p-0.5 shadow-lg shadow-red-600/25 group-hover:scale-105 transition-transform">
+              <div className="w-full h-full bg-[#030712] rounded-[14px] flex items-center justify-center">
                 <Tv className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 group-hover:text-red-400 transition-colors" />
               </div>
             </div>
@@ -83,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="text-lg sm:text-2xl font-black tracking-wider bg-gradient-to-r from-white via-slate-100 to-red-500 bg-clip-text text-transparent">
                   STREAMHUB
                 </span>
-                <span className="px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-extrabold text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-md tracking-widest uppercase">
+                <span className="px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-extrabold text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-md tracking-widest uppercase shadow-sm">
                   VIP 2.0
                 </span>
               </div>
@@ -94,49 +94,37 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-900/80 border border-slate-800 p-1.5 rounded-full shadow-inner">
+          <nav className="hidden md:flex items-center gap-1.5 bg-slate-900/70 border border-white/10 p-1.5 rounded-full shadow-inner backdrop-blur-md">
             <button
               onClick={() => setActiveTab('catalog')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
                 activeTab === 'catalog' || activeTab === 'home'
                   ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-600/30'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
               }`}
             >
               <Grid className="w-3.5 h-3.5 text-red-400" />
               Catálogo VIP
             </button>
 
-            <button
-              onClick={() => setActiveTab('benefits')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                activeTab === 'benefits'
-                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-600/30'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Award className="w-3.5 h-3.5 text-amber-400" />
-              Benefícios
-            </button>
-
-            {user && (
+            {user ? (
               <button
                 onClick={() => setActiveTab('accesses')}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
                   activeTab === 'accesses'
                     ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-600/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 Meus Acessos
               </button>
-            )}
+            ) : null}
 
             {isAdmin && (
               <button
                 onClick={() => setActiveTab('admin')}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
                   activeTab === 'admin'
                     ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-600/30'
                     : 'text-purple-300 hover:text-purple-200 hover:bg-purple-950/40'
@@ -154,12 +142,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Command K Search Button */}
             <button
               onClick={onOpenSearch}
-              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-2"
+              className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-900/80 border border-white/10 text-slate-300 hover:text-white hover:bg-slate-800 transition-all flex items-center gap-2 shadow-sm"
               title="Pesquisa Global (Ctrl + K)"
             >
               <Search className="w-4 h-4 text-amber-400" />
-              <span className="hidden sm:inline text-xs font-semibold text-slate-400">Buscar...</span>
-              <kbd className="hidden lg:inline-block text-[9px] font-mono font-bold bg-slate-800 px-1.5 py-0.5 rounded text-slate-400 border border-slate-700">
+              <span className="hidden sm:inline text-xs font-semibold text-slate-300">Buscar...</span>
+              <kbd className="hidden lg:inline-block text-[9px] font-mono font-bold bg-slate-950 px-1.5 py-0.5 rounded text-slate-400 border border-slate-800">
                 Ctrl K
               </kbd>
             </button>
@@ -243,28 +231,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                       >
                         <Heart className="w-4 h-4 text-red-400" />
                         Meus Favoritos
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setActiveTab('tickets');
-                          setIsProfileMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/70 rounded-xl transition-colors text-left"
-                      >
-                        <Ticket className="w-4 h-4 text-blue-400" />
-                        Suporte & Chamados
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setActiveTab('status');
-                          setIsProfileMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/70 rounded-xl transition-colors text-left"
-                      >
-                        <Activity className="w-4 h-4 text-emerald-400" />
-                        Status do Sistema
                       </button>
 
                       <button

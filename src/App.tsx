@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import { useModalStore } from './store/useModalStore';
 import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { ServiceCards } from './components/ServiceCards';
 import { CatalogPage } from './components/CatalogPage';
 import { BenefitsPage } from './components/BenefitsPage';
 import { UserAccesses } from './components/UserAccesses';
@@ -47,7 +45,7 @@ export default function App() {
     setActivePayment
   } = useModalStore();
 
-  const [activeTab, setActiveTab] = useState<'home' | 'catalog' | 'benefits' | 'accesses' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites'>('home');
+  const [activeTab, setActiveTab] = useState<'catalog' | 'benefits' | 'accesses' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites' | string>('catalog');
   const [primeBlocked, setPrimeBlocked] = useState(false);
   const [primeError, setPrimeError] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -445,146 +443,132 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white pb-16 md:pb-0">
-      <OfflineBanner />
+    <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white pb-16 md:pb-0 relative overflow-x-hidden">
+      {/* Ambient background glow & tech grid */}
+      <div className="fixed inset-0 bg-tech-grid opacity-30 pointer-events-none z-0" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-radial-gradient pointer-events-none z-0" />
+      <div className="fixed -top-40 -right-40 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none z-0" />
+      <div className="fixed top-1/3 -left-40 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none z-0" />
 
-      {/* Main Top Navigation */}
-      <Navbar
-        user={user}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onOpenAuth={openAuth}
-        onLogout={logout}
-        onOpenChat={openChat}
-        onOpenSearch={openSearch}
-        onOpenNotifs={openNotifs}
-      />
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <OfflineBanner />
 
-      {/* Main Content View Switcher */}
-      <main className="flex-1">
-        {activeTab === 'home' && (
-          <div>
-            <Hero 
-              onGeneratePrime={handleGeneratePrime}
-              onBuyNetflix={handleBuyNetflix}
+        {/* Main Top Navigation */}
+        <Navbar
+          user={user}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onOpenAuth={openAuth}
+          onLogout={logout}
+          onOpenChat={openChat}
+          onOpenSearch={openSearch}
+          onOpenNotifs={openNotifs}
+        />
+
+        {/* Main Content View Switcher */}
+        <main className="flex-1">
+          {(activeTab === 'catalog' || activeTab === 'home') && (
+            <CatalogPage
+              user={user}
+              onOpenAuth={openAuth}
+              onSelectService={handleSelectServiceFromCatalog}
             />
-            <ServiceCards
-              onGeneratePrime={handleGeneratePrime}
-              onGenerateParamount={handleGenerateParamount}
-              onGenerateCrunchyroll={handleGenerateCrunchyroll}
-              onGenerateChatGpt={handleGenerateChatGpt}
-              onGenerateFreeFire={handleGenerateFreeFire}
-              onBuyNetflix={handleBuyNetflix}
-              onGenerateIptv={openIptvModal}
-              onOpenReviews={(service) => setSelectedReviewService(service)}
-              primeBlocked={primeBlocked}
-              primeError={primeError}
-              freeFireStock={freeFireStock}
+          )}
+
+          {activeTab === 'benefits' && (
+            <BenefitsPage onOpenCatalog={() => setActiveTab('catalog')} />
+          )}
+
+          {activeTab === 'accesses' && (
+            <UserAccesses
+              accessLogs={userAccessLogs}
+              payments={userPayments}
+              onRefresh={fetchUserAccesses}
+              onOpenNetflixModal={(payment) => {
+                setActivePayment({
+                  id: payment.id,
+                  status: payment.status,
+                  tonLink: payment.tonTransactionId || '',
+                  pixCode: payment.pixCode || '',
+                  credentials: payment.credentials || null
+                });
+              }}
             />
-          </div>
-        )}
+          )}
 
-        {activeTab === 'catalog' && (
-          <CatalogPage
-            user={user}
-            onOpenAuth={openAuth}
-            onSelectService={handleSelectServiceFromCatalog}
-          />
-        )}
+          {activeTab === 'profile' && user && (
+            <UserProfile
+              user={user}
+              onUpdateUser={(updated) => setUser(updated)}
+            />
+          )}
 
-        {activeTab === 'benefits' && (
-          <BenefitsPage onOpenCatalog={() => setActiveTab('catalog')} />
-        )}
+          {activeTab === 'admin' && (
+            <AdminPanel user={user} />
+          )}
 
-        {activeTab === 'accesses' && (
-          <UserAccesses
-            accessLogs={userAccessLogs}
-            payments={userPayments}
-            onRefresh={fetchUserAccesses}
-            onOpenNetflixModal={(payment) => {
-              setActivePayment({
-                id: payment.id,
-                status: payment.status,
-                tonLink: payment.tonTransactionId || '',
-                pixCode: payment.pixCode || '',
-                credentials: payment.credentials || null
-              });
-            }}
-          />
-        )}
+          {activeTab === 'status' && (
+            <SystemStatusPage />
+          )}
 
-        {activeTab === 'profile' && user && (
-          <UserProfile
-            user={user}
-            onUpdateUser={(updated) => setUser(updated)}
-          />
-        )}
+          {activeTab === 'tickets' && (
+            <SupportTickets currentUser={user} />
+          )}
 
-        {activeTab === 'admin' && (
-          <AdminPanel user={user} />
-        )}
+          {activeTab === 'favorites' && (
+            <FavoritesPage
+              currentUser={user}
+              products={products}
+              onSelectProduct={() => setActiveTab('catalog')}
+              onNavigateTab={(tab) => setActiveTab(tab)}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          )}
+        </main>
 
-        {activeTab === 'status' && (
-          <SystemStatusPage />
-        )}
+        {/* Global Modals Manager */}
+        <ModalManager
+          onNavigate={(tab) => setActiveTab(tab as any)}
+          primeBlocked={primeBlocked}
+          primeError={primeError}
+          freeFireStock={freeFireStock}
+        />
 
-        {activeTab === 'tickets' && (
-          <SupportTickets currentUser={user} />
-        )}
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomNav
+          user={user}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onOpenAuth={openAuth}
+        />
 
-        {activeTab === 'favorites' && (
-          <FavoritesPage
-            currentUser={user}
-            products={products}
-            onSelectProduct={() => setActiveTab('catalog')}
-            onNavigateTab={(tab) => setActiveTab(tab)}
-            onToggleFavorite={handleToggleFavorite}
-          />
-        )}
-      </main>
-
-      {/* Global Modals Manager */}
-      <ModalManager
-        onNavigate={(tab) => setActiveTab(tab as any)}
-        primeBlocked={primeBlocked}
-        primeError={primeError}
-        freeFireStock={freeFireStock}
-      />
-
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav
-        user={user}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onOpenAuth={openAuth}
-      />
-
-      {/* Footer */}
-      <footer className="border-t border-slate-800/60 bg-slate-950/80 py-10 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-          <div className="flex items-center justify-center gap-2">
-            <div className="p-2 rounded-xl bg-gradient-to-tr from-red-600 to-rose-500 text-white shadow-lg shadow-red-600/30">
-              <Tv className="w-5 h-5" />
+        {/* Footer */}
+        <footer className="border-t border-white/5 bg-slate-950/60 backdrop-blur-md py-10 mt-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+            <div className="flex items-center justify-center gap-2">
+              <div className="p-2 rounded-xl bg-gradient-to-tr from-red-600 to-rose-500 text-white shadow-lg shadow-red-600/30">
+                <Tv className="w-5 h-5" />
+              </div>
+              <span className="text-lg font-black tracking-tight text-white">
+                STREAMHUB <span className="text-red-500">VIP</span>
+              </span>
             </div>
-            <span className="text-lg font-black tracking-tight text-white">
-              STREAMHUB <span className="text-red-500">VIP</span>
-            </span>
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
+              Plataforma VIP de entretenimento e streaming com liberação instantânea de acessos 24 horas por dia.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 font-medium">
+              <button onClick={() => setActiveTab('catalog')} className="hover:text-white transition-colors">Catálogo VIP</button>
+              {user && (
+                <button onClick={() => setActiveTab('accesses')} className="hover:text-white transition-colors">Meus Acessos</button>
+              )}
+            </div>
+            <div className="text-[11px] text-slate-500 pt-4 border-t border-white/5 flex items-center justify-center gap-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>© 2026 StreamHub VIP — Conectividade segura e garantida.</span>
+            </div>
           </div>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Plataforma VIP de entretenimento e streaming com liberação instantânea de acessos.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
-            <button onClick={() => setActiveTab('home')} className="hover:text-white transition-colors">Início</button>
-            <button onClick={() => setActiveTab('catalog')} className="hover:text-white transition-colors">Catálogo VIP</button>
-            <button onClick={() => setActiveTab('benefits')} className="hover:text-white transition-colors">Benefícios & FAQ</button>
-            <button onClick={() => setActiveTab('status')} className="hover:text-white transition-colors">Status do Sistema</button>
-          </div>
-          <div className="text-[11px] text-slate-400 pt-4 border-t border-slate-900 flex items-center justify-center gap-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span>© 2026 StreamHub VIP — Todos os direitos reservados.</span>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }

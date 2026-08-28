@@ -228,42 +228,42 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
   return (
     <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-[85vh]">
       {/* Header Hero Banner */}
-      <div className="mb-8 p-6 sm:p-10 rounded-3xl bg-gradient-to-r from-slate-900 via-red-950/40 to-slate-900 border border-slate-800 relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="mb-8 p-6 sm:p-10 rounded-3xl bg-gradient-to-b from-slate-900/90 via-slate-900/60 to-slate-950/80 border border-white/10 relative overflow-hidden shadow-2xl backdrop-blur-xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-black text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full uppercase tracking-widest mb-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full uppercase tracking-widest mb-3.5 shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Catálogo VIP Oficial STREAMHUB 2.0</span>
+            <span>Catálogo VIP Oficial • STREAMHUB 2.0</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
             Portal Exclusivo de <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-red-500 via-rose-400 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-red-500 via-rose-400 to-amber-300 bg-clip-text text-transparent">
               Streaming & Entretenimento VIP
             </span>
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base mt-3 leading-relaxed">
-            Resgate acessos gratuitos de <strong className="text-emerald-400">ChatGPT Plus/Pro (GPT-4o)</strong>, <strong className="text-cyan-400">Prime Video</strong>, <strong className="text-blue-400">Paramount+</strong>, <strong className="text-orange-400">Crunchyroll</strong>, códigos <strong className="text-amber-400">Free Fire</strong> e servidores <strong className="text-emerald-400">IPTV</strong> com liberação instantânea 24/7.
+            Resgate contas e acessos de <strong className="text-emerald-400">ChatGPT Plus/Pro</strong>, <strong className="text-blue-400">Paramount+</strong>, <strong className="text-orange-400">Crunchyroll</strong>, códigos <strong className="text-amber-400">Free Fire</strong> e servidores <strong className="text-emerald-400">IPTV</strong> com liberação imediata e suporte 24/7.
           </p>
 
           {/* Trust Badges */}
-          <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-slate-400 text-xs font-semibold">
-            <div className="flex items-center gap-2">
+          <div className="mt-6 pt-5 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 text-slate-300 text-xs font-semibold">
+            <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-950/40 border border-white/5">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>Acesso Seguro 100%</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-950/40 border border-white/5">
               <Zap className="w-4 h-4 text-amber-400 shrink-0" />
               <span>Liberação Instantânea</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-950/40 border border-white/5">
               <CheckCircle className="w-4 h-4 text-cyan-400 shrink-0" />
               <span>Contas Testadas</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-950/40 border border-white/5">
               <Tag className="w-4 h-4 text-rose-400 shrink-0" />
               <span>Grátis & VIP</span>
             </div>
@@ -272,7 +272,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
       </div>
 
       {/* Filter Bar & All Products Section */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-8 bg-slate-900/90 p-4 rounded-2xl border border-slate-800 shadow-xl">
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-6 bg-slate-900/70 p-3.5 sm:p-4 rounded-2xl border border-white/10 shadow-xl backdrop-blur-xl">
         {/* Search Input */}
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -280,8 +280,8 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Pesquisar por nome do serviço, streaming ou código..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-semibold text-white placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors"
+            placeholder="Pesquisar por streaming, ChatGPT, jogos ou IPTV..."
+            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-semibold text-white placeholder-slate-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition-all"
           />
           {searchQuery && (
             <button
@@ -299,7 +299,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
           <select
             value={selectedSort}
             onChange={(e: any) => setSelectedSort(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200 focus:outline-none focus:border-red-500"
+            className="px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-bold text-slate-200 focus:outline-none focus:border-red-500 transition-colors"
           >
             <option value="popular">Mais Populares ⭐</option>
             <option value="price_asc">Menor Preço 💲</option>
@@ -317,8 +317,8 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
             onClick={() => setSelectedCategory(cat)}
             className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               selectedCategory === cat
-                ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg shadow-red-600/30'
-                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg shadow-red-600/30 border border-red-500/50'
+                : 'bg-slate-900/80 border border-white/5 text-slate-400 hover:text-white hover:bg-slate-800'
             }`}
           >
             {cat}
@@ -330,11 +330,11 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-80 bg-slate-900/60 rounded-3xl border border-slate-800 animate-pulse p-6 flex flex-col justify-between">
-              <div className="w-full h-32 bg-slate-800/80 rounded-2xl mb-4"></div>
-              <div className="w-3/4 h-5 bg-slate-800/80 rounded mb-2"></div>
-              <div className="w-full h-4 bg-slate-800/60 rounded mb-4"></div>
-              <div className="w-full h-10 bg-slate-800 rounded-xl"></div>
+            <div key={i} className="h-80 bg-slate-900/40 rounded-3xl border border-white/5 animate-pulse p-6 flex flex-col justify-between">
+              <div className="w-full h-36 bg-slate-800/60 rounded-2xl mb-4" />
+              <div className="w-3/4 h-5 bg-slate-800/60 rounded mb-2" />
+              <div className="w-full h-4 bg-slate-800/40 rounded mb-4" />
+              <div className="w-full h-10 bg-slate-800/60 rounded-xl" />
             </div>
           ))}
         </div>
@@ -343,7 +343,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="group bg-slate-900/90 rounded-3xl border border-slate-800/90 hover:border-red-500/50 shadow-xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-red-600/10"
+              className="group bg-slate-900/80 backdrop-blur-md rounded-3xl border border-white/10 hover:border-red-500/40 shadow-xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-red-600/10"
             >
               {/* Product Cover Image */}
               <div className="relative h-44 overflow-hidden bg-slate-950">
@@ -351,13 +351,19 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
                   src={product.image}
                   alt={product.name}
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${
+                    product.stockStatus === 'SUSPENSO' ? 'grayscale-[35%]' : ''
+                  }`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
 
                 {/* Badge top-left */}
                 {product.badge && (
-                  <span className="absolute top-3 left-3 px-2.5 py-1 text-[10px] font-black uppercase text-amber-300 bg-amber-500/20 border border-amber-500/40 backdrop-blur-md rounded-lg shadow-md">
+                  <span className={`absolute top-3 left-3 px-2.5 py-1 text-[10px] font-black uppercase rounded-lg shadow-md backdrop-blur-md border ${
+                    product.stockStatus === 'SUSPENSO'
+                      ? 'text-amber-300 bg-amber-500/20 border-amber-500/40'
+                      : 'text-amber-300 bg-amber-500/20 border-amber-500/40'
+                  }`}>
                     {product.badge}
                   </span>
                 )}
@@ -365,9 +371,9 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
                 {/* Stock Status top-right */}
                 <span className={`absolute top-3 right-3 px-2.5 py-1 text-[10px] font-black uppercase rounded-lg backdrop-blur-md border shadow-md ${
                   product.stockStatus === 'DISPONIVEL'
-                    ? 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40'
+                    ? 'text-emerald-300 bg-emerald-500/20 border-emerald-500/40'
                     : product.stockStatus === 'ESTOQUE_BAIXO'
-                    ? 'text-amber-400 bg-amber-500/20 border-amber-500/40'
+                    ? 'text-amber-300 bg-amber-500/20 border-amber-500/40'
                     : product.stockStatus === 'SUSPENSO'
                     ? 'text-amber-300 bg-amber-500/20 border-amber-500/40'
                     : 'text-red-400 bg-red-500/20 border-red-500/40'
@@ -385,7 +391,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
               {/* Card Body */}
               <div className="p-5 flex-1 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <div className="flex items-center justify-between gap-2 mb-2">
                     <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">
                       {product.category}
                     </span>
@@ -401,15 +407,15 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
                     {product.name}
                   </h3>
 
-                  <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+                  <p className="text-xs text-slate-300 line-clamp-2 mb-4 leading-relaxed font-normal">
                     {product.description}
                   </p>
                 </div>
 
                 {/* Price & Primary CTA Button */}
-                <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-3">
+                <div className="pt-3.5 border-t border-white/10 flex items-center justify-between gap-3">
                   <div>
-                    <span className="text-[10px] text-slate-500 block uppercase font-bold">Valor</span>
+                    <span className="text-[10px] text-slate-400 block uppercase font-bold">Valor</span>
                     <span className="text-base font-black text-white">
                       {product.isFree || product.price === 0 ? (
                         <span className="text-emerald-400">100% GRÁTIS</span>
@@ -422,7 +428,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setSelectedProduct(product)}
-                      className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition-colors"
+                      className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition-all border border-white/5"
                       title="Ver Detalhes do Produto"
                     >
                       <HelpCircle className="w-4 h-4" />
@@ -433,7 +439,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
                       className={`px-4 py-2.5 rounded-xl text-xs font-extrabold text-white shadow-md active:scale-95 transition-all flex items-center gap-1.5 ${
                         product.stockStatus === 'SUSPENSO'
                           ? 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 shadow-amber-600/20'
-                          : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-600/20'
+                          : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-600/30'
                       }`}
                     >
                       {product.stockStatus === 'SUSPENSO' ? (
@@ -455,7 +461,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
           ))}
         </div>
       ) : (
-        <div className="py-16 text-center bg-slate-900/50 rounded-3xl border border-slate-800 p-8">
+        <div className="py-16 text-center bg-slate-900/50 rounded-3xl border border-white/10 p-8 backdrop-blur-md">
           <Search className="w-12 h-12 text-slate-600 mx-auto mb-3" />
           <h3 className="text-lg font-bold text-white mb-1">Nenhum serviço encontrado</h3>
           <p className="text-slate-400 text-xs max-w-sm mx-auto mb-4">
@@ -466,7 +472,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
               setSearchQuery('');
               setSelectedCategory('Todos');
             }}
-            className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold text-white hover:bg-slate-700 transition-colors"
+            className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold text-white hover:bg-slate-700 transition-colors border border-white/5"
           >
             Limpar Filtros
           </button>
@@ -476,10 +482,10 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
       {/* Product Details Modal */}
       {selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl relative max-h-[90vh] flex flex-col">
+          <div className="bg-slate-900/95 border border-white/10 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl relative max-h-[90vh] flex flex-col backdrop-blur-2xl">
             <button
               onClick={() => setSelectedProduct(null)}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-950/80 text-slate-400 hover:text-white transition-colors"
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-950/80 text-slate-400 hover:text-white transition-colors border border-white/10"
             >
               <X className="w-5 h-5" />
             </button>
@@ -492,7 +498,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
               
               <div className="absolute bottom-4 left-6 right-6">
                 <span className="px-2.5 py-1 text-[10px] font-black uppercase text-amber-300 bg-amber-500/20 border border-amber-500/40 rounded-md inline-block mb-1">
@@ -506,7 +512,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
             <div className="p-6 overflow-y-auto space-y-5 flex-1">
               <div>
                 <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-1">Descrição do Serviço</h4>
-                <p className="text-xs text-slate-300 leading-relaxed">{selectedProduct.description}</p>
+                <p className="text-xs text-slate-300 leading-relaxed font-medium">{selectedProduct.description}</p>
               </div>
 
               {/* Features List */}
@@ -515,7 +521,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
                   <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2">Recursos & Vantagens</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {selectedProduct.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs font-semibold text-slate-200">
+                      <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-slate-950/60 border border-white/5 text-xs font-semibold text-slate-200">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                         <span>{feature}</span>
                       </div>
@@ -526,7 +532,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
 
               {/* Instructions */}
               {selectedProduct.instructions && selectedProduct.instructions.length > 0 && (
-                <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800">
+                <div className="p-4 rounded-2xl bg-slate-950/80 border border-white/5">
                   <h4 className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5 mb-2">
                     <Zap className="w-4 h-4" />
                     Como Utilizar / Instruções de Acesso
@@ -541,9 +547,9 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between gap-4">
+            <div className="p-4 bg-slate-950/90 border-t border-white/10 flex items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] text-slate-500 block font-bold">Valor Total</span>
+                <span className="text-[10px] text-slate-400 block font-bold">Valor Total</span>
                 <span className="text-lg font-black text-white">
                   {selectedProduct.isFree || selectedProduct.price === 0 ? (
                     <span className="text-emerald-400">100% GRÁTIS</span>

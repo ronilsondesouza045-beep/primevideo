@@ -23,27 +23,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         {/* Catálogo VIP */}
         <button
           onClick={() => setActiveTab('catalog')}
-          className={`flex flex-col items-center gap-0.5 py-1 px-1.5 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition-all ${
             activeTab === 'catalog' || activeTab === 'home'
               ? 'text-red-500 font-bold scale-105'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <Grid className="w-5 h-5" />
-          <span className="text-[10px]">Catálogo</span>
-        </button>
-
-        {/* Benefícios */}
-        <button
-          onClick={() => setActiveTab('benefits')}
-          className={`flex flex-col items-center gap-0.5 py-1 px-1.5 rounded-xl transition-all ${
-            activeTab === 'benefits'
-              ? 'text-red-500 font-bold scale-105'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Award className="w-5 h-5" />
-          <span className="text-[10px]">Vantagens</span>
+          <span className="text-[10px]">Catálogo VIP</span>
         </button>
 
         {/* Acessos */}
@@ -55,14 +42,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               onOpenAuth();
             }
           }}
-          className={`flex flex-col items-center gap-0.5 py-1 px-1.5 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition-all ${
             activeTab === 'accesses'
               ? 'text-amber-400 font-bold scale-105'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <Sparkles className="w-5 h-5" />
-          <span className="text-[10px]">Acessos</span>
+          <span className="text-[10px]">Meus Acessos</span>
         </button>
 
         {/* Perfil / Admin */}
