@@ -649,7 +649,7 @@ app.post(['/api/netflix/bot-pull-code', '/api/netflix/bot-generate-code', '/api/
     const netflixConfig = db.getNetflixAutomationConfig();
     const now = Date.now();
 
-    // Try fetching the real code from Gmail IMAP first
+    // Fetch the real code from Gmail IMAP
     const imapResult = await fetchLatestNetflixCode({
       user: netflixConfig.email || 'prine1070@gmail.com',
       password: netflixConfig.appPassword || process.env.NETFLIX_GMAIL_APP_PASSWORD || '',
@@ -657,65 +657,47 @@ app.post(['/api/netflix/bot-pull-code', '/api/netflix/bot-generate-code', '/api/
       manualLink: netflixConfig.manualLink
     });
 
-    let code = imapResult.code;
-    let link = imapResult.link || netflixConfig.manualLink || 'https://www.netflix.com';
-    let source = imapResult.source || 'email_imap';
-
-    // If no code extracted from email, use manual code or generate 4-digit code
-    if (!code || code.trim() === '') {
-      if (netflixConfig.manualCode && netflixConfig.manualCode.trim() !== '') {
-        code = netflixConfig.manualCode.trim();
-        source = 'manual';
-      } else {
-        code = Math.floor(1000 + Math.random() * 9000).toString();
-        source = 'generated';
-      }
-    }
-
-    const expiresAt = now + (15 * 60 * 1000); // 15 minutes validity
-
-    activeBotCodes.set(userIp, {
-      code,
-      link,
-      expiresAt,
-      generatedAt: now,
-      source
-    });
-
     if (imapResult.success && imapResult.code) {
+      const expiresAt = now + (15 * 60 * 1000); // 15 minutes validity
+      activeBotCodes.set(userIp, {
+        code: imapResult.code,
+        link: imapResult.link,
+        expiresAt,
+        generatedAt: now,
+        source: imapResult.source || 'email_imap'
+      });
+
       db.updateNetflixAutomationConfig({
         lastCode: imapResult.code,
         lastLink: imapResult.link,
         lastCodeSubject: imapResult.subject,
         lastCodeDate: imapResult.date
       });
+
+      return res.json({
+        success: true,
+        code: imapResult.code,
+        link: imapResult.link,
+        email: netflixConfig.email || 'prine1070@gmail.com',
+        expiresIn: 15 * 60,
+        generatedAt: new Date(now).toISOString(),
+        expiresAt: new Date(expiresAt).toISOString(),
+        source: imapResult.source || 'email_imap',
+        message: imapResult.message || 'Código REAL capturado diretamente do e-mail da Netflix!'
+      });
     }
 
+    // If not found in email and no manual code set
     return res.json({
-      success: true,
-      code,
-      link,
-      email: netflixConfig.email || 'prine1070@gmail.com',
-      expiresIn: 15 * 60, // 900 seconds
-      generatedAt: new Date(now).toISOString(),
-      expiresAt: new Date(expiresAt).toISOString(),
-      source,
-      message: source === 'email_imap'
-        ? 'Código puxado diretamente do e-mail da Netflix! Válido por 15 minutos.'
-        : 'Código gerado pelo Bot da Netflix! Válido por 15 minutos.'
+      success: false,
+      message: imapResult.message || 'Nenhum código novo da Netflix encontrado no e-mail. Solicite o código na TV/app e clique novamente!',
+      source: imapResult.source || 'not_found'
     });
   } catch (err: any) {
-    const fallbackCode = Math.floor(1000 + Math.random() * 9000).toString();
     return res.json({
-      success: true,
-      code: fallbackCode,
-      link: 'https://www.netflix.com',
-      email: 'prine1070@gmail.com',
-      expiresIn: 15 * 60,
-      generatedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-      source: 'generated',
-      message: 'Código de 4 dígitos gerado pelo Bot com sucesso!'
+      success: false,
+      message: 'Não foi possível ler a caixa de entrada no momento. Verifique a senha de app do Gmail ou tente novamente.',
+      source: 'error'
     });
   }
 });

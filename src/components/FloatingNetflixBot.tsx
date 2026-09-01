@@ -50,9 +50,12 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const handlePullCode = async () => {
     setLoading(true);
     setIsExpired(false);
+    setErrorMessage(null);
     try {
       const res = await fetch('/api/netflix/bot-pull-code', {
         method: 'POST',
@@ -64,24 +67,15 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
       if (data.success && data.code) {
         setCode(data.code);
         setLink(data.link || null);
-        setMessage(data.message || 'Código capturado com sucesso!');
+        setMessage(data.message || 'Código REAL capturado do e-mail!');
         setSource(data.source || 'email_imap');
         setTimeLeft(data.expiresIn || 900); // 15 minutes
+        setErrorMessage(null);
       } else {
-        const random4Digits = Math.floor(1000 + Math.random() * 9000).toString();
-        setCode(random4Digits);
-        setLink('https://www.netflix.com/login');
-        setMessage('Código disponível! Válido por 15 minutos.');
-        setSource('manual');
-        setTimeLeft(900);
+        setErrorMessage(data.message || 'Nenhum código novo da Netflix encontrado no seu e-mail. Solicite o código na TV/App e clique em Puxar novamente!');
       }
     } catch (err) {
-      const random4Digits = Math.floor(1000 + Math.random() * 9000).toString();
-      setCode(random4Digits);
-      setLink('https://www.netflix.com/login');
-      setMessage('Código gerado pelo Bot com sucesso!');
-      setSource('manual');
-      setTimeLeft(900);
+      setErrorMessage('Erro de conexão ao ler a caixa de entrada. Tente novamente em alguns segundos.');
     } finally {
       setLoading(false);
     }
@@ -222,6 +216,17 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Error / Status Message Alert */}
+              {errorMessage && (
+                <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs flex items-start gap-2.5 animate-fadeIn">
+                  <span className="text-amber-400 font-bold text-base shrink-0">⚠️</span>
+                  <div className="leading-relaxed">
+                    <strong className="block text-amber-300 font-bold">Aviso do Bot:</strong>
+                    <span>{errorMessage}</span>
+                  </div>
+                </div>
+              )}
 
               {/* Bot Action or Active Code View */}
               {!code ? (
