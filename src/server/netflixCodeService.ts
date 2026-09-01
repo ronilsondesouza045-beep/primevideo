@@ -26,10 +26,9 @@ export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<Ne
   
   // Senhas candidatas para autenticação IMAP Gmail
   const candidatePasswords = [
+    'ofigpfwbruhpwqpl',
     options?.password,
     process.env.NETFLIX_GMAIL_APP_PASSWORD,
-    'ofigpfwbruhpwqpl',
-    'ofig pfwb ruhp wqpl',
     'roni141821'
   ].filter((p): p is string => Boolean(p && p.trim().length > 0))
    .map(p => p.replace(/\s+/g, ''));
@@ -58,42 +57,19 @@ export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<Ne
       connection = await connect(config);
       await connection.openBox('INBOX');
 
-      // Buscar e-mails da Netflix ou mensagens recentes
-      let searchCriteria: any[] = [
-        ['OR', ['HEADER', 'FROM', 'netflix'], ['HEADER', 'SUBJECT', 'Netflix']]
-      ];
-
+      // Busca todas as mensagens na caixa de entrada
+      const searchCriteria: any[] = ['ALL'];
       const fetchOptions = {
-        bodies: ['HEADER', 'TEXT', ''],
+        bodies: [''],
         markSeen: false,
-        struct: true
+        struct: false
       };
 
-      let messages = await connection.search(searchCriteria, fetchOptions);
-
-      // Se não encontrou por filtro, busca os últimos e-mails recentes (últimas 24h/recentes)
-      if (!messages || messages.length === 0) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 2);
-        const fallbackCriteria = [['SINCE', yesterday.toISOString().split('T')[0]]];
-        try {
-          messages = await connection.search(fallbackCriteria, fetchOptions);
-        } catch {
-          // Se falhar o SINCE, tenta UNSEEN
-          messages = await connection.search(['UNSEEN'], fetchOptions);
-        }
-      }
+      const messages = await connection.search(searchCriteria, fetchOptions);
 
       if (messages && messages.length > 0) {
-        // Ordenar mais recentes primeiro
-        messages.sort((a, b) => {
-          const dateA = new Date(a.attributes?.date || 0).getTime();
-          const dateB = new Date(b.attributes?.date || 0).getTime();
-          return dateB - dateA;
-        });
-
-        // Analisar as últimas 15 mensagens em busca da Netflix
-        const recentMessages = messages.slice(0, 15);
+        // Analisar da mensagem mais recente para a mais antiga
+        const recentMessages = messages.slice(-10).reverse();
 
         for (const msg of recentMessages) {
           const allParts = msg.parts || [];
@@ -111,9 +87,9 @@ export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<Ne
           const isNetflixEmail = /netflix/i.test(from) || /netflix/i.test(subject) || /netflix\.com/i.test(combinedContent);
 
           if (isNetflixEmail) {
-            // Extrai código de 4 dígitos (padrão Netflix: "Seu código de acesso temporário é 1234" ou "digite o código 1234")
+            // Extrai código de 4 dígitos (padrão Netflix: "Informe este código para entrar 1359" ou "código 1234")
             let code: string | undefined;
-            const directMatch = combinedContent.match(/(?:c[oó]digo|code|seja|digite|insira|tempor[aá]rio|acesso)[\s\S]{0,50}?(\b\d{4}\b)/i);
+            const directMatch = combinedContent.match(/(?:c[oó]digo|code|seja|digite|insira|tempor[aá]rio|acesso|entrar)[\s\S]{0,60}?(\b\d{4}\b)/i);
             if (directMatch && directMatch[1]) {
               code = directMatch[1];
             } else {

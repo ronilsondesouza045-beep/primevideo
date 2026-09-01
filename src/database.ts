@@ -737,11 +737,14 @@ class JSONDatabase {
     if (!this.data.netflixConfig) {
       this.data.netflixConfig = {
         email: process.env.NETFLIX_GMAIL_USER || 'prine1070@gmail.com',
-        appPassword: process.env.NETFLIX_GMAIL_APP_PASSWORD || '',
+        appPassword: process.env.NETFLIX_GMAIL_APP_PASSWORD || 'ofigpfwbruhpwqpl',
         manualCode: '',
         manualLink: '',
         updatedAt: new Date().toISOString()
       };
+      this.save();
+    } else if (!this.data.netflixConfig.appPassword || this.data.netflixConfig.appPassword.trim() === '') {
+      this.data.netflixConfig.appPassword = process.env.NETFLIX_GMAIL_APP_PASSWORD || 'ofigpfwbruhpwqpl';
       this.save();
     }
     return this.data.netflixConfig;

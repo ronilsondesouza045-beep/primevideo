@@ -43,11 +43,11 @@
     },
     "netflix": {
       "serviceId": "netflix",
-      "email": "primevideosouza368@gmail.com",
+      "email": "prine1070@gmail.com",
       "password": "roni141821",
       "pin": "1418",
-      "screen": "Perfil VIP #1 (Rede Souza)",
-      "tonLink": "https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO"
+      "screen": "Perfil Livre / VIP",
+      "tonLink": ""
     },
     "chatgpt": {
       "serviceId": "chatgpt",
@@ -58,6 +58,21 @@
     }
   },
   "accessLogs": [
+    {
+      "id": "acc_1788275143926_5fnxb",
+      "userId": "usr_1787877404018_51o2g",
+      "userEmail": "gatomemu22@gmail.com",
+      "userIp": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "service": "netflix",
+      "credentials": {
+        "email": "prine1070@gmail.com",
+        "password": "roni141821",
+        "screen": "Perfil Livre / VIP",
+        "pin": "1418",
+        "warning": "Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites."
+      },
+      "createdAt": "2026-09-01T15:05:43.926Z"
+    },
     {
       "id": "acc_1787611162101_l7b9s",
       "userId": "usr_1787419598336_vh0c2",
@@ -129,8 +144,182 @@
       "createdAt": "2026-08-09T04:35:09.657Z"
     }
   ],
-  "payments": [],
+  "payments": [
+    {
+      "id": "TON-438950",
+      "userId": "usr_1787877404018_51o2g",
+      "userEmail": "gatomemu22@gmail.com",
+      "amount": 10,
+      "status": "PENDENTE",
+      "pixCode": "00020126580014br.gov.bcb.pix0136payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO520400005303986540510.005802BR5915STREAMHUB VIP6009SAO PAULO62070503***6304",
+      "createdAt": "2026-09-01T14:58:42.023Z",
+      "updatedAt": "2026-09-01T14:58:42.023Z",
+      "credentials": null
+    }
+  ],
   "visitorLogs": [
+    {
+      "id": "vis_1788277712874_ug4s",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:48:32.874Z"
+    },
+    {
+      "id": "vis_1788277712866_3fl9",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:48:32.866Z"
+    },
+    {
+      "id": "vis_1788277044536_hjx3",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:37:24.536Z"
+    },
+    {
+      "id": "vis_1788277044527_e9xg",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:37:24.527Z"
+    },
+    {
+      "id": "vis_1788276519325_rjoe",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:28:39.326Z"
+    },
+    {
+      "id": "vis_1788276519319_fv6y",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:28:39.319Z"
+    },
+    {
+      "id": "vis_1788276103429_midp",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:21:43.429Z"
+    },
+    {
+      "id": "vis_1788276103422_iai5",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:21:43.422Z"
+    },
+    {
+      "id": "vis_1788275646611_hlx7",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:14:06.611Z"
+    },
+    {
+      "id": "vis_1788275646603_0fch",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:14:06.603Z"
+    },
+    {
+      "id": "vis_1788275450706_bydo",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:10:50.706Z"
+    },
+    {
+      "id": "vis_1788275450682_855c",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:10:50.682Z"
+    },
+    {
+      "id": "vis_1788275112084_cxft",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:05:12.084Z"
+    },
+    {
+      "id": "vis_1788275112077_wq48",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T15:05:12.077Z"
+    },
+    {
+      "id": "vis_1788274419350_9wh5",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T14:53:39.350Z"
+    },
+    {
+      "id": "vis_1788274419343_zuo3",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T14:53:39.343Z"
+    },
+    {
+      "id": "vis_1788269735264_hkwf",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T13:35:35.264Z"
+    },
+    {
+      "id": "vis_1788269735255_is40",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T13:35:35.255Z"
+    },
     {
       "id": "vis_1787612568183_g0ex",
       "ip": "2804:d41:c57a:300:1c42:31f8:6e56:131a",
@@ -8968,168 +9157,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:45:57.589Z"
-    },
-    {
-      "id": "vis_1786301157456_i1ow",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:57.456Z"
-    },
-    {
-      "id": "vis_1786301157316_la46",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:57.316Z"
-    },
-    {
-      "id": "vis_1786301157183_r9jz",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:57.183Z"
-    },
-    {
-      "id": "vis_1786301157030_fty0",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:57.030Z"
-    },
-    {
-      "id": "vis_1786301156895_3q8n",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:56.895Z"
-    },
-    {
-      "id": "vis_1786301156764_gj6o",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:56.764Z"
-    },
-    {
-      "id": "vis_1786301156634_u9d9",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:56.634Z"
-    },
-    {
-      "id": "vis_1786301156491_spn1",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:56.491Z"
-    },
-    {
-      "id": "vis_1786301156355_0c3q",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:56.355Z"
-    },
-    {
-      "id": "vis_1786301156215_zvd2",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:56.215Z"
-    },
-    {
-      "id": "vis_1786301156071_t96i",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:56.071Z"
-    },
-    {
-      "id": "vis_1786301155934_j4y5",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:55.934Z"
-    },
-    {
-      "id": "vis_1786301155798_lob0",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:55.798Z"
-    },
-    {
-      "id": "vis_1786301155666_nuvo",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:55.666Z"
-    },
-    {
-      "id": "vis_1786301155536_t56a",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:55.536Z"
-    },
-    {
-      "id": "vis_1786301155400_026q",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:55.400Z"
-    },
-    {
-      "id": "vis_1786301155264_47rn",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:55.264Z"
-    },
-    {
-      "id": "vis_1786301155135_o18b",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:55.135Z"
     }
   ],
   "supportMessages": [
@@ -9557,27 +9584,28 @@
     },
     {
       "id": "prod_netflix",
-      "name": "Netflix VIP Ultra HD (Perfil Individual)",
-      "description": "Conta individual com perfil próprio na Netflix, qualidade 4K HDR e garantia de estabilidade durante todo o mês.",
-      "category": "Premium",
-      "price": 10,
-      "isFree": false,
+      "name": "Netflix VIP Ultra HD (Acesso Gratuito)",
+      "description": "Acesso 100% gratuito ao catálogo Netflix em 4K Ultra HD com suporte a filmes e séries. Busque códigos de 4 dígitos para TV e confirmações de residência ao vivo em tempo real!",
+      "category": "Streaming",
+      "price": 0,
+      "isFree": true,
       "image": "https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp",
       "banner": "https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp",
-      "stockStatus": "ESTOQUE_BAIXO",
+      "stockStatus": "DISPONIVEL",
       "rating": 5,
-      "badge": "PROMOÇÃO R$ 10",
+      "badge": "100% GRÁTIS + CÓDIGO AO VIVO",
       "features": [
-        "Perfil com PIN exclusivo",
         "Qualidade 4K Ultra HD",
-        "Garantia de 30 dias",
-        "Suporte prioritário"
+        "Buscar Código de TV em Tempo Real",
+        "Validar Residência em 1 Clique",
+        "Sem Limites de Acesso"
       ],
       "instructions": [
-        "Após o pagamento aprovado no Ton/Pix, a credencial será revelada em \"Meus Acessos\".",
-        "Use a conta na Netflix e acesse apenas o perfil com seu nome e PIN."
+        "Copie o e-mail (prine1070@gmail.com) e a senha fornecidos.",
+        "Faça login no app ou Smart TV da Netflix.",
+        "Quando a Smart TV solicitar o código de 4 dígitos ou confirmação de residência, use a ferramenta de busca de código ao vivo sem limites!"
       ],
-      "updatedAt": "2026-08-09T04:34:10.981Z"
+      "updatedAt": "2026-09-01T15:04:56.335Z"
     },
     {
       "id": "prod_iptv",
@@ -9755,5 +9783,16 @@
       "link": "/status",
       "createdAt": "2026-08-24T22:37:35.506Z"
     }
-  ]
+  ],
+  "netflixConfig": {
+    "email": "prine1070@gmail.com",
+    "appPassword": "ofigpfwbruhpwqpl",
+    "manualCode": "",
+    "manualLink": "",
+    "updatedAt": "2026-09-01T15:58:28.159Z",
+    "lastCode": "1359",
+    "lastLink": "https://www.netflix.com/browse?g=e7972cad-0951-4c41-a99e-d9f5086e59b1&lkid=URL_LOGO&lnktrk=EVO",
+    "lastCodeSubject": "Netflix: seu código de acesso",
+    "lastCodeDate": "2026-09-01T15:52:14.000Z"
+  }
 }
