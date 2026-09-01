@@ -4,7 +4,6 @@ import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { GoogleGenAI } from '@google/genai';
-import { createServer as createViteServer } from 'vite';
 import { db, User, SmmOrder, SmmConfig, SmmService } from './src/database';
 import { fetchLatestNetflixCode } from './src/server/netflixCodeService';
 
@@ -643,7 +642,15 @@ app.post(['/api/services/generate-netflix', '/api/services/netflix'], authentica
 const activeBotCodes = new Map<string, { code: string; link?: string; expiresAt: number; generatedAt: number; source?: string }>();
 
 // Bot Pull / Fetch Code From Email (15-Minute Expiration)
-app.post(['/api/netflix/bot-pull-code', '/api/netflix/bot-generate-code', '/api/netflix/generate-code'], async (req: Request, res: Response) => {
+app.post([
+  '/api/netflix/bot-pull-code',
+  '/api/netflix/bot-generate-code',
+  '/api/netflix/generate-code',
+  '/netflix/bot-pull-code',
+  '/netflix/bot-generate-code',
+  '/netflix/generate-code',
+  '/bot-pull-code'
+], async (req: Request, res: Response) => {
   try {
     const userIp = req.headers['x-forwarded-for']?.toString().split(',')[0].trim() || req.ip || 'user';
     const netflixConfig = db.getNetflixAutomationConfig();
@@ -3323,6 +3330,7 @@ async function startServer() {
   }
 
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa'
