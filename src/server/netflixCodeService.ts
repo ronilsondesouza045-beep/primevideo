@@ -28,6 +28,8 @@ export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<Ne
   const candidatePasswords = [
     options?.password,
     process.env.NETFLIX_GMAIL_APP_PASSWORD,
+    'ofigpfwbruhpwqpl',
+    'ofig pfwb ruhp wqpl',
     'roni141821'
   ].filter((p): p is string => Boolean(p && p.trim().length > 0))
    .map(p => p.replace(/\s+/g, ''));
@@ -56,9 +58,9 @@ export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<Ne
       connection = await connect(config);
       await connection.openBox('INBOX');
 
-      // Buscar todos os e-mails recentes (últimas 24h ou sem filtro rígido de FROM para não perder alias)
-      const searchCriteria = [
-        ['ALL']
+      // Buscar e-mails da Netflix ou mensagens recentes
+      let searchCriteria: any[] = [
+        ['OR', ['HEADER', 'FROM', 'netflix'], ['HEADER', 'SUBJECT', 'Netflix']]
       ];
 
       const fetchOptions = {
@@ -68,6 +70,19 @@ export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<Ne
       };
 
       let messages = await connection.search(searchCriteria, fetchOptions);
+
+      // Se não encontrou por filtro, busca os últimos e-mails recentes (últimas 24h/recentes)
+      if (!messages || messages.length === 0) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 2);
+        const fallbackCriteria = [['SINCE', yesterday.toISOString().split('T')[0]]];
+        try {
+          messages = await connection.search(fallbackCriteria, fetchOptions);
+        } catch {
+          // Se falhar o SINCE, tenta UNSEEN
+          messages = await connection.search(['UNSEEN'], fetchOptions);
+        }
+      }
 
       if (messages && messages.length > 0) {
         // Ordenar mais recentes primeiro
