@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, ExternalLink, Copy, Check, Tv, Clock, Sparkles, Bot, Zap, CheckCircle2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { RefreshCw, ExternalLink, Copy, Check, Tv, Clock, Sparkles, Bot, Zap, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 interface NetflixCodeFetcherProps {
   email?: string;
@@ -12,10 +12,10 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   // 15-Minute Expiration Countdown (900 seconds)
   const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -51,36 +51,36 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const generateBotCode = async () => {
+  const pullBotCode = async () => {
     setLoading(true);
-    setIsExpired(false);
+    setErrorMessage(null);
     try {
-      const res = await fetch('/api/netflix/bot-generate-code', {
+      const res = await fetch('/api/netflix/bot-pull-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
       const data = await res.json();
 
-      if (data.success && data.code) {
+      if (data.success && data.code && !data.isExpired) {
         setCode(data.code);
-        setLink(data.link || 'https://www.netflix.com/youraccount');
-        setMessage(data.message || 'Código gerado com sucesso pelo Bot! Válido por 15 minutos.');
-        setTimeLeft(data.expiresIn || 900); // 15 minutes
+        setLink(data.link || null);
+        setIsExpired(false);
+        setTimeLeft(data.expiresIn || 900); // 15 minutes or remaining time
+        setErrorMessage(null);
+      } else if (data.isExpired) {
+        setCode(null);
+        setIsExpired(true);
+        setTimeLeft(0);
+        setErrorMessage(
+          data.message || 
+          '⏱️ O último código no e-mail já expirou (recebido há mais de 15 minutos). Por favor, peça para reenviar o código na sua Smart TV e clique novamente para puxar o código novo!'
+        );
       } else {
-        // Fallback generator
-        const random4Digits = Math.floor(1000 + Math.random() * 9000).toString();
-        setCode(random4Digits);
-        setLink('https://www.netflix.com/login');
-        setMessage('Código gerado pelo Bot! Válido por 15 minutos.');
-        setTimeLeft(900);
+        setErrorMessage(data.message || 'Nenhum código recente da Netflix encontrado. Peça para enviar o código na TV e clique em Puxar Código!');
       }
     } catch (err: any) {
-      const random4Digits = Math.floor(1000 + Math.random() * 9000).toString();
-      setCode(random4Digits);
-      setLink('https://www.netflix.com/login');
-      setMessage('Código gerado pelo Bot! Válido por 15 minutos.');
-      setTimeLeft(900);
+      setErrorMessage('Erro de conexão ao ler a caixa de entrada. Tente novamente em alguns segundos.');
     } finally {
       setLoading(false);
     }
@@ -121,14 +121,14 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h4 className="text-base sm:text-lg font-black text-white">
-                Bot Netflix TV • Gerador de Código
+                Bot Netflix TV • Resgate de Código
               </h4>
               <span className="px-2.5 py-0.5 text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full uppercase tracking-wider">
                 100% Grátis
               </span>
             </div>
             <p className="text-xs text-slate-300">
-              Gere seu código de 4 dígitos na hora que a Netflix pedir na sua Smart TV.
+              Puxe o código de 4 dígitos oficial enviado pela Netflix com validação de 15 minutos.
             </p>
           </div>
         </div>
@@ -165,7 +165,7 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
           <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 font-black flex items-center justify-center text-xs shrink-0 mt-0.5">2</span>
             <p className="leading-relaxed">
-              Na sua TV, selecione a opção de <strong>Entrar com Código</strong>. Quando aparecer na TV para você inserir os 4 dígitos, clique no botão <strong>"Gerar Código no Bot"</strong> abaixo.
+              Na sua TV, selecione a opção de <strong>Entrar com Código</strong>. Quando a TV pedir os 4 dígitos, clique no botão <strong>"Puxar Código do E-mail"</strong> abaixo.
             </p>
           </div>
 
@@ -173,88 +173,101 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
           <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 font-black flex items-center justify-center text-xs shrink-0 mt-0.5">3</span>
             <p className="leading-relaxed">
-              O Bot entrega seu código imediatamente com validade de <strong>15 minutos</strong>!
+              O Bot puxa o código em tempo real com validade de <strong>15 minutos</strong>! Se o tempo acabar, basta pedir outro na TV e puxar de novo.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Bot Action: Gerar Código ou Exibir Código Ativo */}
-      {!code ? (
-        <button
-          type="button"
-          onClick={generateBotCode}
-          disabled={loading}
-          className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-red-600/40 hover:shadow-red-600/60 active:scale-[0.98] transition-all disabled:opacity-50"
-        >
-          <Bot className={`w-5 h-5 ${loading ? 'animate-bounce' : ''}`} />
-          <span>{loading ? '🤖 Bot Gerando Código...' : '🤖 GERAR CÓDIGO NO BOT AGORA (GRÁTIS)'}</span>
-        </button>
+      {/* Alerta de Código Expirado ou Mensagem do Bot */}
+      {errorMessage && (
+        <div className="p-4 rounded-2xl bg-amber-950/40 border-2 border-amber-500/50 text-amber-200 text-xs flex items-start gap-3 animate-fadeIn shadow-lg shadow-amber-950/40">
+          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          <div className="leading-relaxed space-y-1">
+            <strong className="block text-amber-300 font-bold text-sm">Aviso de Validade:</strong>
+            <p>{errorMessage}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Bot Action: Puxar Código ou Exibir Código Ativo */}
+      {!code || isExpired ? (
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={pullBotCode}
+            disabled={loading}
+            className={`w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl transition-all disabled:opacity-50 active:scale-[0.98] ${
+              isExpired
+                ? 'bg-gradient-to-r from-amber-600 via-red-600 to-amber-600 hover:from-amber-500 hover:to-red-500 text-white shadow-amber-600/40'
+                : 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white shadow-red-600/40 hover:shadow-red-600/60'
+            }`}
+          >
+            <Bot className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            <span>
+              {loading 
+                ? '🤖 Conectando ao Gmail & Puxando Código...' 
+                : isExpired 
+                  ? '🔄 PEÇA NOVO CÓDIGO NA TV E CLIQUE AQUI' 
+                  : '🤖 PUXAR CÓDIGO DO E-MAIL AGORA (GRÁTIS)'}
+            </span>
+          </button>
+
+          {isExpired && (
+            <p className="text-center text-[11px] text-slate-400">
+              💡 Dica: A Netflix invalida códigos após 15 minutos. Peça o código na TV e clique acima para capturar o novo na hora.
+            </p>
+          )}
+        </div>
       ) : (
-        /* Card do Código Gerado pelo Bot */
-        <div className={`p-5 sm:p-6 rounded-3xl border-2 space-y-4 shadow-2xl animate-fadeIn ${
-          isExpired 
-            ? 'bg-slate-950 border-red-500/40' 
-            : 'bg-gradient-to-b from-emerald-950/40 via-slate-950 to-slate-950 border-emerald-500/60 shadow-emerald-950/60'
-        }`}>
+        /* Card do Código Ativo e Válido */
+        <div className="p-5 sm:p-6 rounded-3xl border-2 space-y-4 shadow-2xl animate-fadeIn bg-gradient-to-b from-emerald-950/40 via-slate-950 to-slate-950 border-emerald-500/60 shadow-emerald-950/60">
           
           {/* Header do Status do Código */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className={`w-2.5 h-2.5 rounded-full ${isExpired ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'}`} />
-              <span className={`text-xs font-black uppercase tracking-wider ${isExpired ? 'text-red-400' : 'text-emerald-400'}`}>
-                {isExpired ? 'CÓDIGO EXPIRADO (15 MIN)' : 'CÓDIGO DE 4 DÍGITOS ATIVO NO BOT'}
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
+                CÓDIGO DE 4 DÍGITOS ATIVO NO BOT
               </span>
             </div>
 
             {/* Contador Regressivo de 15 Minutos */}
-            {!isExpired && (
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-bold">
-                <Clock className="w-3.5 h-3.5 text-emerald-400 animate-spin" />
-                <span>Expira em: <strong>{formatTime(timeLeft)}</strong></span>
-              </div>
-            )}
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-bold">
+              <Clock className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Expira em: <strong>{formatTime(timeLeft)}</strong></span>
+            </div>
           </div>
 
           {/* Barra de Progresso do Tempo Restante */}
-          {!isExpired && (
-            <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
-              <div 
-                className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-1000"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-          )}
+          <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
+            <div 
+              className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-1000"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
 
           {/* Número do Código e Botão de Copiar */}
-          {!isExpired ? (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-              <div className="text-center sm:text-left">
-                <span className="text-[11px] text-slate-400 font-bold uppercase block">Digite na sua Smart TV:</span>
-                <div className="text-5xl sm:text-6xl font-black font-mono text-white tracking-[0.25em] drop-shadow-md">
-                  {code}
-                </div>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
+            <div className="text-center sm:text-left">
+              <span className="text-[11px] text-slate-400 font-bold uppercase block">Digite na sua Smart TV:</span>
+              <div className="text-5xl sm:text-6xl font-black font-mono text-white tracking-[0.25em] drop-shadow-md">
+                {code}
               </div>
+            </div>
 
-              <button
-                type="button"
-                onClick={handleCopyCode}
-                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/40 active:scale-95 transition-all"
-              >
-                {copied ? <Check className="w-5 h-5 text-white" /> : <Copy className="w-5 h-5" />}
-                <span>{copied ? 'CÓDIGO COPIADO!' : 'COPIAR CÓDIGO'}</span>
-              </button>
-            </div>
-          ) : (
-            <div className="p-4 rounded-2xl bg-red-950/30 border border-red-500/30 text-center space-y-2">
-              <p className="text-xs text-red-300 font-semibold">
-                O tempo de 15 minutos deste código encerrou. Clique no botão abaixo para gerar um novo código imediatamente!
-              </p>
-            </div>
-          )}
+            <button
+              type="button"
+              onClick={handleCopyCode}
+              className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/40 active:scale-95 transition-all"
+            >
+              {copied ? <Check className="w-5 h-5 text-white" /> : <Copy className="w-5 h-5" />}
+              <span>{copied ? 'CÓDIGO COPIADO!' : 'COPIAR CÓDIGO'}</span>
+            </button>
+          </div>
 
           {/* Opção de Validar Residência na TV se solicitado pela Netflix */}
-          {link && !isExpired && (
+          {link && (
             <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <span className="text-xs text-slate-300 font-medium">
                 A TV pediu confirmação de residência?
@@ -281,16 +294,16 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
             </div>
           )}
 
-          {/* Botão Gerar Novo Código */}
+          {/* Botão Gerar / Puxar Novo Código */}
           <div className="pt-2 flex items-center justify-between">
             <button
               type="button"
-              onClick={generateBotCode}
+              onClick={pullBotCode}
               disabled={loading}
               className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all border border-slate-700"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>{loading ? 'Gerando...' : '🔄 Gerar Novo Código (15 min)'}</span>
+              <span>{loading ? 'Puxando...' : '🔄 Puxar Novo Código do E-mail (15 min)'}</span>
             </button>
           </div>
         </div>
@@ -298,3 +311,4 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
     </div>
   );
 };
+

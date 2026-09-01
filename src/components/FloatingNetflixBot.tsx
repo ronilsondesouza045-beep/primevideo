@@ -64,13 +64,21 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
       });
       const data = await res.json();
 
-      if (data.success && data.code) {
+      if (data.success && data.code && !data.isExpired) {
         setCode(data.code);
         setLink(data.link || null);
         setMessage(data.message || 'Código REAL capturado do e-mail!');
         setSource(data.source || 'email_imap');
-        setTimeLeft(data.expiresIn || 900); // 15 minutes
+        setTimeLeft(data.expiresIn || 900); // 15 minutes or remaining time
         setErrorMessage(null);
+      } else if (data.isExpired) {
+        setCode(null);
+        setIsExpired(true);
+        setTimeLeft(0);
+        setErrorMessage(
+          data.message || 
+          '⏱️ O último código no e-mail já expirou (recebido há mais de 15 minutos). Peça para enviar um novo código na sua Smart TV e clique abaixo para capturar o código novo!'
+        );
       } else {
         setErrorMessage(data.message || 'Nenhum código novo da Netflix encontrado no seu e-mail. Solicite o código na TV/App e clique em Puxar novamente!');
       }
@@ -229,80 +237,82 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
               )}
 
               {/* Bot Action or Active Code View */}
-              {!code ? (
-                <button
-                  type="button"
-                  onClick={handlePullCode}
-                  disabled={loading}
-                  className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-red-600/40 hover:shadow-red-600/60 active:scale-[0.98] transition-all disabled:opacity-50"
-                >
-                  <Bot className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-                  <span>{loading ? '🤖 Conectando ao E-mail & Puxando Código...' : '🤖 PUXAR CÓDIGO DO E-MAIL AGORA'}</span>
-                </button>
+              {!code || isExpired ? (
+                <div className="space-y-2.5">
+                  <button
+                    type="button"
+                    onClick={handlePullCode}
+                    disabled={loading}
+                    className={`w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl transition-all disabled:opacity-50 active:scale-[0.98] ${
+                      isExpired
+                        ? 'bg-gradient-to-r from-amber-600 via-red-600 to-amber-600 hover:from-amber-500 hover:to-red-500 text-white shadow-amber-600/40'
+                        : 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white shadow-red-600/40 hover:shadow-red-600/60'
+                    }`}
+                  >
+                    <Bot className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+                    <span>
+                      {loading 
+                        ? '🤖 Conectando ao E-mail & Puxando Código...' 
+                        : isExpired 
+                          ? '🔄 PEÇA NOVO CÓDIGO NA TV E CLIQUE AQUI' 
+                          : '🤖 PUXAR CÓDIGO DO E-MAIL AGORA'}
+                    </span>
+                  </button>
+
+                  {isExpired && (
+                    <p className="text-center text-[11px] text-slate-400">
+                      💡 Peça para a Netflix reenviar o código na sua Smart TV e clique no botão acima para capturar o novo na hora!
+                    </p>
+                  )}
+                </div>
               ) : (
                 /* Card do Código Puxado */
-                <div className={`p-4 sm:p-5 rounded-2xl border-2 space-y-4 shadow-xl animate-fadeIn ${
-                  isExpired 
-                    ? 'bg-slate-950 border-red-500/40' 
-                    : 'bg-gradient-to-b from-emerald-950/40 via-slate-950 to-slate-950 border-emerald-500/60'
-                }`}>
+                <div className="p-4 sm:p-5 rounded-2xl border-2 space-y-4 shadow-xl animate-fadeIn bg-gradient-to-b from-emerald-950/40 via-slate-950 to-slate-950 border-emerald-500/60 shadow-emerald-950/60">
                   
                   {/* Status & Timer */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2.5 h-2.5 rounded-full ${isExpired ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'}`} />
-                      <span className={`text-xs font-black uppercase tracking-wider ${isExpired ? 'text-red-400' : 'text-emerald-400'}`}>
-                        {isExpired ? 'CÓDIGO EXPIRADO' : 'CÓDIGO PUXADO DO E-MAIL'}
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
+                        CÓDIGO PUXADO DO E-MAIL
                       </span>
                     </div>
 
-                    {!isExpired && (
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-bold">
-                        <Clock className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{formatTime(timeLeft)}</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-bold">
+                      <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Expira em: <strong>{formatTime(timeLeft)}</strong></span>
+                    </div>
                   </div>
 
                   {/* Progress Bar */}
-                  {!isExpired && (
-                    <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
-                      <div 
-                        className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-1000"
-                        style={{ width: `${progressPercent}%` }}
-                      />
-                    </div>
-                  )}
+                  <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
+                    <div 
+                      className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-1000"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
 
                   {/* Display Code */}
-                  {!isExpired ? (
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-1">
-                      <div className="text-center sm:text-left">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Código de 4 Dígitos:</span>
-                        <div className="text-4xl sm:text-5xl font-black font-mono text-white tracking-[0.25em] drop-shadow-md">
-                          {code}
-                        </div>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-1">
+                    <div className="text-center sm:text-left">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase block">Código de 4 Dígitos:</span>
+                      <div className="text-4xl sm:text-5xl font-black font-mono text-white tracking-[0.25em] drop-shadow-md">
+                        {code}
                       </div>
+                    </div>
 
-                      <button
-                        type="button"
-                        onClick={handleCopyCode}
-                        className="w-full sm:w-auto px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/40 active:scale-95 transition-all"
-                      >
-                        {copiedCode ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
-                        <span>{copiedCode ? 'COPIADO!' : 'COPIAR CÓDIGO'}</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="p-3 rounded-xl bg-red-950/30 border border-red-500/30 text-center">
-                      <p className="text-xs text-red-300 font-semibold">
-                        Este código expirou após 15 minutos. Peça o código novamente na TV e clique abaixo para puxar o novo!
-                      </p>
-                    </div>
-                  )}
+                    <button
+                      type="button"
+                      onClick={handleCopyCode}
+                      className="w-full sm:w-auto px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/40 active:scale-95 transition-all"
+                    >
+                      {copiedCode ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
+                      <span>{copiedCode ? 'COPIADO!' : 'COPIAR CÓDIGO'}</span>
+                    </button>
+                  </div>
 
                   {/* Link Confirmation if present */}
-                  {link && !isExpired && (
+                  {link && (
                     <div className="pt-2.5 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <span className="text-[11px] text-slate-300 font-medium">
                         Pediu confirmação de residência na TV?

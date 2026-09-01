@@ -665,7 +665,8 @@ app.post([
     });
 
     if (imapResult.success && imapResult.code) {
-      const expiresAt = now + (15 * 60 * 1000); // 15 minutes validity
+      const expiresIn = imapResult.expiresIn || 15 * 60;
+      const expiresAt = now + (expiresIn * 1000);
       activeBotCodes.set(userIp, {
         code: imapResult.code,
         link: imapResult.link,
@@ -683,10 +684,12 @@ app.post([
 
       return res.json({
         success: true,
+        isExpired: false,
         code: imapResult.code,
         link: imapResult.link,
         email: netflixConfig.email || 'prine1070@gmail.com',
-        expiresIn: 15 * 60,
+        expiresIn,
+        ageMinutes: imapResult.ageMinutes || 0,
         generatedAt: new Date(now).toISOString(),
         expiresAt: new Date(expiresAt).toISOString(),
         source: imapResult.source || 'email_imap',
@@ -694,9 +697,12 @@ app.post([
       });
     }
 
-    // If not found in email and no manual code set
+    // If not found in email or expired
     return res.json({
       success: false,
+      isExpired: imapResult.isExpired || false,
+      ageMinutes: imapResult.ageMinutes,
+      code: imapResult.code,
       message: imapResult.message || 'Nenhum código novo da Netflix encontrado no e-mail. Solicite o código na TV/app e clique novamente!',
       source: imapResult.source || 'not_found'
     });

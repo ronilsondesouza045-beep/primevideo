@@ -8,7 +8,10 @@ export interface NetflixCodeResult {
   subject?: string;
   date?: string;
   message?: string;
-  source?: 'email_imap' | 'manual' | 'not_found' | 'generated' | string;
+  isExpired?: boolean;
+  ageMinutes?: number;
+  expiresIn?: number;
+  source?: 'email_imap' | 'email_imap_expired' | 'manual' | 'not_found' | 'generated' | string;
 }
 
 export interface FetchOptions {
@@ -20,6 +23,7 @@ export interface FetchOptions {
 
 /**
  * Conecta ao Gmail via IMAP e busca códigos de verificação reais de 4 dígitos e links enviados pela Netflix.
+ * Valida rigorosamente se o código recebido no e-mail tem menos de 15 minutos (900 segundos).
  */
 export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<NetflixCodeResult> {
   const user = (options?.user || process.env.NETFLIX_GMAIL_USER || 'prine1070@gmail.com').trim();
@@ -109,13 +113,38 @@ export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<Ne
             }
 
             if (code || link) {
+              const rawEmailDate = parsed.date || msg.attributes?.date || new Date();
+              const emailTimestamp = new Date(rawEmailDate).getTime();
+              const now = Date.now();
+              const diffSeconds = Math.max(0, Math.floor((now - emailTimestamp) / 1000));
+              const ageMinutes = Math.floor(diffSeconds / 60);
+
+              // Validação de 15 minutos (900 segundos)
+              if (diffSeconds > 900) {
+                return {
+                  success: false,
+                  isExpired: true,
+                  code,
+                  link: link || manualLink || 'https://www.netflix.com',
+                  ageMinutes,
+                  date: new Date(emailTimestamp).toISOString(),
+                  message: `O último código encontrado no e-mail (${code || 'link'}) já expirou (chegou há ${ageMinutes} minutos). A Netflix exige códigos gerados em menos de 15 minutos. Peça para enviar um novo código na sua Smart TV e clique novamente!`,
+                  source: 'email_imap_expired'
+                };
+              }
+
+              const remainingSec = Math.max(10, 900 - diffSeconds);
+
               return {
                 success: true,
+                isExpired: false,
                 code: code || 'Confirmar no Link',
                 link: link || manualLink || 'https://www.netflix.com',
                 subject,
-                date: new Date(msg.attributes?.date || Date.now()).toISOString(),
-                message: 'Código REAL capturado diretamente do seu e-mail com sucesso!',
+                date: new Date(emailTimestamp).toISOString(),
+                expiresIn: remainingSec,
+                ageMinutes,
+                message: `Código REAL capturado! Válido por mais ${Math.floor(remainingSec / 60)} min e ${remainingSec % 60}s.`,
                 source: 'email_imap'
               };
             }
@@ -143,6 +172,7 @@ export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<Ne
       link: manualLink || 'https://www.netflix.com',
       message: 'Código de acesso disponível.',
       date: new Date().toISOString(),
+      expiresIn: 900,
       source: 'manual'
     };
   }
@@ -151,7 +181,7 @@ export async function fetchLatestNetflixCode(options?: FetchOptions): Promise<Ne
     success: false,
     message: lastErrorMsg.includes('Invalid credentials') || lastErrorMsg.includes('auth')
       ? 'Atenção: Configure a Senha de Aplicativo do Gmail (NETFLIX_GMAIL_APP_PASSWORD) ou cadastre o código no Painel Admin.'
-      : 'Nenhum e-mail recente da Netflix encontrado. Solicite o código na sua TV/app da Netflix e clique novamente!',
+      : 'Nenhum e-mail recente da Netflix encontrado na caixa de entrada. Solicite o código na sua Smart TV e clique novamente!',
     source: 'not_found'
   };
 }

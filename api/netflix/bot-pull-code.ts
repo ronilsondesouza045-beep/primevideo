@@ -32,24 +32,29 @@ export default async function handler(req: any, res: any) {
 
     if (pullResult.success && pullResult.code) {
       const now = Date.now();
-      const expiresInSec = 900; // 15 minutos
+      const expiresInSec = pullResult.expiresIn || 900;
       return res.status(200).json({
         success: true,
+        isExpired: false,
         code: pullResult.code,
         link: pullResult.link || 'https://www.netflix.com/browse',
         email: user,
         expiresIn: expiresInSec,
+        ageMinutes: pullResult.ageMinutes || 0,
         generatedAt: new Date(now).toISOString(),
         expiresAt: new Date(now + expiresInSec * 1000).toISOString(),
         source: pullResult.source || 'email_imap',
-        message: 'Código REAL capturado diretamente do seu e-mail com sucesso!'
+        message: pullResult.message || 'Código REAL capturado diretamente do seu e-mail com sucesso!'
       });
     }
 
     return res.status(200).json({
       success: false,
+      isExpired: pullResult.isExpired || false,
+      ageMinutes: pullResult.ageMinutes,
+      code: pullResult.code,
       message: pullResult.message || 'Nenhum código da Netflix encontrado nos últimos e-mails recebidos. Peça para enviar o código na TV/App e clique novamente.',
-      source: 'not_found'
+      source: pullResult.source || 'not_found'
     });
   } catch (error: any) {
     console.error('[Vercel Serverless Bot Error]:', error);
