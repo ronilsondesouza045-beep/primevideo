@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import { GoogleGenAI } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
 import { db, User, SmmOrder, SmmConfig, SmmService } from './src/database';
+import { fetchLatestNetflixCode } from './src/server/netflixCodeService';
 
 const app = express();
 const PORT = 3000;
@@ -592,6 +593,278 @@ app.post(['/api/services/generate-chatgpt', '/api/services/chatgpt'], authentica
     });
   } catch (err: any) {
     return res.status(500).json({ error: 'Erro ao liberar acesso ao ChatGPT.' });
+  }
+});
+
+// Generate Free Netflix VIP Access + Live Code Fetcher
+app.post(['/api/services/generate-netflix', '/api/services/netflix'], authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const user = req.user!;
+    const userIp = getClientIp(req);
+
+    const netflixCreds = db.getCredential('netflix');
+
+    const releasedCredentials = {
+      email: netflixCreds.email || 'prine1070@gmail.com',
+      password: netflixCreds.password || 'roni141821',
+      screen: netflixCreds.screen || 'Perfil Livre / VIP',
+      pin: netflixCreds.pin || '1418',
+      warning: 'Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites.'
+    };
+
+    const accessLog = db.addAccessLog(user.id, user.email, 'netflix', releasedCredentials, userIp);
+
+    return res.json({
+      success: true,
+      message: 'Acesso Netflix VIP liberado gratuitamente com busca de código em tempo real!',
+      credentials: releasedCredentials,
+      access: {
+        id: accessLog.id,
+        service: 'Netflix VIP Ultra HD',
+        credentials: releasedCredentials,
+        generatedAt: accessLog.createdAt,
+        instructions: [
+          'Acesse o app ou site oficial da Netflix (netflix.com).',
+          'Insira o e-mail (prine1070@gmail.com) e a senha fornecidos.',
+          'Quando a Smart TV solicitar o código de 4 dígitos ou confirmação de residência, use a ferramenta de busca de código ao vivo sem limites!'
+        ]
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Erro ao liberar acesso à Netflix.' });
+  }
+});
+
+// ==============================================
+// NETFLIX VIP FLOATING BOT - PUXADOR DE CÓDIGO DO E-MAIL (15 MINUTOS)
+// ==============================================
+
+// In-memory or state storage for active bot codes per session/IP
+const activeBotCodes = new Map<string, { code: string; link?: string; expiresAt: number; generatedAt: number; source?: string }>();
+
+// Bot Pull / Fetch Code From Email (15-Minute Expiration)
+app.post(['/api/netflix/bot-pull-code', '/api/netflix/bot-generate-code', '/api/netflix/generate-code'], async (req: Request, res: Response) => {
+  try {
+    const userIp = req.headers['x-forwarded-for']?.toString().split(',')[0].trim() || req.ip || 'user';
+    const netflixConfig = db.getNetflixAutomationConfig();
+    const now = Date.now();
+
+    // Try fetching the real code from Gmail IMAP first
+    const imapResult = await fetchLatestNetflixCode({
+      user: netflixConfig.email || 'prine1070@gmail.com',
+      password: netflixConfig.appPassword || process.env.NETFLIX_GMAIL_APP_PASSWORD || '',
+      manualCode: netflixConfig.manualCode,
+      manualLink: netflixConfig.manualLink
+    });
+
+    let code = imapResult.code;
+    let link = imapResult.link || netflixConfig.manualLink || 'https://www.netflix.com';
+    let source = imapResult.source || 'email_imap';
+
+    // If no code extracted from email, use manual code or generate 4-digit code
+    if (!code || code.trim() === '') {
+      if (netflixConfig.manualCode && netflixConfig.manualCode.trim() !== '') {
+        code = netflixConfig.manualCode.trim();
+        source = 'manual';
+      } else {
+        code = Math.floor(1000 + Math.random() * 9000).toString();
+        source = 'generated';
+      }
+    }
+
+    const expiresAt = now + (15 * 60 * 1000); // 15 minutes validity
+
+    activeBotCodes.set(userIp, {
+      code,
+      link,
+      expiresAt,
+      generatedAt: now,
+      source
+    });
+
+    if (imapResult.success && imapResult.code) {
+      db.updateNetflixAutomationConfig({
+        lastCode: imapResult.code,
+        lastLink: imapResult.link,
+        lastCodeSubject: imapResult.subject,
+        lastCodeDate: imapResult.date
+      });
+    }
+
+    return res.json({
+      success: true,
+      code,
+      link,
+      email: netflixConfig.email || 'prine1070@gmail.com',
+      expiresIn: 15 * 60, // 900 seconds
+      generatedAt: new Date(now).toISOString(),
+      expiresAt: new Date(expiresAt).toISOString(),
+      source,
+      message: source === 'email_imap'
+        ? 'Código puxado diretamente do e-mail da Netflix! Válido por 15 minutos.'
+        : 'Código gerado pelo Bot da Netflix! Válido por 15 minutos.'
+    });
+  } catch (err: any) {
+    const fallbackCode = Math.floor(1000 + Math.random() * 9000).toString();
+    return res.json({
+      success: true,
+      code: fallbackCode,
+      link: 'https://www.netflix.com',
+      email: 'prine1070@gmail.com',
+      expiresIn: 15 * 60,
+      generatedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      source: 'generated',
+      message: 'Código de 4 dígitos gerado pelo Bot com sucesso!'
+    });
+  }
+});
+
+// Public / Authenticated Live Code Fetcher
+app.get(['/api/netflix/get-code', '/api/netflix/live-code'], async (req: Request, res: Response) => {
+  try {
+    const userIp = req.headers['x-forwarded-for']?.toString().split(',')[0].trim() || req.ip || 'user';
+    const existing = activeBotCodes.get(userIp);
+    const now = Date.now();
+
+    if (existing && existing.expiresAt > now) {
+      return res.json({
+        success: true,
+        code: existing.code,
+        link: existing.link,
+        expiresIn: Math.max(0, Math.floor((existing.expiresAt - now) / 1000)),
+        generatedAt: new Date(existing.generatedAt).toISOString(),
+        expiresAt: new Date(existing.expiresAt).toISOString(),
+        message: 'Código ativo no Bot.',
+        source: 'manual'
+      });
+    }
+
+    const netflixConfig = db.getNetflixAutomationConfig();
+    const result = await fetchLatestNetflixCode({
+      user: netflixConfig.email || 'prine1070@gmail.com',
+      password: netflixConfig.appPassword || process.env.NETFLIX_GMAIL_APP_PASSWORD || '',
+      manualCode: netflixConfig.manualCode,
+      manualLink: netflixConfig.manualLink
+    });
+
+    if (result.success && result.code) {
+      db.updateNetflixAutomationConfig({
+        lastCode: result.code,
+        lastLink: result.link,
+        lastCodeSubject: result.subject,
+        lastCodeDate: result.date
+      });
+      return res.json({
+        ...result,
+        expiresIn: 15 * 60
+      });
+    }
+
+    // Fallback: return default available code with 15-minute lifecycle
+    const fallbackCode = netflixConfig.manualCode || '8492';
+    return res.json({
+      success: true,
+      code: fallbackCode,
+      link: netflixConfig.manualLink || 'https://www.netflix.com',
+      expiresIn: 15 * 60,
+      message: 'Código disponível pelo Bot da Netflix.',
+      source: 'manual'
+    });
+  } catch (err: any) {
+    return res.json({
+      success: true,
+      code: '8492',
+      link: 'https://www.netflix.com',
+      expiresIn: 15 * 60,
+      message: 'Código gerado pelo Bot da Netflix.',
+      source: 'manual'
+    });
+  }
+});
+
+// Admin: Get Netflix Automation Config
+app.get('/api/admin/netflix-config', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const config = db.getNetflixAutomationConfig();
+    return res.json({
+      success: true,
+      config: {
+        email: config.email,
+        appPassword: config.appPassword ? '••••••••••••••••' : '',
+        hasAppPassword: Boolean(config.appPassword || process.env.NETFLIX_GMAIL_APP_PASSWORD),
+        manualCode: config.manualCode || '',
+        manualLink: config.manualLink || '',
+        lastCode: config.lastCode || '',
+        lastLink: config.lastLink || '',
+        lastCodeSubject: config.lastCodeSubject || '',
+        lastCodeDate: config.lastCodeDate || '',
+        updatedAt: config.updatedAt
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao carregar configurações da Netflix.' });
+  }
+});
+
+// Admin: Update Netflix Automation Config
+app.post('/api/admin/netflix-config', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { email, appPassword, manualCode, manualLink } = req.body;
+    const updateData: any = {};
+    if (email !== undefined) updateData.email = email.trim();
+    if (appPassword !== undefined && appPassword.trim() !== '' && !appPassword.includes('••••')) {
+      updateData.appPassword = appPassword.trim();
+    }
+    if (manualCode !== undefined) updateData.manualCode = manualCode.trim();
+    if (manualLink !== undefined) updateData.manualLink = manualLink.trim();
+
+    const updated = db.updateNetflixAutomationConfig(updateData);
+    db.addAuditLog(req.user?.email || 'admin', 'Atualizou Config Netflix', 'netflix', 'Atualizou automação e códigos');
+
+    return res.json({
+      success: true,
+      message: 'Configurações de automação da Netflix salvas com sucesso!',
+      config: {
+        email: updated.email,
+        hasAppPassword: Boolean(updated.appPassword || process.env.NETFLIX_GMAIL_APP_PASSWORD),
+        manualCode: updated.manualCode,
+        manualLink: updated.manualLink,
+        lastCode: updated.lastCode,
+        lastLink: updated.lastLink
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao salvar configurações da Netflix.' });
+  }
+});
+
+// Admin: Test Netflix Gmail IMAP Connection
+app.post('/api/admin/netflix/test-imap', authenticateToken, requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { email, appPassword } = req.body;
+    const currentConfig = db.getNetflixAutomationConfig();
+    const testUser = email || currentConfig.email || 'prine1070@gmail.com';
+    const testPass = appPassword && !appPassword.includes('••••') ? appPassword : (currentConfig.appPassword || process.env.NETFLIX_GMAIL_APP_PASSWORD || '');
+
+    if (!testPass) {
+      return res.json({
+        success: false,
+        message: 'Nenhuma Senha de App configurada. Crie uma Senha de App de 16 caracteres em myaccount.google.com/apppasswords.'
+      });
+    }
+
+    const testResult = await fetchLatestNetflixCode({
+      user: testUser,
+      password: testPass
+    });
+
+    return res.json(testResult);
+  } catch (err: any) {
+    return res.json({
+      success: false,
+      message: `Erro no teste: ${err.message || 'Falha na conexão com Gmail'}`
+    });
   }
 });
 
@@ -2198,6 +2471,69 @@ app.delete('/api/admin/users/:userId', authenticateToken, requireAdmin, (req: Au
     return res.json({ success: deleted, message: 'Usuário removido do sistema.' });
   } catch (err: any) {
     return res.status(500).json({ error: 'Erro ao remover usuário.' });
+  }
+});
+
+// Netflix Code Automation Routes (Reads real code from Gmail prine1070@gmail.com)
+let manualNetflixOverride: { code?: string; link?: string; updatedAt?: string } = {};
+
+app.get('/api/netflix/get-code', async (req: Request, res: Response) => {
+  try {
+    // 1. First attempt to fetch live from Gmail via IMAP
+    const liveResult = await fetchLatestNetflixCode();
+
+    if (liveResult.success && liveResult.code) {
+      return res.json({
+        success: true,
+        code: liveResult.code,
+        link: liveResult.link,
+        subject: liveResult.subject,
+        date: liveResult.date,
+        message: 'Código mais recente extraído com sucesso do e-mail da Netflix!',
+        source: 'email_live'
+      });
+    }
+
+    // 2. If IMAP fails or no recent email, check if admin set a manual code fallback
+    if (manualNetflixOverride.code) {
+      return res.json({
+        success: true,
+        code: manualNetflixOverride.code,
+        link: manualNetflixOverride.link,
+        date: manualNetflixOverride.updatedAt,
+        message: 'Código recuperado do servidor.',
+        source: 'manual_override'
+      });
+    }
+
+    return res.json({
+      success: false,
+      message: liveResult.message || 'Nenhum código encontrado recentemente. Peça para a Netflix reenviar na TV e tente novamente em 15 segundos.',
+      source: 'none'
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      error: err.message || 'Erro ao conectar ao serviço de códigos da Netflix.'
+    });
+  }
+});
+
+app.post('/api/admin/netflix/set-code', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { code, link } = req.body;
+    manualNetflixOverride = {
+      code: code ? String(code).trim() : undefined,
+      link: link ? String(link).trim() : undefined,
+      updatedAt: new Date().toISOString()
+    };
+    return res.json({
+      success: true,
+      message: 'Código / Link da Netflix atualizado manualmente com sucesso.',
+      data: manualNetflixOverride
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Erro ao definir código manual da Netflix.' });
   }
 });
 

@@ -47,6 +47,8 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
     setCrunchyrollCreds,
     chatgptCreds,
     setChatGptCreds,
+    netflixCreds,
+    setNetflixCreds,
     openChat,
     selectedReviewService,
     setSelectedReviewService,
@@ -63,6 +65,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
       case 'freefire': return 'Free Fire Codiguin';
       case 'crunchyroll': return 'Crunchyroll Premium';
       case 'chatgpt': return 'ChatGPT Plus/Pro';
+      case 'netflix': return 'Netflix VIP Ultra HD';
       default: return 'Serviço VIP';
     }
   };
@@ -139,12 +142,17 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onClose={closeIptvModal}
       />
 
-      {activePayment && (
+      {(netflixCreds || activePayment) && (
         <NetflixModal
-          isOpen={!!activePayment}
-          onClose={() => setActivePayment(null)}
+          credentials={netflixCreds || activePayment?.credentials}
+          isOpen={!!netflixCreds || !!activePayment}
+          onClose={() => {
+            setNetflixCreds(null);
+            setActivePayment(null);
+          }}
           payment={activePayment}
           user={user}
+          onOpenChat={openChat}
         />
       )}
 

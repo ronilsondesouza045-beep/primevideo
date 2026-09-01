@@ -68,6 +68,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const [netflixScreen, setNetflixScreen] = useState('');
   const [tonLink, setTonLink] = useState('');
 
+  // Netflix Gmail IMAP & Manual Code Automation
+  const [netflixAppPassword, setNetflixAppPassword] = useState('');
+  const [netflixManualCode, setNetflixManualCode] = useState('');
+  const [netflixManualLink, setNetflixManualLink] = useState('');
+  const [netflixTesting, setNetflixTesting] = useState(false);
+  const [netflixTestResult, setNetflixTestResult] = useState<{ success: boolean; message?: string; code?: string } | null>(null);
+
   useEffect(() => {
     loadAdminData();
   }, []);
@@ -164,6 +171,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           setNetflixPin(data.netflix.pin || '');
           setNetflixScreen(data.netflix.screen || '');
           setTonLink(data.netflix.tonLink || '');
+        }
+      }
+
+      // 6.2 Fetch Netflix Automation & IMAP Config
+      const resNetConfig = await fetch('/api/admin/netflix-config', fetchOptions);
+      if (resNetConfig.ok) {
+        const netData = await resNetConfig.json();
+        if (netData.config) {
+          if (netData.config.appPassword) setNetflixAppPassword(netData.config.appPassword);
+          if (netData.config.manualCode) setNetflixManualCode(netData.config.manualCode);
+          if (netData.config.manualLink) setNetflixManualLink(netData.config.manualLink);
         }
       }
 
@@ -346,6 +364,60 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       }
     } catch (err) {
       alert('Falha na comunicação com o servidor.');
+    }
+  };
+
+  const handleSaveNetflixAutomation = async () => {
+    try {
+      // 1. Save standard credentials first
+      await handleSaveCredentials('netflix');
+
+      // 2. Save automation config
+      const res = await fetch('/api/admin/netflix-config', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({
+          email: netflixEmail,
+          appPassword: netflixAppPassword,
+          manualCode: netflixManualCode,
+          manualLink: netflixManualLink
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSuccessMsg(data.message || 'Configurações e automação da Netflix salvas!');
+        setTimeout(() => setSuccessMsg(''), 3500);
+      } else {
+        alert(data.error || 'Erro ao salvar automação Netflix.');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao salvar.');
+    }
+  };
+
+  const handleTestNetflixImap = async () => {
+    setNetflixTesting(true);
+    setNetflixTestResult(null);
+    try {
+      const res = await fetch('/api/admin/netflix/test-imap', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({
+          email: netflixEmail,
+          appPassword: netflixAppPassword
+        })
+      });
+      const data = await res.json();
+      setNetflixTestResult(data);
+    } catch (err: any) {
+      setNetflixTestResult({
+        success: false,
+        message: 'Erro na conexão com o servidor de teste.'
+      });
+    } finally {
+      setNetflixTesting(false);
     }
   };
 
@@ -1193,16 +1265,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
             </div>
           </div>
 
-          {/* Netflix & Ton Link Config */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3.5 col-span-1 md:col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-red-500" />
-              <h3 className="text-sm font-bold text-white">Netflix VIP & Link Ton</h3>
+          {/* Netflix & Automação de Código Config */}
+          <div className="p-5 rounded-2xl bg-slate-900 border border-red-500/40 shadow-xl space-y-4 col-span-1 md:col-span-2 lg:col-span-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-red-500 fill-red-500" />
+                <h3 className="text-sm font-bold text-white">Netflix VIP (Automação)</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 text-[9px] font-black uppercase">
+                100% Grátis + Código TV
+              </span>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               <div>
-                <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">E-mail Netflix</label>
+                <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">E-mail Netflix (Login)</label>
                 <input
                   type="text"
                   value={netflixEmail}
@@ -1242,22 +1319,68 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                 </div>
               </div>
 
-              <div>
-                <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">Link Pix / Ton</label>
+              {/* Gmail IMAP App Password Configuration */}
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] text-emerald-400 font-extrabold uppercase flex items-center gap-1">
+                    <Key className="w-3 h-3 text-emerald-400" />
+                    Senha de App do Google (IMAP)
+                  </label>
+                  <span className="text-[9px] text-slate-400">16 letras</span>
+                </div>
+                <input
+                  type="password"
+                  placeholder="ex: abcd efgh ijkl mnop"
+                  value={netflixAppPassword}
+                  onChange={(e) => setNetflixAppPassword(e.target.value)}
+                  className="w-full p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono text-emerald-300 focus:outline-none focus:border-emerald-500"
+                />
+                <p className="text-[10px] text-slate-400 leading-relaxed">
+                  Para leitura automática dos e-mails da Netflix sem erros de login, crie uma <strong>Senha de App</strong> no Google: <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer" className="text-cyan-400 underline">myaccount.google.com/apppasswords</a> e ative o IMAP no Gmail.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={handleTestNetflixImap}
+                  disabled={netflixTesting}
+                  className="w-full py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3 h-3 ${netflixTesting ? 'animate-spin' : ''}`} />
+                  <span>{netflixTesting ? 'Testando Conexão IMAP...' : 'Testar Conexão Gmail'}</span>
+                </button>
+
+                {netflixTestResult && (
+                  <div className={`p-2 rounded-lg text-[10px] font-bold ${
+                    netflixTestResult.success ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/30' : 'bg-red-950/60 text-red-300 border border-red-500/30'
+                  }`}>
+                    {netflixTestResult.message || (netflixTestResult.success ? `Código encontrado: ${netflixTestResult.code}` : 'Falha na conexão')}
+                  </div>
+                )}
+              </div>
+
+              {/* Manual Code Fallback */}
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <label className="text-[10px] text-amber-300 font-extrabold uppercase block">
+                  Código Manual / Fallback (Opcional)
+                </label>
                 <input
                   type="text"
-                  value={tonLink}
-                  onChange={(e) => setTonLink(e.target.value)}
-                  className="w-full p-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 focus:outline-none focus:border-red-500"
+                  placeholder="ex: 8492 ou link direto"
+                  value={netflixManualCode}
+                  onChange={(e) => setNetflixManualCode(e.target.value)}
+                  className="w-full p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono text-amber-300 focus:outline-none focus:border-amber-500"
                 />
+                <p className="text-[10px] text-slate-400">
+                  Se você preencher um código manual aqui, ele será entregue imediatamente aos clientes enquanto o IMAP não estiver configurado.
+                </p>
               </div>
 
               <button
-                onClick={() => handleSaveCredentials('netflix')}
-                className="w-full py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-red-600/20"
+                onClick={handleSaveNetflixAutomation}
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 active:scale-95 transition-all"
               >
                 <Save className="w-3.5 h-3.5" />
-                <span>Salvar Netflix & Ton</span>
+                <span>Salvar Configurações & Automação</span>
               </button>
             </div>
           </div>

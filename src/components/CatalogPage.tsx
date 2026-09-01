@@ -115,18 +115,22 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     },
     {
       id: 'prod_netflix',
-      name: 'Netflix VIP Ultra HD (Perfil Individual)',
-      description: 'Conta individual com perfil próprio na Netflix, qualidade 4K HDR e garantia de estabilidade durante todo o mês.',
-      category: 'Premium',
-      price: 10.00,
-      isFree: false,
+      name: 'Netflix VIP Ultra HD (Acesso Gratuito)',
+      description: 'Acesso 100% gratuito ao catálogo Netflix em 4K Ultra HD. Basta colocar o e-mail na sua Smart TV e gerar o código de 4 dígitos na hora no Bot oficial com validade de 15 minutos!',
+      category: 'Streaming',
+      price: 0,
+      isFree: true,
       image: OFFICIAL_IMAGES['prod_netflix'],
       banner: OFFICIAL_IMAGES['prod_netflix'],
-      stockStatus: 'ESTOQUE_BAIXO',
+      stockStatus: 'DISPONIVEL',
       rating: 5.0,
-      badge: 'PROMOÇÃO R$ 10',
-      features: ['Perfil com PIN exclusivo', 'Qualidade 4K Ultra HD', 'Garantia de 30 dias', 'Suporte prioritário'],
-      instructions: ['Após o pagamento aprovado no Ton/Pix, a credencial será revelada em "Meus Acessos".', 'Use a conta na Netflix e acesse apenas o perfil com seu nome e PIN.'],
+      badge: '100% GRÁTIS + BOT TV',
+      features: ['Qualidade 4K Ultra HD', 'Bot Gerador de Código TV na Hora', 'Código com Validade de 15 Minutos', 'Validar Residência em 1 Clique', 'Sem Limites de Acesso'],
+      instructions: [
+        'Copie o e-mail (prine1070@gmail.com) e coloque na sua Smart TV ou aplicativo.',
+        'Quando a TV pedir o código de 4 dígitos, clique no botão "Gerar Código no Bot".',
+        'Digite o código de 4 dígitos na TV antes dos 15 minutos expirarem!'
+      ],
       updatedAt: new Date().toISOString()
     },
     {

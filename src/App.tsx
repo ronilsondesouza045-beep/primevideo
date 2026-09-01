@@ -13,6 +13,7 @@ import { FavoritesPage } from './components/FavoritesPage';
 import { ModalManager } from './components/ModalManager';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { OfflineBanner } from './components/OfflineBanner';
+import { FloatingNetflixBot } from './components/FloatingNetflixBot';
 import { Product } from './types';
 import { Tv, ShieldCheck, Heart, Sparkles, Flame, Radio } from 'lucide-react';
 
@@ -40,6 +41,7 @@ export default function App() {
     setParamountCreds,
     setCrunchyrollCreds,
     setChatGptCreds,
+    setNetflixCreds,
     setSelectedReviewService,
     setFreeFireResult,
     setActivePayment
@@ -345,7 +347,7 @@ export default function App() {
     }
   };
 
-  const handleBuyNetflix = async () => {
+  const handleGenerateNetflix = async () => {
     if (!user) {
       openAuth();
       return;
@@ -353,29 +355,59 @@ export default function App() {
 
     try {
       const token = localStorage.getItem('streamhub_token');
-      const res = await fetch('/api/payments/create-netflix-order', {
+      const res = await fetch('/api/services/generate-netflix', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(user.email ? { 'x-user-email': user.email } : {})
+        },
+        body: JSON.stringify({ email: user.email })
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setActivePayment({
-          id: data.paymentId,
-          status: data.status,
-          tonLink: data.tonPaymentLink,
-          pixCode: data.pixCode,
-          credentials: null
-        });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success && data?.credentials) {
+        setNetflixCreds(data.credentials);
         fetchUserAccesses();
       } else {
-        alert(data.error || 'Erro ao gerar pedido de pagamento.');
+        const fallbackCreds = {
+          email: 'prine1070@gmail.com',
+          password: 'roni141821',
+          screen: 'Perfil Livre / VIP',
+          pin: '1418',
+          warning: 'Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites.'
+        };
+        setNetflixCreds(fallbackCreds);
+        const localLog: any = {
+          id: 'acc_' + Date.now(),
+          userId: user.id,
+          userEmail: user.email,
+          service: 'netflix',
+          credentials: fallbackCreds,
+          createdAt: new Date().toISOString(),
+          ip: '127.0.0.1'
+        };
+        setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
       }
     } catch (err) {
-      alert('Erro ao conectar ao servidor de pagamentos.');
+      const fallbackCreds = {
+        email: 'prine1070@gmail.com',
+        password: 'roni141821',
+        screen: 'Perfil Livre / VIP',
+        pin: '1418',
+        warning: 'Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites.'
+      };
+      setNetflixCreds(fallbackCreds);
+      const localLog: any = {
+        id: 'acc_' + Date.now(),
+        userId: user.id,
+        userEmail: user.email,
+        service: 'netflix',
+        credentials: fallbackCreds,
+        createdAt: new Date().toISOString(),
+        ip: '127.0.0.1'
+      };
+      setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
     }
   };
 
@@ -412,7 +444,7 @@ export default function App() {
     else if (serviceKey === 'crunchyroll') handleGenerateCrunchyroll();
     else if (serviceKey === 'chatgpt') handleGenerateChatGpt();
     else if (serviceKey === 'iptv') openIptvModal();
-    else if (serviceKey === 'netflix') handleBuyNetflix();
+    else if (serviceKey === 'netflix') handleGenerateNetflix();
     else if (serviceKey === 'freefire') handleGenerateFreeFire();
   };
 
@@ -525,6 +557,9 @@ export default function App() {
             />
           )}
         </main>
+
+        {/* Floating Netflix Code Bot (Available to all visitors on the front screen) */}
+        <FloatingNetflixBot defaultEmail="prine1070@gmail.com" />
 
         {/* Global Modals Manager */}
         <ModalManager

@@ -13,7 +13,8 @@ interface ModalState {
   paramountCreds: ServiceCredentials | null;
   crunchyrollCreds: ServiceCredentials | null;
   chatgptCreds: ServiceCredentials | null;
-  selectedReviewService: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt' | null;
+  netflixCreds: ServiceCredentials | null;
+  selectedReviewService: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt' | 'netflix' | null;
 
   freeFireResult: {
     code?: string;
@@ -51,7 +52,8 @@ interface ModalState {
   setParamountCreds: (creds: ServiceCredentials | null) => void;
   setCrunchyrollCreds: (creds: ServiceCredentials | null) => void;
   setChatGptCreds: (creds: ServiceCredentials | null) => void;
-  setSelectedReviewService: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt' | null) => void;
+  setNetflixCreds: (creds: ServiceCredentials | null) => void;
+  setSelectedReviewService: (service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt' | 'netflix' | null) => void;
   setFreeFireResult: (result: ModalState['freeFireResult']) => void;
   setActivePayment: (payment: ModalState['activePayment']) => void;
 
@@ -70,6 +72,7 @@ export const useModalStore = create<ModalState>((set) => ({
   paramountCreds: null,
   crunchyrollCreds: null,
   chatgptCreds: null,
+  netflixCreds: null,
   selectedReviewService: null,
   freeFireResult: null,
   activePayment: null,
@@ -93,6 +96,7 @@ export const useModalStore = create<ModalState>((set) => ({
   setParamountCreds: (creds) => set({ paramountCreds: creds }),
   setCrunchyrollCreds: (creds) => set({ crunchyrollCreds: creds }),
   setChatGptCreds: (creds) => set({ chatgptCreds: creds }),
+  setNetflixCreds: (creds) => set({ netflixCreds: creds }),
   setSelectedReviewService: (service) => set({ selectedReviewService: service }),
   setFreeFireResult: (result) => set({ freeFireResult: result }),
   setActivePayment: (payment) => set({ activePayment: payment }),
@@ -107,6 +111,7 @@ export const useModalStore = create<ModalState>((set) => ({
     paramountCreds: null,
     crunchyrollCreds: null,
     chatgptCreds: null,
+    netflixCreds: null,
     selectedReviewService: null,
     freeFireResult: null,
     activePayment: null

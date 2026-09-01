@@ -223,6 +223,18 @@ export interface AutoUpdateState {
   }>;
 }
 
+export interface NetflixAutomationConfig {
+  email: string;
+  appPassword?: string;
+  manualCode?: string;
+  manualLink?: string;
+  lastCode?: string;
+  lastLink?: string;
+  lastCodeSubject?: string;
+  lastCodeDate?: string;
+  updatedAt?: string;
+}
+
 interface DatabaseSchema {
   users: User[];
   credentials: Record<string, ServiceCredential>;
@@ -245,6 +257,7 @@ interface DatabaseSchema {
   userPresence?: UserPresence[];
   homeContentConfig?: HomeContentConfig;
   autoUpdateState?: AutoUpdateState;
+  netflixConfig?: NetflixAutomationConfig;
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -472,14 +485,14 @@ class JSONDatabase {
       tonLink: ''
     };
 
-    // Netflix Default (Paid R$ 10,00)
+    // Netflix Default (100% Gratuito + Busca de Código ao Vivo)
     this.data.credentials['netflix'] = {
       serviceId: 'netflix',
-      email: 'primevideosouza368@gmail.com',
+      email: 'prine1070@gmail.com',
       password: 'roni141821',
       pin: '1418',
-      screen: 'Perfil VIP #1 (Rede Souza)',
-      tonLink: 'https://payment-link-v3.ton.com.br/pl_gE0bN7eV8MQWxR0U6CMo3lvZYxz2p9qO'
+      screen: 'Perfil Livre / VIP',
+      tonLink: ''
     };
 
     this.save();
@@ -718,6 +731,30 @@ class JSONDatabase {
       ...cred
     };
     this.save();
+  }
+
+  public getNetflixAutomationConfig(): NetflixAutomationConfig {
+    if (!this.data.netflixConfig) {
+      this.data.netflixConfig = {
+        email: process.env.NETFLIX_GMAIL_USER || 'prine1070@gmail.com',
+        appPassword: process.env.NETFLIX_GMAIL_APP_PASSWORD || '',
+        manualCode: '',
+        manualLink: '',
+        updatedAt: new Date().toISOString()
+      };
+      this.save();
+    }
+    return this.data.netflixConfig;
+  }
+
+  public updateNetflixAutomationConfig(config: Partial<NetflixAutomationConfig>): NetflixAutomationConfig {
+    this.data.netflixConfig = {
+      ...this.getNetflixAutomationConfig(),
+      ...config,
+      updatedAt: new Date().toISOString()
+    };
+    this.save();
+    return this.data.netflixConfig;
   }
 
   // Access Logs
@@ -1938,20 +1975,21 @@ class JSONDatabase {
       },
       {
         id: 'prod_netflix',
-        name: 'Netflix VIP Ultra HD (Perfil Individual)',
-        description: 'Conta individual com perfil próprio na Netflix, qualidade 4K HDR e garantia de estabilidade durante todo o mês.',
-        category: 'Premium',
-        price: 10.00,
-        isFree: false,
+        name: 'Netflix VIP Ultra HD (Acesso Gratuito)',
+        description: 'Acesso 100% gratuito ao catálogo Netflix em 4K Ultra HD com suporte a filmes e séries. Busque códigos de 4 dígitos para TV e confirmações de residência ao vivo em tempo real!',
+        category: 'Streaming',
+        price: 0,
+        isFree: true,
         image: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
         banner: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
-        stockStatus: 'ESTOQUE_BAIXO',
+        stockStatus: 'DISPONIVEL',
         rating: 5.0,
-        badge: 'PROMOÇÃO R$ 10',
-        features: ['Perfil com PIN exclusivo', 'Qualidade 4K Ultra HD', 'Garantia de 30 dias', 'Suporte prioritário'],
+        badge: '100% GRÁTIS + CÓDIGO AO VIVO',
+        features: ['Qualidade 4K Ultra HD', 'Buscar Código de TV em Tempo Real', 'Validar Residência em 1 Clique', 'Sem Limites de Acesso'],
         instructions: [
-          'Após o pagamento aprovado no Ton/Pix, a credencial será revelada em "Meus Acessos".',
-          'Use a conta na Netflix e acesse apenas o perfil com seu nome e PIN.'
+          'Copie o e-mail (prine1070@gmail.com) e a senha fornecidos.',
+          'Faça login no app ou Smart TV da Netflix.',
+          'Quando a Smart TV solicitar o código de 4 dígitos ou confirmação de residência, use a ferramenta de busca de código ao vivo sem limites!'
         ],
         updatedAt: new Date().toISOString()
       },
@@ -2002,8 +2040,15 @@ class JSONDatabase {
     } else {
       let updated = false;
       for (const defItem of defaults) {
-        if (!this.data.products.some(p => p.id === defItem.id)) {
+        const existingIdx = this.data.products.findIndex(p => p.id === defItem.id);
+        if (existingIdx === -1) {
           this.data.products.push(defItem);
+          updated = true;
+        } else if (defItem.id === 'prod_netflix' && (!this.data.products[existingIdx].isFree || this.data.products[existingIdx].price > 0)) {
+          this.data.products[existingIdx] = {
+            ...this.data.products[existingIdx],
+            ...defItem
+          };
           updated = true;
         }
       }
