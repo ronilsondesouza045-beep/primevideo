@@ -159,6 +159,24 @@
   ],
   "visitorLogs": [
     {
+      "id": "vis_1788279103175_cdwa",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T16:11:43.175Z"
+    },
+    {
+      "id": "vis_1788279103164_gszu",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-01T16:11:43.164Z"
+    },
+    {
       "id": "vis_1788278341086_hyl2",
       "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
       "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
@@ -9139,24 +9157,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:45:58.148Z"
-    },
-    {
-      "id": "vis_1786301158013_zwi2",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:58.013Z"
-    },
-    {
-      "id": "vis_1786301157866_ya7z",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:57.866Z"
     }
   ],
   "supportMessages": [
@@ -9789,7 +9789,7 @@
     "appPassword": "ofigpfwbruhpwqpl",
     "manualCode": "",
     "manualLink": "",
-    "updatedAt": "2026-09-01T16:11:25.175Z",
+    "updatedAt": "2026-09-01T16:21:09.342Z",
     "lastCode": "1359",
     "lastLink": "https://www.netflix.com/browse?g=e7972cad-0951-4c41-a99e-d9f5086e59b1&lkid=URL_LOGO&lnktrk=EVO",
     "lastCodeSubject": "Netflix: seu código de acesso",
