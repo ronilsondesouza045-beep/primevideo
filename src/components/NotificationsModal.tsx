@@ -5,6 +5,7 @@ import {
   Settings, RefreshCw, Zap
 } from 'lucide-react';
 import { SystemNotification, User as UserType } from '../types';
+import { notificationsService } from '../services/notificationsService';
 
 interface NotificationsModalProps {
   isOpen: boolean;
@@ -35,22 +36,13 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
     if (showSpinner) setLoading(true);
     setIsRefreshing(true);
     try {
-      const token = localStorage.getItem('streamhub_token');
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (activeUser?.email) headers['x-user-email'] = activeUser.email;
-
-      const res = await fetch('/api/notifications', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.notifications && Array.isArray(data.notifications)) {
-          setNotifications(data.notifications);
-          const unread = data.notifications.filter((n: SystemNotification) => !n.read).length;
-          if (onUnreadCountChange) onUnreadCountChange(unread);
-        }
-      }
+      await notificationsService.fetchFromApi();
+      const list = notificationsService.getNotifications();
+      setNotifications(list);
+      const unread = list.filter((n: SystemNotification) => !n.read).length;
+      if (onUnreadCountChange) onUnreadCountChange(unread);
     } catch (e) {
-      console.error('Error fetching real-time notifications:', e);
+      console.error('Error refreshing notifications:', e);
     } finally {
       if (showSpinner) setLoading(false);
       setIsRefreshing(false);
@@ -59,36 +51,27 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      fetchNotifications(notifications.length === 0);
+      // 1. Initial sync and subscription to real-time service (Firestore + Cache)
+      const unsubscribe = notificationsService.subscribe((list) => {
+        setNotifications(list);
+        const unread = list.filter((n: SystemNotification) => !n.read).length;
+        if (onUnreadCountChange) onUnreadCountChange(unread);
+      });
 
-      // Real-time synchronization polling every 3 seconds while open
-      const interval = setInterval(() => {
-        fetchNotifications(false);
-      }, 3000);
-
-      const handleLiveUpdate = () => {
-        fetchNotifications(false);
-      };
-      window.addEventListener('streamhub_notifications_updated', handleLiveUpdate);
+      // 2. Immediate API poll in background
+      notificationsService.fetchFromApi();
 
       return () => {
-        clearInterval(interval);
-        window.removeEventListener('streamhub_notifications_updated', handleLiveUpdate);
+        unsubscribe();
       };
     }
-  }, [isOpen, activeUser]);
+  }, [isOpen]);
 
   const handleMarkAllRead = async () => {
     try {
-      const token = localStorage.getItem('streamhub_token');
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (activeUser?.email) headers['x-user-email'] = activeUser.email;
-
-      await fetch('/api/notifications/read', { method: 'POST', headers });
+      await notificationsService.markAllAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       if (onUnreadCountChange) onUnreadCountChange(0);
-      window.dispatchEvent(new CustomEvent('streamhub_notifications_updated'));
     } catch (e) {
       console.error('Error marking read:', e);
     }

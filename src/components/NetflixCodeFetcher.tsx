@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, ExternalLink, Copy, Check, Tv, Clock, Sparkles, Bot, Zap, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { notificationsService } from '../services/notificationsService';
 
 interface NetflixCodeFetcherProps {
   email?: string;
@@ -87,8 +88,15 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
         setTimeLeft(data.expiresIn || 900); // 15 minutes or remaining time
         setErrorMessage(null);
 
-        // Sync live notification center instantly
-        window.dispatchEvent(new CustomEvent('streamhub_notifications_updated'));
+        // Sync live notification center and Firestore
+        notificationsService.addNotification({
+          title: '⚡ Código Netflix TV Gerado (Tempo Real)',
+          message: `${userDisplayName || 'Membro VIP'} acabou de puxar um código de 4 dígitos para Smart TV na Netflix em tempo real.`,
+          category: 'netflix',
+          userName: userDisplayName || 'Membro VIP',
+          service: 'netflix',
+          type: 'success'
+        });
       } else if (data.isExpired) {
         setCode(null);
         setIsExpired(true);

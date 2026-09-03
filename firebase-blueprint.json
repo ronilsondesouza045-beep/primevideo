@@ -37,6 +37,22 @@
         "createdAt": { "type": "string" }
       },
       "required": ["userId", "serviceType", "status"]
+    },
+    "notifications": {
+      "title": "notifications",
+      "description": "Central de notificações e atividades em tempo real (códigos Netflix e acessos VIP)",
+      "properties": {
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "read": { "type": "boolean" },
+        "type": { "type": "string" },
+        "category": { "type": "string" },
+        "userName": { "type": "string" },
+        "service": { "type": "string" },
+        "link": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "message", "createdAt"]
     }
   }
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, SystemNotification } from '../types';
+import { notificationsService } from '../services/notificationsService';
 import { 
   Tv, ShieldCheck, LogIn, LogOut, Sparkles, Grid, Award, 
   User as UserIcon, Bell, CheckCircle2, AlertCircle, ShoppingBag, 
@@ -32,47 +33,19 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 8000);
-    const handleUpdate = () => fetchUnreadCount();
-    window.addEventListener('streamhub_notifications_updated', handleUpdate);
+    const unsubscribe = notificationsService.subscribe((list) => {
+      setUnreadCount(list.filter(n => !n.read).length);
+    });
 
     return () => {
-      clearInterval(interval);
-      window.removeEventListener('streamhub_notifications_updated', handleUpdate);
+      unsubscribe();
     };
-  }, [user]);
-
-  const fetchUnreadCount = async () => {
-    try {
-      const token = localStorage.getItem('streamhub_token');
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (user?.email) headers['x-user-email'] = user.email;
-
-      const res = await fetch('/api/notifications', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.notifications && Array.isArray(data.notifications)) {
-          setUnreadCount(data.notifications.filter((n: SystemNotification) => !n.read).length);
-        }
-      }
-    } catch (e) {}
-  };
+  }, []);
 
   const handleMarkNotifsRead = async () => {
     setUnreadCount(0);
     try {
-      const token = localStorage.getItem('streamhub_token');
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (user?.email) headers['x-user-email'] = user.email;
-
-      await fetch('/api/notifications/read', {
-        method: 'POST',
-        headers
-      });
-      window.dispatchEvent(new CustomEvent('streamhub_notifications_updated'));
+      await notificationsService.markAllAsRead();
     } catch (e) {}
   };
 

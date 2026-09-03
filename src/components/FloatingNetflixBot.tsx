@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Bot, X, Copy, Check, ExternalLink, RefreshCw, Sparkles, Clock, ShieldCheck, Mail, ArrowRight, Tv, Key } from 'lucide-react';
+import { notificationsService } from '../services/notificationsService';
 
 interface FloatingNetflixBotProps {
   defaultEmail?: string;
@@ -97,8 +98,15 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
         setTimeLeft(data.expiresIn || 900); // 15 minutes or remaining time
         setErrorMessage(null);
 
-        // Notify live notification center instantly
-        window.dispatchEvent(new CustomEvent('streamhub_notifications_updated'));
+        // Notify live notification center and persist to real-time sync
+        notificationsService.addNotification({
+          title: '⚡ Código Netflix TV Gerado (Tempo Real)',
+          message: `${userDisplayName || 'Membro VIP'} acabou de puxar um código de 4 dígitos para Smart TV na Netflix em tempo real.`,
+          category: 'netflix',
+          userName: userDisplayName || 'Membro VIP',
+          service: 'netflix',
+          type: 'success'
+        });
       } else if (data.isExpired) {
         setCode(null);
         setIsExpired(true);

@@ -14,6 +14,7 @@ import { ModalManager } from './components/ModalManager';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { OfflineBanner } from './components/OfflineBanner';
 import { FloatingNetflixBot } from './components/FloatingNetflixBot';
+import { notificationsService } from './services/notificationsService';
 import { Product } from './types';
 import { Tv, ShieldCheck, Heart, Sparkles, Flame, Radio } from 'lucide-react';
 
@@ -153,6 +154,14 @@ export default function App() {
       if (res.ok && data?.success && data?.credentials) {
         setPrimeCreds(data.credentials);
         fetchUserAccesses();
+        notificationsService.addNotification({
+          title: '🎬 Prime Video VIP Liberado',
+          message: `${user?.name || user?.email?.split('@')[0] || 'Membro VIP'} liberou acesso ao catálogo Prime Video VIP.`,
+          category: 'streaming',
+          userName: user?.name || user?.email?.split('@')[0] || 'Membro VIP',
+          service: 'prime',
+          type: 'info'
+        });
       } else {
         alert(data?.error || primeError || 'O serviço Prime Video está temporariamente suspenso por enquanto.');
       }
@@ -183,6 +192,14 @@ export default function App() {
       if (res.ok && data?.success && data?.credentials) {
         setParamountCreds(data.credentials);
         fetchUserAccesses();
+        notificationsService.addNotification({
+          title: '🍿 Paramount+ VIP Liberado',
+          message: `${user?.name || user?.email?.split('@')[0] || 'Membro VIP'} resgatou acesso imediato ao catálogo Paramount+.`,
+          category: 'streaming',
+          userName: user?.name || user?.email?.split('@')[0] || 'Membro VIP',
+          service: 'paramount',
+          type: 'info'
+        });
       } else {
         const fallbackCreds = {
           email: 'olivia8515@web-library.net',
@@ -191,6 +208,14 @@ export default function App() {
           warning: 'Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.'
         };
         setParamountCreds(fallbackCreds);
+        notificationsService.addNotification({
+          title: '🍿 Paramount+ VIP Liberado',
+          message: `${user?.name || user?.email?.split('@')[0] || 'Membro VIP'} resgatou acesso imediato ao catálogo Paramount+.`,
+          category: 'streaming',
+          userName: user?.name || user?.email?.split('@')[0] || 'Membro VIP',
+          service: 'paramount',
+          type: 'info'
+        });
         const localLog: any = {
           id: 'acc_' + Date.now(),
           userId: user.id,
@@ -210,6 +235,14 @@ export default function App() {
         warning: 'Aviso: A qualquer momento essa conta Paramount+ gratuita pode ser alterada ou parar de funcionar sem aviso prévio.'
       };
       setParamountCreds(fallbackCreds);
+      notificationsService.addNotification({
+        title: '🍿 Paramount+ VIP Liberado',
+        message: `${user?.name || user?.email?.split('@')[0] || 'Membro VIP'} resgatou acesso imediato ao catálogo Paramount+.`,
+        category: 'streaming',
+        userName: user?.name || user?.email?.split('@')[0] || 'Membro VIP',
+        service: 'paramount',
+        type: 'info'
+      });
       const localLog: any = {
         id: 'acc_' + Date.now(),
         userId: user.id,
@@ -369,6 +402,14 @@ export default function App() {
       if (res.ok && data?.success && data?.credentials) {
         setNetflixCreds(data.credentials);
         fetchUserAccesses();
+        notificationsService.addNotification({
+          title: '⚡ Netflix VIP Liberado',
+          message: `${user?.name || user?.email?.split('@')[0] || 'Membro VIP'} liberou os dados de acesso Netflix VIP Ultra HD.`,
+          category: 'netflix',
+          userName: user?.name || user?.email?.split('@')[0] || 'Membro VIP',
+          service: 'netflix',
+          type: 'success'
+        });
       } else {
         const fallbackCreds = {
           email: 'prine1070@gmail.com',
@@ -378,6 +419,14 @@ export default function App() {
           warning: 'Acesso 100% Gratuito! Você pode entrar diretamente com este E-mail e Senha, ou resgatar o código de 4 dígitos da TV pelo Bot abaixo.'
         };
         setNetflixCreds(fallbackCreds);
+        notificationsService.addNotification({
+          title: '⚡ Netflix VIP Liberado',
+          message: `${user?.name || user?.email?.split('@')[0] || 'Membro VIP'} liberou os dados de acesso Netflix VIP Ultra HD.`,
+          category: 'netflix',
+          userName: user?.name || user?.email?.split('@')[0] || 'Membro VIP',
+          service: 'netflix',
+          type: 'success'
+        });
         const localLog: any = {
           id: 'acc_' + Date.now(),
           userId: user.id,
@@ -398,6 +447,14 @@ export default function App() {
         warning: 'Acesso 100% Gratuito! Você pode entrar diretamente com este E-mail e Senha, ou resgatar o código de 4 dígitos da TV pelo Bot abaixo.'
       };
       setNetflixCreds(fallbackCreds);
+      notificationsService.addNotification({
+        title: '⚡ Netflix VIP Liberado',
+        message: `${user?.name || user?.email?.split('@')[0] || 'Membro VIP'} liberou os dados de acesso Netflix VIP Ultra HD.`,
+        category: 'netflix',
+        userName: user?.name || user?.email?.split('@')[0] || 'Membro VIP',
+        service: 'netflix',
+        type: 'success'
+      });
       const localLog: any = {
         id: 'acc_' + Date.now(),
         userId: user.id,
