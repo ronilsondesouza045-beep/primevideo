@@ -4,11 +4,15 @@ import { Bot, X, Copy, Check, ExternalLink, RefreshCw, Sparkles, Clock, ShieldCh
 interface FloatingNetflixBotProps {
   defaultEmail?: string;
   defaultPassword?: string;
+  coverImage?: string;
 }
+
+const NETFLIX_DEFAULT_IMAGE = 'https://www.shutterstock.com/image-photo/rajasthan-jaipur-india-15-netflix-260nw-2195929279.jpg';
 
 export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
   defaultEmail = 'prine1070@gmail.com',
-  defaultPassword = 'roni1418rr'
+  defaultPassword = 'roni1418rr',
+  coverImage = NETFLIX_DEFAULT_IMAGE
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -127,25 +131,34 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
         <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 flex items-center gap-2 animate-bounce-slight">
           <button
             onClick={() => setIsOpen(true)}
-            className="group flex items-center gap-3 px-4 py-3 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs sm:text-sm shadow-2xl shadow-red-600/50 border-2 border-red-400/40 hover:scale-105 active:scale-95 transition-all"
-            title="Abrir Bot Netflix para puxar código"
+            className="group flex items-center gap-3 pl-2 pr-4 py-2 sm:py-2.5 rounded-full bg-slate-950/95 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-2xl shadow-red-600/50 border-2 border-red-500/80 hover:border-red-400 hover:scale-105 active:scale-95 transition-all backdrop-blur-md"
+            title="Abrir Bot Netflix para puxar código ou senha"
           >
-            <div className="relative">
-              <div className="p-1.5 rounded-full bg-white/20">
-                <Bot className="w-5 h-5 text-white" />
+            {/* Custom Image Avatar */}
+            <div className="relative shrink-0">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border-2 border-red-500 shadow-md shadow-red-600/40 bg-slate-900 group-hover:scale-105 transition-transform">
+                <img
+                  src={coverImage}
+                  alt="Netflix Bot"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover object-center"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=200&auto=format&fit=crop&q=80';
+                  }}
+                />
               </div>
-              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-slate-950"></span>
               </span>
             </div>
 
             <div className="text-left leading-tight">
               <div className="flex items-center gap-1.5">
-                <span className="uppercase tracking-wider">Bot Netflix</span>
-                <span className="px-1.5 py-0.2 bg-emerald-500/30 text-emerald-300 text-[9px] rounded font-extrabold">GRÁTIS</span>
+                <span className="uppercase tracking-wider font-black text-white">Bot Netflix</span>
+                <span className="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] rounded font-extrabold">GRÁTIS</span>
               </div>
-              <span className="text-[10px] text-red-100 font-medium block">Puxar Código do E-mail</span>
+              <span className="text-[10px] text-red-300 font-medium block">Código TV & Senha</span>
             </div>
           </button>
         </div>
@@ -153,40 +166,91 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
 
       {/* Interactive Floating Modal / Drawer */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full sm:max-w-lg bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border-t sm:border-2 border-red-500/50 rounded-t-3xl sm:rounded-3xl shadow-2xl shadow-red-950/80 overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
+          <div className="w-full sm:max-w-lg bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border-t sm:border-2 border-red-500/50 rounded-t-3xl sm:rounded-3xl shadow-2xl shadow-red-950/90 overflow-hidden max-h-[92vh] flex flex-col">
             
-            {/* Header */}
-            <div className="p-4 sm:p-5 bg-gradient-to-r from-red-600 via-rose-600 to-slate-950 text-white flex items-center justify-between border-b border-red-500/30">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-2xl bg-white/10 border border-white/20 shadow-inner">
-                  <Bot className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base sm:text-lg font-black tracking-tight">Bot Netflix TV & E-mail</h3>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-black uppercase tracking-wider">
-                      100% Grátis
-                    </span>
-                  </div>
-                  <p className="text-xs text-red-100/90 font-medium">
-                    Puxe o código enviado pela Netflix no e-mail na hora!
-                  </p>
-                </div>
-              </div>
+            {/* Custom Netflix Image Hero Header */}
+            <div className="relative w-full h-36 sm:h-44 overflow-hidden border-b border-red-500/40 shrink-0">
+              <img
+                src={coverImage}
+                alt="Netflix Bot Capa"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover object-center transform scale-105 filter brightness-90"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=800&auto=format&fit=crop&q=80';
+                }}
+              />
+              {/* Cinematic gradient overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-black/30" />
+              <div className="absolute inset-0 bg-gradient-to-r from-red-950/70 via-slate-950/40 to-black/70" />
 
+              {/* Close Button */}
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="absolute top-3 right-3 p-2 rounded-xl bg-black/60 hover:bg-black/85 text-white backdrop-blur-md border border-white/20 shadow-lg transition-all z-10"
                 title="Fechar"
               >
                 <X className="w-5 h-5" />
               </button>
+
+              {/* Header Info Overlay */}
+              <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="relative shrink-0">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border-2 border-red-500 shadow-xl shadow-red-950 bg-slate-900">
+                      <img
+                        src={coverImage}
+                        alt="Netflix Avatar"
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-slate-950"></span>
+                    </span>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-black tracking-tight text-white drop-shadow-md">
+                        Bot Netflix TV & E-mail
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[9px] font-black uppercase tracking-wider shadow">
+                        100% Grátis
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-200 drop-shadow font-medium">
+                      Puxe o código de 4 dígitos ou entre direto com senha
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Content Area (Scrollable) */}
             <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-slate-200">
               
+              {/* Mini Status Card com a Imagem Netflix */}
+              <div className="relative rounded-2xl overflow-hidden border border-red-500/40 p-3 bg-gradient-to-r from-red-950/60 via-slate-900/90 to-slate-950 flex items-center gap-3.5 shadow-lg shadow-red-950/40">
+                <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-red-500/50 shrink-0 shadow-md">
+                  <img
+                    src={coverImage}
+                    alt="Netflix Oficial"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 truncate">Conta Oficial Sincronizada</span>
+                  </div>
+                  <h4 className="text-xs sm:text-sm font-bold text-white truncate">Acesso Netflix VIP 24h</h4>
+                  <p className="text-[11px] text-slate-300">Use os dados abaixo para logar direto ou resgatar o código.</p>
+                </div>
+              </div>
+
               {/* E-mail & Senha Netflix Boxes */}
               <div className="space-y-2.5">
                 {/* E-mail Box */}

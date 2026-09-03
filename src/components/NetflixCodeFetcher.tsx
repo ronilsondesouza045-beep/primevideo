@@ -5,11 +5,15 @@ interface NetflixCodeFetcherProps {
   email?: string;
   password?: string;
   autoStart?: boolean;
+  coverImage?: string;
 }
+
+const NETFLIX_DEFAULT_IMAGE = 'https://www.shutterstock.com/image-photo/rajasthan-jaipur-india-15-netflix-260nw-2195929279.jpg';
 
 export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({ 
   email = 'prine1070@gmail.com',
-  password = 'roni1418rr'
+  password = 'roni1418rr',
+  coverImage = NETFLIX_DEFAULT_IMAGE
 }) => {
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState<string | null>(null);
@@ -124,8 +128,22 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
       {/* Bot Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-red-600 to-rose-700 text-white shadow-lg shadow-red-600/30 flex items-center justify-center border border-red-400/30">
-            <Bot className="w-6 h-6 text-white" />
+          <div className="relative shrink-0">
+            <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-red-500 shadow-lg shadow-red-600/30 bg-slate-900">
+              <img
+                src={coverImage}
+                alt="Netflix Bot"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=200&auto=format&fit=crop&q=80';
+                }}
+              />
+            </div>
+            <span className="absolute -bottom-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-slate-950"></span>
+            </span>
           </div>
           <div>
             <div className="flex items-center gap-2">
