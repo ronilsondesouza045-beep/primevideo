@@ -33,18 +33,27 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   useEffect(() => {
     fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 8000);
+    const handleUpdate = () => fetchUnreadCount();
+    window.addEventListener('streamhub_notifications_updated', handleUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('streamhub_notifications_updated', handleUpdate);
+    };
   }, [user]);
 
   const fetchUnreadCount = async () => {
     try {
       const token = localStorage.getItem('streamhub_token');
-      if (!token) return;
-      const res = await fetch('/api/notifications', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      if (user?.email) headers['x-user-email'] = user.email;
+
+      const res = await fetch('/api/notifications', { headers });
       if (res.ok) {
         const data = await res.json();
-        if (data.notifications) {
+        if (data.notifications && Array.isArray(data.notifications)) {
           setUnreadCount(data.notifications.filter((n: SystemNotification) => !n.read).length);
         }
       }
@@ -55,11 +64,15 @@ export const Navbar: React.FC<NavbarProps> = ({
     setUnreadCount(0);
     try {
       const token = localStorage.getItem('streamhub_token');
-      if (!token) return;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      if (user?.email) headers['x-user-email'] = user.email;
+
       await fetch('/api/notifications/read', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers
       });
+      window.dispatchEvent(new CustomEvent('streamhub_notifications_updated'));
     } catch (e) {}
   };
 
@@ -152,22 +165,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               </kbd>
             </button>
 
+            {/* Notifications Bell Button (Visible for all visitors and members) */}
+            <button
+              onClick={onOpenNotifs}
+              className="relative p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+              title="Central de Notificações em Tempo Real"
+            >
+              <Bell className="w-4 h-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse shadow-md shadow-red-600/50">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+
             {user ? (
               <div className="flex items-center gap-2 sm:gap-3">
-                {/* Notifications Bell Button */}
-                <button
-                  onClick={onOpenNotifs}
-                  className="relative p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
-                  title="Central de Notificações"
-                >
-                  <Bell className="w-4 h-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
-
                 {/* Profile Menu Dropdown */}
                 <div className="relative">
                   <button

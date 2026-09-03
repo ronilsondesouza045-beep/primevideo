@@ -5,6 +5,7 @@ interface FloatingNetflixBotProps {
   defaultEmail?: string;
   defaultPassword?: string;
   coverImage?: string;
+  currentUser?: any;
 }
 
 const NETFLIX_DEFAULT_IMAGE = 'https://www.shutterstock.com/image-photo/rajasthan-jaipur-india-15-netflix-260nw-2195929279.jpg';
@@ -12,7 +13,8 @@ const NETFLIX_DEFAULT_IMAGE = 'https://www.shutterstock.com/image-photo/rajastha
 export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
   defaultEmail = 'prine1070@gmail.com',
   defaultPassword = 'roni1418rr',
-  coverImage = NETFLIX_DEFAULT_IMAGE
+  coverImage = NETFLIX_DEFAULT_IMAGE,
+  currentUser
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,6 +26,13 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPassword, setCopiedPassword] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  // Listen to open events from notifications or other parts
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true);
+    window.addEventListener('streamhub_open_netflix_bot', handleOpen);
+    return () => window.removeEventListener('streamhub_open_netflix_bot', handleOpen);
+  }, []);
 
   // 15-Minute Expiration Countdown (900s)
   const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -64,10 +73,19 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
     setIsExpired(false);
     setErrorMessage(null);
     try {
+      const userDisplayName = currentUser?.name || (currentUser?.email ? currentUser.email.split('@')[0] : '') || localStorage.getItem('streamhub_user_name') || '';
+
       const res = await fetch('/api/netflix/bot-pull-code', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: defaultEmail })
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-name': userDisplayName,
+          'x-user-email': currentUser?.email || ''
+        },
+        body: JSON.stringify({ 
+          email: defaultEmail,
+          userName: userDisplayName
+        })
       });
       const data = await res.json();
 
@@ -78,6 +96,9 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
         setSource(data.source || 'email_imap');
         setTimeLeft(data.expiresIn || 900); // 15 minutes or remaining time
         setErrorMessage(null);
+
+        // Notify live notification center instantly
+        window.dispatchEvent(new CustomEvent('streamhub_notifications_updated'));
       } else if (data.isExpired) {
         setCode(null);
         setIsExpired(true);

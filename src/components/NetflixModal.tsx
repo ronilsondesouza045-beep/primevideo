@@ -24,6 +24,7 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
   status,
   isOpen = true,
   payment,
+  user,
   onClose,
   onOpenChat
 }) => {
@@ -207,7 +208,7 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
 
           {/* Live Netflix Code & TV Household Residence Fetcher */}
           <div className="pt-1">
-            <NetflixCodeFetcher email={effectiveCreds.email || 'prine1070@gmail.com'} />
+            <NetflixCodeFetcher email={effectiveCreds.email || 'prine1070@gmail.com'} currentUser={user} />
           </div>
 
           {/* Optional Support Contact */}

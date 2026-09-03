@@ -2120,15 +2120,24 @@ class JSONDatabase {
   }
 
   // ==============================================
-  // NOTIFICATIONS SYSTEM
+  // NOTIFICATIONS SYSTEM (COM SUPORTE A TEMPO REAL & CATEGORIAS)
   // ==============================================
   public getNotifications(userId?: string): SystemNotification[] {
     const list = this.data.notifications || [];
-    if (!userId) return list.slice(0, 20);
-    return list.filter(n => !n.userId || n.userId === userId).slice(0, 20);
+    if (!userId) return list.slice(0, 40);
+    return list.filter(n => !n.userId || n.userId === userId).slice(0, 40);
   }
 
-  public addNotification(userId: string | undefined, title: string, message: string, type: SystemNotification['type'] = 'info', link?: string): SystemNotification {
+  public addNotification(
+    userId: string | undefined,
+    title: string,
+    message: string,
+    type: SystemNotification['type'] = 'info',
+    link?: string,
+    category: 'netflix' | 'streaming' | 'system' | 'catalog' = 'system',
+    userName?: string,
+    service?: string
+  ): SystemNotification {
     if (!this.data.notifications) this.data.notifications = [];
     const notification: SystemNotification = {
       id: `notif_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
@@ -2138,11 +2147,14 @@ class JSONDatabase {
       read: false,
       type,
       link,
+      category,
+      userName,
+      service,
       createdAt: new Date().toISOString()
     };
     this.data.notifications.unshift(notification);
-    if (this.data.notifications.length > 100) {
-      this.data.notifications = this.data.notifications.slice(0, 100);
+    if (this.data.notifications.length > 150) {
+      this.data.notifications = this.data.notifications.slice(0, 150);
     }
     this.save();
     return notification;
@@ -2151,9 +2163,7 @@ class JSONDatabase {
   public markNotificationsRead(userId?: string): boolean {
     if (!this.data.notifications) return false;
     this.data.notifications.forEach(n => {
-      if (!userId || n.userId === userId) {
-        n.read = true;
-      }
+      n.read = true;
     });
     this.save();
     return true;

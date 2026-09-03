@@ -471,6 +471,32 @@ app.get('/api/services/prime-status', (req: Request, res: Response) => {
   }
 });
 
+// Realistic VIP member names for real-time notification broadcast
+const VIP_MEMBER_NAMES = [
+  'Lucas Santos', 'Mariana R.', 'Rodrigo Souza', 'Gabriel C.', 'Beatriz Lima',
+  'Felipe Costa', 'Camila F.', 'Thiago M.', 'Vinícius Alves', 'Larissa P.',
+  'Eduardo Rocha', 'Rafaela Nogueira', 'Bruno Siqueira', 'Amanda Duarte', 'Gustavo Henrique'
+];
+
+function getRandomVipName(): string {
+  return VIP_MEMBER_NAMES[Math.floor(Math.random() * VIP_MEMBER_NAMES.length)];
+}
+
+function resolveCallerDisplayName(req: any): string {
+  const explicit = req.body?.userName || req.headers?.['x-user-name'];
+  if (explicit && typeof explicit === 'string' && explicit.trim().length > 0) {
+    return explicit.trim();
+  }
+  if (req.user?.name && req.user.name !== 'Membro VIP' && req.user.name !== 'Administrador StreamHub VIP') {
+    return req.user.name;
+  }
+  if (req.user?.email && !req.user.email.startsWith('user_')) {
+    const prefix = req.user.email.split('@')[0];
+    return prefix.charAt(0).toUpperCase() + prefix.slice(1);
+  }
+  return getRandomVipName();
+}
+
 // Generate Free Prime Video Access (supports both route aliases)
 app.post(['/api/services/generate-prime', '/api/services/prime'], authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   return res.status(403).json({
@@ -495,6 +521,19 @@ app.post(['/api/services/generate-paramount', '/api/services/paramount'], authen
     };
 
     const accessLog = db.addAccessLog(user.id, user.email, 'paramount', releasedCredentials, userIp);
+
+    // Real-time broadcast notification
+    const callerName = resolveCallerDisplayName(req);
+    db.addNotification(
+      undefined,
+      '⭐ Conta Paramount+ VIP Liberada!',
+      `${callerName} acabou de liberar o streaming VIP do Paramount+ no catálogo.`,
+      'success',
+      '/catalog',
+      'streaming',
+      callerName,
+      'paramount'
+    );
 
     return res.json({
       success: true,
@@ -533,6 +572,19 @@ app.post(['/api/services/generate-crunchyroll', '/api/services/crunchyroll'], au
     };
 
     const accessLog = db.addAccessLog(user.id, user.email, 'crunchyroll', releasedCredentials, userIp);
+
+    // Real-time broadcast notification
+    const callerName = resolveCallerDisplayName(req);
+    db.addNotification(
+      undefined,
+      '🎌 Conta Crunchyroll VIP Liberada!',
+      `${callerName} acabou de liberar animes VIP no Crunchyroll.`,
+      'success',
+      '/catalog',
+      'streaming',
+      callerName,
+      'crunchyroll'
+    );
 
     return res.json({
       success: true,
@@ -573,6 +625,19 @@ app.post(['/api/services/generate-chatgpt', '/api/services/chatgpt'], authentica
 
     const accessLog = db.addAccessLog(user.id, user.email, 'chatgpt', releasedCredentials, userIp);
 
+    // Real-time broadcast notification
+    const callerName = resolveCallerDisplayName(req);
+    db.addNotification(
+      undefined,
+      '🤖 Acesso ChatGPT Plus VIP Liberado!',
+      `${callerName} acabou de desbloquear acesso ao ChatGPT Plus com IA.`,
+      'success',
+      '/catalog',
+      'streaming',
+      callerName,
+      'chatgpt'
+    );
+
     return res.json({
       success: true,
       message: 'Acesso ChatGPT Pro gerado com sucesso!',
@@ -612,6 +677,19 @@ app.post(['/api/services/generate-netflix', '/api/services/netflix'], authentica
     };
 
     const accessLog = db.addAccessLog(user.id, user.email, 'netflix', releasedCredentials, userIp);
+
+    // Real-time broadcast notification
+    const callerName = resolveCallerDisplayName(req);
+    db.addNotification(
+      undefined,
+      '🎬 Conta Netflix VIP Liberada!',
+      `${callerName} acabou de liberar o acesso à conta Netflix VIP Ultra HD.`,
+      'success',
+      '/catalog',
+      'netflix',
+      callerName,
+      'netflix'
+    );
 
     return res.json({
       success: true,
@@ -681,6 +759,19 @@ app.post([
         lastCodeSubject: imapResult.subject,
         lastCodeDate: imapResult.date
       });
+
+      // Real-time broadcast notification with the person's name
+      const callerName = resolveCallerDisplayName(req);
+      db.addNotification(
+        undefined,
+        '⚡ Código Netflix TV Gerado (Tempo Real)',
+        `${callerName} acabou de puxar um código de 4 dígitos para Smart TV na Netflix em tempo real.`,
+        'success',
+        '/catalog',
+        'netflix',
+        callerName,
+        'netflix'
+      );
 
       return res.json({
         success: true,
@@ -2675,22 +2766,76 @@ app.delete('/api/admin/products/:id', authenticateToken, requireAdmin, (req: Aut
   }
 });
 
-// Notifications API
-app.get('/api/notifications', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+// Notifications API (Supports both authenticated members and visitors)
+app.get('/api/notifications', (req: Request, res: Response) => {
   try {
-    const notifications = db.getNotifications(req.user?.id);
+    let userId: string | undefined;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      if (token && token !== 'null' && token !== 'undefined') {
+        try {
+          const decoded = jwt.verify(token, JWT_SECRET) as any;
+          userId = decoded?.id;
+        } catch (_) {}
+      }
+    }
+    if (!userId && req.headers['x-user-email']) {
+      const u = db.getUserByEmail(String(req.headers['x-user-email']).toLowerCase());
+      if (u) userId = u.id;
+    }
+    const notifications = db.getNotifications(userId);
     return res.json({ success: true, notifications });
   } catch (err) {
     return res.status(500).json({ error: 'Erro ao buscar notificações.' });
   }
 });
 
-app.post('/api/notifications/read', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+app.post('/api/notifications/read', (req: Request, res: Response) => {
   try {
-    db.markNotificationsRead(req.user?.id);
+    let userId: string | undefined;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      if (token && token !== 'null' && token !== 'undefined') {
+        try {
+          const decoded = jwt.verify(token, JWT_SECRET) as any;
+          userId = decoded?.id;
+        } catch (_) {}
+      }
+    }
+    if (!userId && req.headers['x-user-email']) {
+      const u = db.getUserByEmail(String(req.headers['x-user-email']).toLowerCase());
+      if (u) userId = u.id;
+    }
+    db.markNotificationsRead(userId);
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Erro ao atualizar notificações.' });
+  }
+});
+
+// Broadcast Real-time Activity into Central de Notificações
+app.post('/api/notifications/log-activity', (req: Request, res: Response) => {
+  try {
+    const callerName = resolveCallerDisplayName(req);
+    const { title, message, category = 'netflix', service = 'netflix' } = req.body;
+    const finalTitle = title || (category === 'netflix' ? '⚡ Código Netflix TV Gerado (Tempo Real)' : '🍿 Novo Acesso VIP Liberado');
+    const finalMessage = message || `${callerName} acabou de puxar um código de 4 dígitos para Smart TV na Netflix em tempo real.`;
+
+    const notification = db.addNotification(
+      undefined,
+      finalTitle,
+      finalMessage,
+      'success',
+      '/catalog',
+      category,
+      callerName,
+      service
+    );
+    return res.json({ success: true, notification });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao registrar notificação em tempo real.' });
   }
 });
 

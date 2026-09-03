@@ -348,6 +348,9 @@ export interface SystemNotification {
   type: 'info' | 'success' | 'warning' | 'alert';
   link?: string;
   createdAt: string;
+  category?: 'netflix' | 'streaming' | 'system' | 'catalog';
+  userName?: string;
+  service?: string;
 }
 
 export interface AuditLog {

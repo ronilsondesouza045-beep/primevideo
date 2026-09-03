@@ -559,7 +559,7 @@ export default function App() {
         </main>
 
         {/* Floating Netflix Code Bot (Available to all visitors on the front screen) */}
-        <FloatingNetflixBot defaultEmail="prine1070@gmail.com" />
+        <FloatingNetflixBot defaultEmail="prine1070@gmail.com" currentUser={user} />
 
         {/* Global Modals Manager */}
         <ModalManager

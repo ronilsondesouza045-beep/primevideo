@@ -6,6 +6,7 @@ interface NetflixCodeFetcherProps {
   password?: string;
   autoStart?: boolean;
   coverImage?: string;
+  currentUser?: any;
 }
 
 const NETFLIX_DEFAULT_IMAGE = 'https://www.shutterstock.com/image-photo/rajasthan-jaipur-india-15-netflix-260nw-2195929279.jpg';
@@ -13,7 +14,8 @@ const NETFLIX_DEFAULT_IMAGE = 'https://www.shutterstock.com/image-photo/rajastha
 export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({ 
   email = 'prine1070@gmail.com',
   password = 'roni1418rr',
-  coverImage = NETFLIX_DEFAULT_IMAGE
+  coverImage = NETFLIX_DEFAULT_IMAGE,
+  currentUser
 }) => {
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState<string | null>(null);
@@ -62,10 +64,19 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
     setLoading(true);
     setErrorMessage(null);
     try {
+      const userDisplayName = currentUser?.name || (currentUser?.email ? currentUser.email.split('@')[0] : '') || localStorage.getItem('streamhub_user_name') || '';
+
       const res = await fetch('/api/netflix/bot-pull-code', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-name': userDisplayName,
+          'x-user-email': currentUser?.email || ''
+        },
+        body: JSON.stringify({ 
+          email,
+          userName: userDisplayName
+        })
       });
       const data = await res.json();
 
@@ -75,6 +86,9 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
         setIsExpired(false);
         setTimeLeft(data.expiresIn || 900); // 15 minutes or remaining time
         setErrorMessage(null);
+
+        // Sync live notification center instantly
+        window.dispatchEvent(new CustomEvent('streamhub_notifications_updated'));
       } else if (data.isExpired) {
         setCode(null);
         setIsExpired(true);

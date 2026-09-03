@@ -69,7 +69,7 @@
         "password": "roni1418rr",
         "screen": "Perfil Livre / VIP",
         "pin": "1418",
-        "warning": "Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites."
+        "warning": "Acesso 100% Gratuito! Entre com este E-mail e Senha, ou se a sua Smart TV pedir o código de 4 dígitos, use o Bot de busca de código em tempo real abaixo."
       },
       "createdAt": "2026-09-01T15:05:43.926Z"
     },
@@ -158,6 +158,60 @@
     }
   ],
   "visitorLogs": [
+    {
+      "id": "vis_1788405211955_hh1c",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-03T03:13:31.955Z"
+    },
+    {
+      "id": "vis_1788405211946_695m",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-03T03:13:31.946Z"
+    },
+    {
+      "id": "vis_1788404463945_h6dc",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-03T03:01:03.945Z"
+    },
+    {
+      "id": "vis_1788404463933_742s",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-03T03:01:03.933Z"
+    },
+    {
+      "id": "vis_1788403107786_3zhd",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-03T02:38:27.786Z"
+    },
+    {
+      "id": "vis_1788403107779_sj3s",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-03T02:38:27.779Z"
+    },
     {
       "id": "vis_1788402824609_jehl",
       "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
@@ -9103,60 +9157,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:45:59.521Z"
-    },
-    {
-      "id": "vis_1786301159379_nay3",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:59.379Z"
-    },
-    {
-      "id": "vis_1786301159247_r2y3",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:59.247Z"
-    },
-    {
-      "id": "vis_1786301159095_iybu",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:59.095Z"
-    },
-    {
-      "id": "vis_1786301158957_wd4c",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:58.957Z"
-    },
-    {
-      "id": "vis_1786301158821_dg7n",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:58.821Z"
-    },
-    {
-      "id": "vis_1786301158685_a5ws",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:58.685Z"
     }
   ],
   "supportMessages": [
@@ -9775,12 +9775,73 @@
   },
   "notifications": [
     {
+      "id": "notif_1788406057323_476",
+      "title": "⚡ Código Netflix TV Gerado (Tempo Real)",
+      "message": "Gabriel Costa acabou de puxar um código de 4 dígitos para Smart TV na Netflix em tempo real.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "netflix",
+      "userName": "Gabriel Costa",
+      "service": "netflix",
+      "createdAt": "2026-09-03T03:27:37.323Z"
+    },
+    {
+      "id": "notif_netflix_001",
+      "title": "⚡ Código Netflix TV Gerado (Tempo Real)",
+      "message": "Roni Souza acabou de puxar um código de 4 dígitos para Smart TV na Netflix em tempo real.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "netflix",
+      "userName": "Roni Souza",
+      "service": "netflix",
+      "createdAt": "2026-09-03T03:15:00.000Z"
+    },
+    {
+      "id": "notif_netflix_002",
+      "title": "⚡ Código Netflix TV Gerado (Tempo Real)",
+      "message": "Lucas Santos acabou de puxar um código de 4 dígitos para Smart TV na Netflix em tempo real.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "netflix",
+      "userName": "Lucas Santos",
+      "service": "netflix",
+      "createdAt": "2026-09-03T03:02:10.000Z"
+    },
+    {
+      "id": "notif_streaming_003",
+      "title": "⭐ Conta Paramount+ VIP Liberada!",
+      "message": "Mariana Silva acabou de liberar o streaming VIP do Paramount+ no catálogo.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "streaming",
+      "userName": "Mariana Silva",
+      "service": "paramount",
+      "createdAt": "2026-09-03T02:45:00.000Z"
+    },
+    {
+      "id": "notif_streaming_004",
+      "title": "🤖 Acesso ChatGPT Plus VIP Liberado!",
+      "message": "Gabriel Costa acabou de desbloquear acesso ao ChatGPT Plus com IA.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "streaming",
+      "userName": "Gabriel Costa",
+      "service": "chatgpt",
+      "createdAt": "2026-09-03T02:18:00.000Z"
+    },
+    {
       "id": "notif_1787611055506_150",
       "title": "🤖 Atualização Automática de Sistema (v2.5.57)",
       "message": "O sistema executou a manutenção automática periódica com sucesso! O catálogo VIP, contas de streaming, gerador IPTV e gateway de pagamento estão 100% operacionais e otimizados.",
       "read": false,
       "type": "success",
       "link": "/status",
+      "category": "system",
       "createdAt": "2026-08-24T22:37:35.506Z"
     }
   ],
@@ -9789,10 +9850,10 @@
     "appPassword": "ofigpfwbruhpwqpl",
     "manualCode": "",
     "manualLink": "",
-    "updatedAt": "2026-09-01T16:30:58.462Z",
-    "lastCode": "1359",
-    "lastLink": "https://www.netflix.com/browse?g=e7972cad-0951-4c41-a99e-d9f5086e59b1&lkid=URL_LOGO&lnktrk=EVO",
+    "updatedAt": "2026-09-03T03:14:49.608Z",
+    "lastCode": "5657",
+    "lastLink": "https://www.netflix.com/browse?g=dbfdbaa6-ac49-4d9b-af29-115e75419566&lkid=URL_LOGO&lnktrk=EVO",
     "lastCodeSubject": "Netflix: seu código de acesso",
-    "lastCodeDate": "2026-09-01T15:52:14.000Z"
+    "lastCodeDate": "2026-09-03T03:14:27.000Z"
   }
 }
