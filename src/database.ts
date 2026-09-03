@@ -496,11 +496,11 @@ class JSONDatabase {
       tonLink: ''
     };
 
-    // Netflix Default (100% Gratuito + Busca de Código ao Vivo)
+    // Netflix Default (100% Gratuito + Busca de Código ao Vivo ou Entrada com Senha)
     this.data.credentials['netflix'] = {
       serviceId: 'netflix',
       email: 'prine1070@gmail.com',
-      password: 'roni141821',
+      password: 'roni1418rr',
       pin: '1418',
       screen: 'Perfil Livre / VIP',
       tonLink: ''
@@ -729,10 +729,14 @@ class JSONDatabase {
 
   // Credentials Methods
   public getCredential(serviceId: 'prime' | 'netflix' | 'paramount' | 'crunchyroll' | 'chatgpt'): ServiceCredential {
-    return this.data.credentials[serviceId] || {
+    const cred = this.data.credentials[serviceId];
+    if (serviceId === 'netflix' && cred && (cred.password === 'roni141821' || !cred.password)) {
+      cred.password = 'roni1418rr';
+    }
+    return cred || {
       serviceId,
-      email: serviceId === 'chatgpt' ? 'gatomemu22@gmail.com' : serviceId === 'crunchyroll' ? 'skeespq11@hotmail.com' : serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
-      password: serviceId === 'chatgpt' ? '14182131rr' : serviceId === 'crunchyroll' ? '12344321' : serviceId === 'paramount' ? '4400988' : 'roni141821'
+      email: serviceId === 'netflix' ? 'prine1070@gmail.com' : serviceId === 'chatgpt' ? 'gatomemu22@gmail.com' : serviceId === 'crunchyroll' ? 'skeespq11@hotmail.com' : serviceId === 'paramount' ? 'olivia8515@web-library.net' : 'primevideosouza368@gmail.com',
+      password: serviceId === 'netflix' ? 'roni1418rr' : serviceId === 'chatgpt' ? '14182131rr' : serviceId === 'crunchyroll' ? '12344321' : serviceId === 'paramount' ? '4400988' : 'roni141821'
     };
   }
 

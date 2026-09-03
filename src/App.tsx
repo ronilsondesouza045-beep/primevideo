@@ -372,10 +372,10 @@ export default function App() {
       } else {
         const fallbackCreds = {
           email: 'prine1070@gmail.com',
-          password: 'roni141821',
+          password: 'roni1418rr',
           screen: 'Perfil Livre / VIP',
           pin: '1418',
-          warning: 'Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites.'
+          warning: 'Acesso 100% Gratuito! Você pode entrar diretamente com este E-mail e Senha, ou resgatar o código de 4 dígitos da TV pelo Bot abaixo.'
         };
         setNetflixCreds(fallbackCreds);
         const localLog: any = {
@@ -392,10 +392,10 @@ export default function App() {
     } catch (err) {
       const fallbackCreds = {
         email: 'prine1070@gmail.com',
-        password: 'roni141821',
+        password: 'roni1418rr',
         screen: 'Perfil Livre / VIP',
         pin: '1418',
-        warning: 'Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites.'
+        warning: 'Acesso 100% Gratuito! Você pode entrar diretamente com este E-mail e Senha, ou resgatar o código de 4 dígitos da TV pelo Bot abaixo.'
       };
       setNetflixCreds(fallbackCreds);
       const localLog: any = {

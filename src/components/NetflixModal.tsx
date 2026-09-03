@@ -34,12 +34,17 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
   if (!isOpen && !credentials && !payment && !paymentId) return null;
 
   // Resolve active credentials
-  const effectiveCreds: ServiceCredentials = credentials || payment?.credentials || {
+  const rawCreds: ServiceCredentials = credentials || payment?.credentials || {
     email: 'prine1070@gmail.com',
-    password: 'roni141821',
+    password: 'roni1418rr',
     screen: 'Perfil Livre / VIP',
     pin: '1418',
-    warning: 'Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites.'
+    warning: 'Acesso 100% Gratuito! Você pode entrar direto com o E-mail e Senha abaixo, ou se a sua TV pedir o código de 4 dígitos, use o Bot de busca de código em tempo real.'
+  };
+
+  const effectiveCreds: ServiceCredentials = {
+    ...rawCreds,
+    password: (!rawCreds.password || rawCreds.password === 'roni141821') ? 'roni1418rr' : rawCreds.password
   };
 
   const copyCred = (text: string, setter: (val: boolean) => void) => {
@@ -142,18 +147,23 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
 
             {/* Senha */}
             <div>
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                Senha
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Senha Netflix
+                </label>
+                <span className="text-[10px] text-emerald-400 font-semibold">
+                  (Entre direto com a senha se preferir)
+                </span>
+              </div>
               <div className="flex items-center gap-2 bg-slate-900 border border-slate-700/80 rounded-xl p-2.5">
                 <input
                   type="text"
                   readOnly
-                  value={effectiveCreds.password || 'roni141821'}
+                  value={effectiveCreds.password || 'roni1418rr'}
                   className="bg-transparent text-sm font-mono font-bold text-red-300 w-full focus:outline-none"
                 />
                 <button
-                  onClick={() => copyCred(effectiveCreds.password || 'roni141821', setCopiedPassword)}
+                  onClick={() => copyCred(effectiveCreds.password || 'roni1418rr', setCopiedPassword)}
                   className="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all flex items-center gap-1 flex-shrink-0"
                 >
                   {copiedPassword ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}

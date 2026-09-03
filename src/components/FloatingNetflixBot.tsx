@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, X, Copy, Check, ExternalLink, RefreshCw, Sparkles, Clock, ShieldCheck, Mail, ArrowRight, Tv } from 'lucide-react';
+import { Bot, X, Copy, Check, ExternalLink, RefreshCw, Sparkles, Clock, ShieldCheck, Mail, ArrowRight, Tv, Key } from 'lucide-react';
 
 interface FloatingNetflixBotProps {
   defaultEmail?: string;
+  defaultPassword?: string;
 }
 
 export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
-  defaultEmail = 'prine1070@gmail.com'
+  defaultEmail = 'prine1070@gmail.com',
+  defaultPassword = 'roni1418rr'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -16,6 +18,7 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
   const [source, setSource] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedPassword, setCopiedPassword] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
   // 15-Minute Expiration Countdown (900s)
@@ -102,6 +105,12 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
     setTimeout(() => setCopiedEmail(false), 2000);
   };
 
+  const handleCopyPassword = () => {
+    navigator.clipboard.writeText(defaultPassword);
+    setCopiedPassword(true);
+    setTimeout(() => setCopiedPassword(false), 2000);
+  };
+
   const handleCopyLink = () => {
     if (!link) return;
     navigator.clipboard.writeText(link);
@@ -178,49 +187,78 @@ export const FloatingNetflixBot: React.FC<FloatingNetflixBotProps> = ({
             {/* Content Area (Scrollable) */}
             <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-slate-200">
               
-              {/* E-mail Netflix Box */}
-              <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-red-500/30 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-red-400 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-red-400" />
-                    E-mail Oficial Netflix
-                  </span>
-                  <span className="text-[10px] text-slate-400">Login da Conta</span>
+              {/* E-mail & Senha Netflix Boxes */}
+              <div className="space-y-2.5">
+                {/* E-mail Box */}
+                <div className="p-3 rounded-2xl bg-slate-900/90 border border-red-500/30 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-red-400 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-red-400" />
+                      E-mail Oficial Netflix
+                    </span>
+                    <span className="text-[10px] text-slate-400">Login da Conta</span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800">
+                    <span className="font-mono font-bold text-xs sm:text-sm text-red-200 truncate">
+                      {defaultEmail}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleCopyEmail}
+                      className="px-3 py-1.5 rounded-lg bg-red-600/30 hover:bg-red-600/50 text-red-200 text-xs font-bold flex items-center gap-1 transition-all shrink-0"
+                    >
+                      {copiedEmail ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedEmail ? 'Copiado!' : 'Copiar'}</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 p-2.5 bg-slate-950 rounded-xl border border-slate-800">
-                  <span className="font-mono font-bold text-xs sm:text-sm text-red-200 truncate">
-                    {defaultEmail}
-                  </span>
-                  <button
-                    onClick={handleCopyEmail}
-                    className="px-3 py-1.5 rounded-lg bg-red-600/30 hover:bg-red-600/50 text-red-200 text-xs font-bold flex items-center gap-1 transition-all shrink-0"
-                  >
-                    {copiedEmail ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedEmail ? 'Copiado!' : 'Copiar'}</span>
-                  </button>
+                {/* Senha Box (Nova - Se quiser entrar só com a senha) */}
+                <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                      <Key className="w-3.5 h-3.5 text-amber-400" />
+                      Senha da Conta
+                    </span>
+                    <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                      Entrar direto com senha
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800">
+                    <span className="font-mono font-bold text-xs sm:text-sm text-amber-200 tracking-wider">
+                      {defaultPassword}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleCopyPassword}
+                      className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold flex items-center gap-1 transition-all shrink-0"
+                    >
+                      {copiedPassword ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedPassword ? 'Copiado!' : 'Copiar'}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {/* Como Funciona */}
               <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800/90 space-y-2.5">
-                <div className="flex items-center gap-1.5 font-bold text-amber-300 text-xs">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>Passo a Passo Rápido:</span>
+                <div className="flex items-center justify-between font-bold text-amber-300 text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <span>Como Acessar na TV ou Celular:</span>
+                  </div>
                 </div>
                 
                 <div className="space-y-1.5 text-[11px] text-slate-300">
                   <div className="flex items-start gap-2 p-2 rounded-lg bg-slate-900/80 border border-slate-800">
-                    <span className="w-4 h-4 rounded-full bg-red-600/30 text-red-300 font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">1</span>
-                    <span>Coloque o e-mail <strong className="text-white">{defaultEmail}</strong> na sua TV ou aplicativo da Netflix e peça para enviar o código.</span>
+                    <span className="w-4 h-4 rounded-full bg-emerald-600/30 text-emerald-300 font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">A</span>
+                    <span><strong>Opção 1 (Direto com Senha):</strong> Digite o e-mail <strong className="text-white">{defaultEmail}</strong> e a senha <strong className="text-amber-300">{defaultPassword}</strong> na sua TV/app.</span>
                   </div>
                   <div className="flex items-start gap-2 p-2 rounded-lg bg-slate-900/80 border border-slate-800">
-                    <span className="w-4 h-4 rounded-full bg-emerald-600/30 text-emerald-300 font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">2</span>
-                    <span>Clique no botão vermelho abaixo para o Bot <strong>puxar o código do e-mail</strong> instantaneamente.</span>
-                  </div>
-                  <div className="flex items-start gap-2 p-2 rounded-lg bg-slate-900/80 border border-slate-800">
-                    <span className="w-4 h-4 rounded-full bg-cyan-600/30 text-cyan-300 font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">3</span>
-                    <span>Digite o código de 4 dígitos na sua TV antes do tempo de 15 minutos expirar!</span>
+                    <span className="w-4 h-4 rounded-full bg-red-600/30 text-red-300 font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">B</span>
+                    <span><strong>Opção 2 (Código da TV):</strong> Na TV, peça o código de 4 dígitos e clique no botão vermelho abaixo para puxar do e-mail na hora!</span>
                   </div>
                 </div>
               </div>

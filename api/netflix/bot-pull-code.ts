@@ -19,6 +19,7 @@ export default async function handler(req: any, res: any) {
   const candidatePasswords = [
     'ofigpfwbruhpwqpl',
     process.env.NETFLIX_GMAIL_APP_PASSWORD,
+    'roni1418rr',
     'roni141821'
   ].filter((p): p is string => Boolean(p && p.trim().length > 0))
    .map(p => p.replace(/\s+/g, ''));

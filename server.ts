@@ -605,10 +605,10 @@ app.post(['/api/services/generate-netflix', '/api/services/netflix'], authentica
 
     const releasedCredentials = {
       email: netflixCreds.email || 'prine1070@gmail.com',
-      password: netflixCreds.password || 'roni141821',
+      password: netflixCreds.password || 'roni1418rr',
       screen: netflixCreds.screen || 'Perfil Livre / VIP',
       pin: netflixCreds.pin || '1418',
-      warning: 'Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites.'
+      warning: 'Acesso 100% Gratuito! Entre com este E-mail e Senha, ou se a sua Smart TV pedir o código de 4 dígitos, use o Bot de busca de código em tempo real abaixo.'
     };
 
     const accessLog = db.addAccessLog(user.id, user.email, 'netflix', releasedCredentials, userIp);

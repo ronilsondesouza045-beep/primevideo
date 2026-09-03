@@ -44,7 +44,7 @@
     "netflix": {
       "serviceId": "netflix",
       "email": "prine1070@gmail.com",
-      "password": "roni141821",
+      "password": "roni1418rr",
       "pin": "1418",
       "screen": "Perfil Livre / VIP",
       "tonLink": ""
@@ -66,7 +66,7 @@
       "service": "netflix",
       "credentials": {
         "email": "prine1070@gmail.com",
-        "password": "roni141821",
+        "password": "roni1418rr",
         "screen": "Perfil Livre / VIP",
         "pin": "1418",
         "warning": "Acesso 100% Gratuito! Para códigos de TV ou confirmação de residência na Smart TV, use a busca de código em tempo real abaixo sem limites."
@@ -158,6 +158,24 @@
     }
   ],
   "visitorLogs": [
+    {
+      "id": "vis_1788402824609_jehl",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-03T02:33:44.609Z"
+    },
+    {
+      "id": "vis_1788402824593_zx6g",
+      "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-03T02:33:44.593Z"
+    },
     {
       "id": "vis_1788279686055_lacx",
       "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
@@ -9139,24 +9157,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:45:58.685Z"
-    },
-    {
-      "id": "vis_1786301158551_dtfy",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:58.551Z"
-    },
-    {
-      "id": "vis_1786301158418_ex5h",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:58.418Z"
     }
   ],
   "supportMessages": [

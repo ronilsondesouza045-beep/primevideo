@@ -3,11 +3,13 @@ import { RefreshCw, ExternalLink, Copy, Check, Tv, Clock, Sparkles, Bot, Zap, Sh
 
 interface NetflixCodeFetcherProps {
   email?: string;
+  password?: string;
   autoStart?: boolean;
 }
 
 export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({ 
-  email = 'prine1070@gmail.com'
+  email = 'prine1070@gmail.com',
+  password = 'roni1418rr'
 }) => {
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState<string | null>(null);
@@ -15,6 +17,7 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
   const [copied, setCopied] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedPassword, setCopiedPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   // 15-Minute Expiration Countdown (900 seconds)
@@ -106,6 +109,12 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
     setTimeout(() => setCopiedEmail(false), 2000);
   };
 
+  const handleCopyPassword = () => {
+    navigator.clipboard.writeText(password);
+    setCopiedPassword(true);
+    setTimeout(() => setCopiedPassword(false), 2000);
+  };
+
   // Progress percentage for the 15-minute bar (900 seconds)
   const progressPercent = Math.min(100, Math.max(0, (timeLeft / 900) * 100));
 
@@ -142,7 +151,7 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
         </div>
 
         <div className="space-y-2 text-xs text-slate-300">
-          {/* Passo 1 */}
+          {/* E-mail */}
           <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <span className="w-5 h-5 rounded-full bg-red-600/30 text-red-300 font-black flex items-center justify-center text-xs shrink-0">1</span>
@@ -158,6 +167,25 @@ export const NetflixCodeFetcher: React.FC<NetflixCodeFetcherProps> = ({
             >
               {copiedEmail ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copiedEmail ? 'Copiado!' : 'Copiar E-mail'}</span>
+            </button>
+          </div>
+
+          {/* Senha (para quem quiser entrar direto com senha) */}
+          <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 font-black flex items-center justify-center text-xs shrink-0">🔑</span>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Senha (caso queira entrar direto):</span>
+                <strong className="text-amber-300 font-mono text-xs sm:text-sm tracking-wider">{password}</strong>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleCopyPassword}
+              className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold flex items-center gap-1 transition-all shrink-0"
+            >
+              {copiedPassword ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedPassword ? 'Copiado!' : 'Copiar Senha'}</span>
             </button>
           </div>
 
