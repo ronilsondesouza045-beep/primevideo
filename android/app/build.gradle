@@ -1,3 +1,7 @@
+plugins {
+    id 'com.android.application'
+}
+
 def appVersionCode =
         (project.findProperty("APP_VERSION_CODE") ?: "1000").toInteger()
 
@@ -15,10 +19,6 @@ def androidKeyAlias =
 
 def androidKeyPassword =
         System.getenv("ANDROID_KEY_PASSWORD")
-
-plugins {
-    id 'com.android.application'
-}
 
 android {
     namespace 'com.ronilson.primevideo'
@@ -46,9 +46,11 @@ android {
             ) {
 
                 storeFile file(androidKeystorePath)
+
                 storePassword androidKeystorePassword
 
                 keyAlias androidKeyAlias
+
                 keyPassword androidKeyPassword
             }
         }
@@ -61,6 +63,7 @@ android {
         }
 
         release {
+
             minifyEnabled false
 
             signingConfig signingConfigs.release
