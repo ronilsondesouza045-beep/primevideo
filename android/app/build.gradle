@@ -1,0 +1,85 @@
+def appVersionCode =
+        (project.findProperty("APP_VERSION_CODE") ?: "1000").toInteger()
+
+def appVersionName =
+        project.findProperty("APP_VERSION_NAME") ?: "1.0.0"
+
+def androidKeystorePath =
+        System.getenv("ANDROID_KEYSTORE_PATH")
+
+def androidKeystorePassword =
+        System.getenv("ANDROID_KEYSTORE_PASSWORD")
+
+def androidKeyAlias =
+        System.getenv("ANDROID_KEY_ALIAS")
+
+def androidKeyPassword =
+        System.getenv("ANDROID_KEY_PASSWORD")
+
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.ronilson.primevideo'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.ronilson.primevideo"
+
+        minSdk 26
+        targetSdk 36
+
+        versionCode appVersionCode
+        versionName appVersionName
+    }
+
+    signingConfigs {
+
+        release {
+
+            if (
+                androidKeystorePath != null &&
+                androidKeystorePassword != null &&
+                androidKeyAlias != null &&
+                androidKeyPassword != null
+            ) {
+
+                storeFile file(androidKeystorePath)
+                storePassword androidKeystorePassword
+
+                keyAlias androidKeyAlias
+                keyPassword androidKeyPassword
+            }
+        }
+    }
+
+    buildTypes {
+
+        debug {
+            debuggable true
+        }
+
+        release {
+            minifyEnabled false
+
+            signingConfig signingConfigs.release
+
+            proguardFiles(
+                getDefaultProguardFile(
+                    'proguard-android-optimize.txt'
+                ),
+                'proguard-rules.pro'
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation "androidx.webkit:webkit:1.17.1"
+}

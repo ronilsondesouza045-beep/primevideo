@@ -6,3 +6,15 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# ============================================================
+# PRIMEVIDEO ANDROID
+# ============================================================
+android/.gradle/
+android/local.properties
+android/*.jks
+android/**/*.jks
+android/**/build/
+android/app/src/main/assets/*
+!android/app/src/main/assets/.gitkeep
+PrimeVideo-Android*.apk
