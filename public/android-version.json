@@ -1,0 +1,16 @@
+{
+  "platform": "android",
+  "versionCode": 2,
+  "versionName": "1.0.0",
+  "minVersionCode": 2,
+  "required": false,
+  "title": "Nova versao disponivel",
+  "message": "Uma nova versao do PrimeVideo esta disponivel.",
+  "changes": [
+    "Aplicativo Android com React integrado ao APK",
+    "Sistema de atualizacao Android preparado",
+    "Integracao mantida com Firebase, Gemini e Vercel"
+  ],
+  "downloadUrl": "https://github.com/ronilsondesouza045-beep/primevideo/releases/latest/download/PrimeVideo-Android.apk",
+  "publishedAt": "2026-10-01T20:37:51-03:00"
+}
