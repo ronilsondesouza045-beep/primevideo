@@ -3,13 +3,18 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library';
+import { randomUUID } from 'crypto';
 import { GoogleGenAI } from '@google/genai';
 import { db, User, SmmOrder, SmmConfig, SmmService } from './src/database';
 import { fetchLatestNetflixCode } from './src/server/netflixCodeService';
 
 const app = express();
 const PORT = 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'streamhub_vip_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'streamhub_vip_secret_key_2026';
+
+const GOOGLE_WEB_CLIENT_ID = '985577291647-qt8vfpd0rp45p8njj1gdufcii4ci67l1.apps.googleusercontent.com';
+const googleOAuthClient = new OAuth2Client(GOOGLE_WEB_CLIENT_ID);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -255,70 +260,120 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
   }
 });
 
-// Social Login & Google Token Handler
-app.post('/api/auth/social-login', (req: Request, res: Response) => {
+/* GOOGLE_LOGIN_SECURE_BEGIN */
+// Social Login - Google ID Token verificado no servidor
+app.post('/api/auth/social-login', async (req: Request, res: Response) => {
+  const credential =
+    typeof req.body?.credential === 'string'
+      ? req.body.credential.trim()
+      : '';
+
+  if (!credential) {
+    return res.status(400).json({
+      error: 'Token Google obrigatorio.'
+    });
+  }
+
   try {
-    const { credential, email, name, avatarUrl, picture } = req.body;
+    const ticket = await googleOAuthClient.verifyIdToken({
+      idToken: credential,
+      audience: GOOGLE_WEB_CLIENT_ID
+    });
 
-    let userEmail = email;
-    let userName = name;
-    let userAvatar = avatarUrl || picture;
+    const payload = ticket.getPayload();
 
-    // If Google GIS Token (credential JWT) was provided, decode it
-    if (credential) {
-      try {
-        const decoded: any = jwt.decode(credential);
-        if (decoded && decoded.email) {
-          userEmail = decoded.email;
-          userName = decoded.name || userName || 'Cliente Google VIP';
-          userAvatar = decoded.picture || userAvatar;
-        }
-      } catch (e) {
-        console.error('Erro ao decodificar token do Google GIS:', e);
-      }
+    if (
+      !payload ||
+      !payload.sub ||
+      !payload.email ||
+      payload.email_verified !== true
+    ) {
+      return res.status(401).json({
+        error: 'Conta Google nao validada.'
+      });
     }
 
-    userEmail = userEmail || `google_vip_${Math.floor(1000 + Math.random() * 9000)}@gmail.com`;
-    userName = userName || 'Cliente Google VIP';
-    userAvatar = userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=dc2626&color=ffffff&bold=true`;
+    const userEmail = payload.email.toLowerCase();
+    const userName =
+      payload.name ||
+      userEmail.split('@')[0] ||
+      'Usuario Google';
+
+    const userAvatar =
+      payload.picture ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=dc2626&color=ffffff&bold=true`;
 
     let user = db.getUserByEmail(userEmail);
+
     if (!user) {
-      user = db.createUser(userEmail, 'social_login_pwd_2026', userName, userAvatar);
-    } else {
-      if (userAvatar && user.avatarUrl !== userAvatar) {
-        db.updateUserAvatar(user.id, userAvatar);
-        user.avatarUrl = userAvatar;
-      }
+      user = db.createUser(
+        userEmail,
+        randomUUID(),
+        userName,
+        userAvatar
+      );
+    } else if (
+      userAvatar &&
+      user.avatarUrl !== userAvatar
+    ) {
+      db.updateUserAvatar(
+        user.id,
+        userAvatar
+      );
+
+      user.avatarUrl =
+        userAvatar;
     }
 
     if (user.status === 'blocked') {
-      return res.status(403).json({ error: 'Sua conta está bloqueada pelo administrador.' });
+      return res.status(403).json({
+        error: 'Sua conta esta bloqueada pelo administrador.'
+      });
     }
 
-    db.recordUserLogin(user.id, getClientIp(req));
+    db.recordUserLogin(
+      user.id,
+      getClientIp(req)
+    );
+
     db.addVisitorLog(
       getClientIp(req),
       (req.headers['user-agent'] as string) || '',
       '/social-login',
-      { id: user.id, name: user.name, email: user.email }
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
     );
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, name: user.name, avatarUrl: user.avatarUrl },
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        avatarUrl: user.avatarUrl
+      },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      {
+        expiresIn: '7d'
+      }
     );
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie(
+      'token',
+      token,
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      }
+    );
 
     return res.json({
-      message: 'Login Social realizado com sucesso!',
+      message: 'Login Google realizado com sucesso!',
       user: {
         id: user.id,
         email: user.email,
@@ -329,11 +384,13 @@ app.post('/api/auth/social-login', (req: Request, res: Response) => {
       },
       token
     });
-  } catch (err: any) {
-    return res.status(500).json({ error: 'Erro ao conectar via Login Social.' });
+  } catch {
+    return res.status(401).json({
+      error: 'Token Google invalido ou expirado.'
+    });
   }
 });
-
+/* GOOGLE_LOGIN_SECURE_END */
 // GET Current Authenticated User (Me)
 app.get('/api/auth/me', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
   try {

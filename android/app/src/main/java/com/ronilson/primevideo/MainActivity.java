@@ -25,12 +25,25 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.webkit.WebViewAssetLoader;
+import androidx.credentials.Credential;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CredentialManagerCallback;
+import androidx.credentials.CustomCredential;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialException;
+
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -321,6 +334,11 @@ public class MainActivity extends Activity {
             );
         }
 
+        webView.addJavascriptInterface(
+                new PrimeAndroidBridge(),
+                "PrimeVideoNative"
+        );
+
         webView.setWebViewClient(
                 new PrimeWebViewClient()
         );
@@ -352,6 +370,218 @@ public class MainActivity extends Activity {
         );
     }
 
+    private class PrimeAndroidBridge {
+
+        @JavascriptInterface
+        public void googleSignIn(
+                String serverClientId,
+                String callbackName
+        ) {
+
+            if (
+                    serverClientId == null ||
+                    serverClientId.trim().isEmpty() ||
+                    callbackName == null ||
+                    !callbackName.matches(
+                            "[A-Za-z0-9_]+"
+                    )
+            ) {
+                return;
+            }
+
+            runOnUiThread(
+                    () -> startGoogleSignIn(
+                            serverClientId.trim(),
+                            callbackName
+                    )
+            );
+        }
+    }
+
+    private void startGoogleSignIn(
+            String serverClientId,
+            String callbackName
+    ) {
+
+        CredentialManager manager =
+                CredentialManager.create(
+                        MainActivity.this
+                );
+
+        GetSignInWithGoogleOption googleOption =
+                new GetSignInWithGoogleOption.Builder(
+                        serverClientId
+                ).build();
+
+        GetCredentialRequest request =
+                new GetCredentialRequest.Builder()
+                        .addCredentialOption(
+                                googleOption
+                        )
+                        .build();
+
+        manager.getCredentialAsync(
+                MainActivity.this,
+                request,
+                null,
+                command ->
+                        runOnUiThread(
+                                command
+                        ),
+                new CredentialManagerCallback<
+                        GetCredentialResponse,
+                        GetCredentialException
+                >() {
+
+                    @Override
+                    public void onResult(
+                            GetCredentialResponse result
+                    ) {
+
+                        Credential credential =
+                                result.getCredential();
+
+                        if (
+                                credential instanceof
+                                        CustomCredential
+                        ) {
+
+                            CustomCredential custom =
+                                    (CustomCredential)
+                                            credential;
+
+                            if (
+                                    GoogleIdTokenCredential
+                                            .TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                                            .equals(
+                                                    custom.getType()
+                                            )
+                            ) {
+
+                                try {
+
+                                    GoogleIdTokenCredential google =
+                                            GoogleIdTokenCredential
+                                                    .createFrom(
+                                                            custom.getData()
+                                                    );
+
+                                    deliverGoogleResult(
+                                            callbackName,
+                                            true,
+                                            google.getIdToken(),
+                                            null
+                                    );
+
+                                    return;
+
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        }
+
+                        deliverGoogleResult(
+                                callbackName,
+                                false,
+                                null,
+                                "Nao foi possivel ler a Conta Google."
+                        );
+                    }
+
+                    @Override
+                    public void onError(
+                            GetCredentialException error
+                    ) {
+
+                        deliverGoogleResult(
+                                callbackName,
+                                false,
+                                null,
+                                "Login Google cancelado ou indisponivel."
+                        );
+                    }
+                }
+        );
+    }
+
+    private void deliverGoogleResult(
+            String callbackName,
+            boolean ok,
+            String idToken,
+            String error
+    ) {
+
+        if (
+                callbackName == null ||
+                !callbackName.matches(
+                        "[A-Za-z0-9_]+"
+                )
+        ) {
+            return;
+        }
+
+        JSONObject payload =
+                new JSONObject();
+
+        try {
+
+            payload.put(
+                    "ok",
+                    ok
+            );
+
+            if (idToken != null) {
+                payload.put(
+                        "idToken",
+                        idToken
+                );
+            }
+
+            if (error != null) {
+                payload.put(
+                        "error",
+                        error
+                );
+            }
+
+        } catch (Exception ignored) {
+            return;
+        }
+
+        String callbackJson =
+                JSONObject.quote(
+                        callbackName
+                );
+
+        String payloadJson =
+                JSONObject.quote(
+                        payload.toString()
+                );
+
+        String javascript =
+                "(function(){" +
+                "var cb=window[" +
+                callbackJson +
+                "];" +
+                "if(typeof cb==='function'){" +
+                "cb(" +
+                payloadJson +
+                ");" +
+                "}" +
+                "})();";
+
+        runOnUiThread(
+                () -> {
+
+                    if (webView != null) {
+                        webView.evaluateJavascript(
+                                javascript,
+                                null
+                        );
+                    }
+                }
+        );
+    }
     private class PrimeWebViewClient
             extends WebViewClient {
 

@@ -23,40 +23,178 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen = true, onClose, on
   const [errorMsg, setErrorMsg] = useState('');
 
   // Direct Google Login Handler (Authentic Google Authentication with instant fallback)
+  const completeGoogleLogin = async (credential: string) => {
+    const res = await fetch('/api/auth/social-login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        credential
+      })
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (
+      !res.ok ||
+      !data?.token ||
+      !data?.user
+    ) {
+      throw new Error(
+        data?.error ||
+        'Nao foi possivel validar sua Conta Google.'
+      );
+    }
+
+    localStorage.setItem(
+      'streamhub_token',
+      data.token
+    );
+
+    localStorage.setItem(
+      'streamhub_user',
+      JSON.stringify(data.user)
+    );
+
+    useAuthStore
+      .getState()
+      .setUser(data.user);
+
+    onSuccess(data.user);
+    onClose();
+  };
+
   const handleDirectGoogleLogin = async () => {
     setLoading(true);
     setErrorMsg('');
 
     try {
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      
-      const result = await signInWithPopup(auth, provider);
-      const googleUser = result.user;
+      const nativeBridge =
+        (window as any).PrimeVideoNative;
 
-      if (googleUser && googleUser.email) {
-        const userAvatar = googleUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(googleUser.displayName || googleUser.email)}&background=dc2626&color=ffffff&bold=true`;
-        
-        await handleSocialLogin(
-          userAvatar,
-          googleUser.displayName || googleUser.email.split('@')[0] || 'Usuário Google',
-          googleUser.email
+      if (
+        nativeBridge &&
+        typeof nativeBridge.googleSignIn === 'function'
+      ) {
+        const callbackName =
+          `__primevideoGoogle_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+
+        await new Promise<void>(
+          (resolve, reject) => {
+            let finished = false;
+
+            const cleanup = () => {
+              try {
+                delete (window as any)[callbackName];
+              } catch {}
+            };
+
+            const timeout =
+              window.setTimeout(
+                () => {
+                  if (finished) return;
+
+                  finished = true;
+                  cleanup();
+
+                  reject(
+                    new Error(
+                      'O login Google demorou demais. Tente novamente.'
+                    )
+                  );
+                },
+                120000
+              );
+
+            (window as any)[callbackName] =
+              async (raw: string) => {
+                if (finished) return;
+
+                finished = true;
+
+                window.clearTimeout(timeout);
+
+                try {
+                  const nativeResult =
+                    JSON.parse(raw);
+
+                  if (
+                    !nativeResult?.ok ||
+                    !nativeResult?.idToken
+                  ) {
+                    throw new Error(
+                      nativeResult?.error ||
+                      'Login Google cancelado.'
+                    );
+                  }
+
+                  await completeGoogleLogin(
+                    nativeResult.idToken
+                  );
+
+                  resolve();
+                } catch (error) {
+                  reject(error);
+                } finally {
+                  cleanup();
+                }
+              };
+
+            nativeBridge.googleSignIn(
+              '985577291647-qt8vfpd0rp45p8njj1gdufcii4ci67l1.apps.googleusercontent.com',
+              callbackName
+            );
+          }
         );
+
         return;
       }
-    } catch (fErr: any) {
-      console.warn('Firebase Google popup sandbox notice, executing instant social login:', fErr);
-      const targetEmail = email && email.includes('@') ? email.toLowerCase() : 'ronisouza495@gmail.com';
-      const targetName = name || (targetEmail === 'ronisouza495@gmail.com' ? 'Ronilson Souza (Admin)' : 'Cliente Google VIP');
-      const targetAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(targetName)}&background=dc2626&color=ffffff&bold=true`;
-      
-      await handleSocialLogin(targetAvatar, targetName, targetEmail);
-      return;
+
+      const provider =
+        new GoogleAuthProvider();
+
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+
+      const result =
+        await signInWithPopup(
+          auth,
+          provider
+        );
+
+      const oauthCredential =
+        GoogleAuthProvider.credentialFromResult(
+          result
+        );
+
+      const idToken =
+        oauthCredential?.idToken;
+
+      if (!idToken) {
+        throw new Error(
+          'O Google nao retornou um ID Token valido.'
+        );
+      }
+
+      await completeGoogleLogin(
+        idToken
+      );
+    } catch (error: any) {
+      console.error(
+        'Google login failed:',
+        error
+      );
+
+      setErrorMsg(
+        error?.message ||
+        'Nao foi possivel entrar com o Google.'
+      );
     } finally {
       setLoading(false);
     }
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -123,69 +261,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen = true, onClose, on
   };
 
   // Google One-Click Login with Real Google Avatars
-  const handleSocialLogin = async (customAvatarUrl?: string, customName?: string, customEmail?: string) => {
-    setLoading(true);
-    setErrorMsg('');
-
-    const sampleAvatars = [
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250',
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=250',
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250'
-    ];
-
-    const selectedAvatar = customAvatarUrl || sampleAvatars[Math.floor(Math.random() * sampleAvatars.length)];
-    const socialEmail = customEmail || `google_vip_${Math.floor(1000 + Math.random() * 9000)}@gmail.com`;
-    const socialName = customName || 'Cliente Google VIP';
-
-    try {
-      const res = await fetch('/api/auth/social-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: socialEmail,
-          name: socialName,
-          avatarUrl: selectedAvatar
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.token) {
-          localStorage.setItem('streamhub_token', data.token);
-        }
-        if (data.user) {
-          localStorage.setItem('streamhub_user', JSON.stringify(data.user));
-          useAuthStore.getState().setUser(data.user);
-          onSuccess(data.user);
-          onClose();
-          setLoading(false);
-          return;
-        }
-      }
-    } catch (err) {
-      console.log('Server API offline, switching to seamless local session');
-    }
-
-    // Guaranteed fallback user (works 100% on Vercel, custom domains, or static deployment)
-    const isAdmin = socialEmail.toLowerCase() === 'ronisouza495@gmail.com';
-    const fallbackUser: User = {
-      id: `usr_google_${Date.now()}`,
-      email: socialEmail,
-      name: socialName,
-      role: isAdmin ? 'admin' : 'user',
-      status: 'active',
-      avatarUrl: selectedAvatar,
-      createdAt: new Date().toISOString()
-    };
-
-    localStorage.setItem('streamhub_user', JSON.stringify(fallbackUser));
-    useAuthStore.getState().setUser(fallbackUser);
-    onSuccess(fallbackUser);
-    onClose();
-    setLoading(false);
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
       <div className="relative w-full max-w-md my-auto bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-8 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
