@@ -6,13 +6,17 @@ import { PrimeCountdown } from './PrimeCountdown';
 interface PrimeModalProps {
   credentials: ServiceCredentials | null;
   onClose: () => void;
-  onOpenChat: () => void;
+  onOpenChat?: () => void;
+  blocked?: boolean;
+  errorMessage?: string | null;
 }
 
 export const PrimeModal: React.FC<PrimeModalProps> = ({
   credentials,
   onClose,
-  onOpenChat,
+  onOpenChat = () => {},
+  blocked = false,
+  errorMessage = null,
 }) => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPassword, setCopiedPassword] = useState(false);
@@ -190,7 +194,10 @@ export const PrimeModal: React.FC<PrimeModalProps> = ({
             </div>
 
             {/* Countdown */}
-            <PrimeCountdown />
+            <PrimeCountdown
+              createdAt={credentials.createdAt}
+              expiresAt={credentials.expiresAt}
+            />
 
             {/* Instructions */}
             <div className="bg-slate-950/50 border border-slate-800/80 rounded-2xl p-4">

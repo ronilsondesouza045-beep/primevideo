@@ -40,6 +40,10 @@ export interface ServiceCredentials {
   pin?: string;
   screen?: string;
   warning?: string;
+  createdAt?: string;
+  expiresAt?: string;
+  creationDate?: string;
+  expirationDate?: string;
 }
 
 export interface AccessLog {

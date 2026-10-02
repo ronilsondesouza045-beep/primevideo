@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { ServiceCredentials } from '../types';
 import { 
   X, Copy, Check, Bot, ExternalLink, Smartphone, Sparkles, AlertTriangle,
-  Cpu, Image, Brain, Briefcase, Code2, Search, FolderKanban, CheckCircle2
+  Cpu, Image, Brain, Briefcase, Code2, Search, FolderKanban, CheckCircle2,
+  Mail, Key, ShieldCheck
 } from 'lucide-react';
 import { ChatGptTimer } from './ChatGptTimer';
 
@@ -27,7 +28,7 @@ export const ChatGptModal: React.FC<ChatGptModalProps> = ({
     if (type === 'email') {
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2000);
-    } else {
+    } else if (type === 'password') {
       setCopiedPassword(true);
       setTimeout(() => setCopiedPassword(false), 2000);
     }

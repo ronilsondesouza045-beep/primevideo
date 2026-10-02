@@ -41,21 +41,22 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     {
       id: 'prod_prime',
       name: 'Prime Video VIP (Acesso Grátis)',
-      description: 'Acesso ao catálogo de filmes, séries e produções originais do Prime Video. (Temporariamente suspenso para manutenção).',
+      description: 'Acesso completo ao catálogo de filmes, séries e produções originais do Prime Video em 4K Ultra HD. Validade em tempo real até 26/10/2026.',
       category: 'Streaming',
       price: 0,
       isFree: true,
       image: OFFICIAL_IMAGES['prod_prime'],
       banner: OFFICIAL_IMAGES['prod_prime'],
-      stockStatus: 'SUSPENSO',
+      stockStatus: 'DISPONIVEL',
       rating: 4.9,
-      badge: 'TEMPORARIAMENTE SUSPENSO',
-      features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Suporte VIP via Chatbot'],
+      badge: '100% GRÁTIS VIP',
+      features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Validade em tempo real até 26/10/2026'],
       instructions: [
-        'Aviso: O serviço Prime Video está temporariamente suspenso no momento.',
-        'Em breve novas contas serão adicionadas.'
+        'Copie o e-mail: g05280994@gmail.com e a senha: 1418994r.',
+        'Acesse o aplicativo Prime Video na sua Smart TV, celular ou PC.',
+        'Aproveite todo o catálogo liberado até 26/10/2026!'
       ],
-      updatedAt: new Date().toISOString()
+      updatedAt: '2026-09-26T00:00:00.000Z'
     },
     {
       id: 'prod_paramount',

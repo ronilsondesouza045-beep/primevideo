@@ -63,6 +63,10 @@ export interface ServiceCredential {
   pin?: string;
   screen?: string;
   tonLink?: string;
+  createdAt?: string;
+  expiresAt?: string;
+  creationDate?: string;
+  expirationDate?: string;
 }
 
 export interface AccessLog {
@@ -77,6 +81,10 @@ export interface AccessLog {
     pin?: string;
     screen?: string;
     warning?: string;
+    createdAt?: string;
+    expiresAt?: string;
+    creationDate?: string;
+    expirationDate?: string;
   };
   createdAt: string;
 }
@@ -235,6 +243,18 @@ export interface NetflixAutomationConfig {
   updatedAt?: string;
 }
 
+export interface ChatGptAutomationConfig {
+  email: string;
+  appPassword?: string;
+  manualCode?: string;
+  manualLink?: string;
+  lastCode?: string;
+  lastLink?: string;
+  lastCodeSubject?: string;
+  lastCodeDate?: string;
+  updatedAt?: string;
+}
+
 interface DatabaseSchema {
   users: User[];
   credentials: Record<string, ServiceCredential>;
@@ -258,6 +278,7 @@ interface DatabaseSchema {
   homeContentConfig?: HomeContentConfig;
   autoUpdateState?: AutoUpdateState;
   netflixConfig?: NetflixAutomationConfig;
+  chatgptConfig?: ChatGptAutomationConfig;
 }
 
 const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT);
@@ -454,13 +475,17 @@ class JSONDatabase {
 
   private ensureDefaultCredentials() {
     // Prime Video Default:
-    // Email: primevideosouza368@gmail.com
-    // Senha: roni141821
+    // Email: g05280994@gmail.com
+    // Senha: 1418994r
+    // Data de Criação: 26/09/2026 | Vencimento: 26/10/2026
     this.data.credentials['prime'] = {
       serviceId: 'prime',
-      email: 'primevideosouza368@gmail.com',
-      password: 'roni141821',
-      tonLink: ''
+      email: 'g05280994@gmail.com',
+      password: '1418994r',
+      screen: 'Livre / Escolha qualquer perfil',
+      tonLink: '',
+      createdAt: '2026-09-26T00:00:00.000Z',
+      expiresAt: '2026-10-26T23:59:59.999Z'
     };
 
     // Paramount+ Default (100% Gratuito)
@@ -773,6 +798,33 @@ class JSONDatabase {
     };
     this.save();
     return this.data.netflixConfig;
+  }
+
+  public getChatGptAutomationConfig(): ChatGptAutomationConfig {
+    if (!this.data.chatgptConfig) {
+      this.data.chatgptConfig = {
+        email: process.env.CHATGPT_GMAIL_USER || 'souzagatopreto50@gmail.com',
+        appPassword: process.env.CHATGPT_GMAIL_APP_PASSWORD || 'imeflehszalusovb',
+        manualCode: '',
+        manualLink: '',
+        updatedAt: new Date().toISOString()
+      };
+      this.save();
+    } else if (!this.data.chatgptConfig.appPassword || this.data.chatgptConfig.appPassword.trim() === '' || this.data.chatgptConfig.appPassword.includes('~Y?')) {
+      this.data.chatgptConfig.appPassword = process.env.CHATGPT_GMAIL_APP_PASSWORD || 'imeflehszalusovb';
+      this.save();
+    }
+    return this.data.chatgptConfig;
+  }
+
+  public updateChatGptAutomationConfig(config: Partial<ChatGptAutomationConfig>): ChatGptAutomationConfig {
+    this.data.chatgptConfig = {
+      ...this.getChatGptAutomationConfig(),
+      ...config,
+      updatedAt: new Date().toISOString()
+    };
+    this.save();
+    return this.data.chatgptConfig;
   }
 
   // Access Logs
@@ -1908,21 +1960,22 @@ class JSONDatabase {
       {
         id: 'prod_prime',
         name: 'Prime Video VIP (Acesso Grátis)',
-        description: 'Acesso ao catálogo de filmes, séries e produções originais do Prime Video. (Temporariamente suspenso para manutenção).',
+        description: 'Acesso completo ao catálogo de filmes, séries e produções exclusivas do Prime Video em 4K Ultra HD. Validade em tempo real até 26/10/2026.',
         category: 'Streaming',
         price: 0,
         isFree: true,
         image: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
         banner: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
-        stockStatus: 'SUSPENSO',
+        stockStatus: 'DISPONIVEL',
         rating: 4.9,
-        badge: 'TEMPORARIAMENTE SUSPENSO',
-        features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Suporte VIP via Chatbot'],
+        badge: '100% GRÁTIS VIP',
+        features: ['Qualidade 4K Ultra HD', 'Multi-perfis liberados', 'Ativação Instantânea 24/7', 'Validade em tempo real até 26/10/2026'],
         instructions: [
-          'Aviso: O serviço Prime Video está temporariamente suspenso no momento.',
-          'Em breve novas contas serão adicionadas.'
+          'Copie o e-mail: g05280994@gmail.com e a senha: 1418994r.',
+          'Acesse o aplicativo Prime Video na sua Smart TV ou celular/computador.',
+          'Aproveite todo o catálogo liberado até 26/10/2026!'
         ],
-        updatedAt: new Date().toISOString()
+        updatedAt: '2026-09-26T00:00:00.000Z'
       },
       {
         id: 'prod_paramount',

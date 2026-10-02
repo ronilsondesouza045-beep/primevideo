@@ -124,6 +124,9 @@ export default function App() {
 
   useEffect(() => {
     checkPrimeStatus();
+    // Periodically verify real-time status
+    const interval = setInterval(checkPrimeStatus, 30000);
+    return () => clearInterval(interval);
   }, [user]);
 
   // Service generation handlers with graceful fallback
@@ -134,7 +137,7 @@ export default function App() {
     }
 
     if (primeBlocked) {
-      alert(primeError || 'O serviço Prime Video está temporariamente suspenso por enquanto.');
+      alert(primeError || 'O acesso ao Prime Video expirou em 26/10/2026 e foi bloqueado automaticamente.');
       return;
     }
 
@@ -163,10 +166,10 @@ export default function App() {
           type: 'info'
         });
       } else {
-        alert(data?.error || primeError || 'O serviço Prime Video está temporariamente suspenso por enquanto.');
+        alert(data?.error || primeError || 'Não foi possível liberar o Prime Video no momento.');
       }
     } catch (err) {
-      alert(primeError || 'O serviço Prime Video está temporariamente suspenso por enquanto.');
+      alert(primeError || 'Erro ao conectar ao servidor para liberar o Prime Video.');
     }
   };
 

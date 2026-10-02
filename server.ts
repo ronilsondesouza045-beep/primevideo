@@ -456,15 +456,46 @@ app.post('/api/auth/logout', (req: Request, res: Response) => {
 // 2. SERVICES & ACCESS GENERATOR
 // ==============================================
 
+// Prime Video Real-time Expiration & Auto-Blocking Configuration
+// Data de criação: 26/09/2026 | Data de vencimento: 26/10/2026
+const PRIME_CREATION_DATE = new Date('2026-09-26T00:00:00.000Z');
+const PRIME_EXPIRATION_DATE = new Date('2026-10-26T23:59:59.999Z');
+
+function isPrimeVideoExpired(): boolean {
+  return Date.now() >= PRIME_EXPIRATION_DATE.getTime();
+}
+
 // Check Prime Video status/eligibility for current IP or User
 app.get('/api/services/prime-status', (req: Request, res: Response) => {
   try {
     const userIp = getClientIp(req);
+    const expired = isPrimeVideoExpired();
+    const now = Date.now();
+
+    if (expired) {
+      return res.json({
+        blocked: true,
+        reason: 'EXPIRADO',
+        clientIp: userIp,
+        creationDate: '26/09/2026',
+        expirationDate: '26/10/2026',
+        createdAt: PRIME_CREATION_DATE.toISOString(),
+        expiresAt: PRIME_EXPIRATION_DATE.toISOString(),
+        remainingMs: 0,
+        errorMessage: 'O acesso ao Prime Video expirou em 26/10/2026 e foi bloqueado automaticamente conforme a validade.'
+      });
+    }
+
     return res.json({
-      blocked: true,
-      reason: 'SUSPENSO',
+      blocked: false,
+      reason: null,
       clientIp: userIp,
-      errorMessage: 'O serviço Prime Video está temporariamente suspenso para manutenção e atualização. Novos acessos serão liberados em breve!'
+      creationDate: '26/09/2026',
+      expirationDate: '26/10/2026',
+      createdAt: PRIME_CREATION_DATE.toISOString(),
+      expiresAt: PRIME_EXPIRATION_DATE.toISOString(),
+      remainingMs: Math.max(0, PRIME_EXPIRATION_DATE.getTime() - now),
+      message: 'Prime Video VIP 100% Liberado com validade em tempo real até 26/10/2026!'
     });
   } catch (err) {
     return res.status(500).json({ error: 'Erro ao verificar status.' });
@@ -499,10 +530,65 @@ function resolveCallerDisplayName(req: any): string {
 
 // Generate Free Prime Video Access (supports both route aliases)
 app.post(['/api/services/generate-prime', '/api/services/prime'], authenticateToken, (req: AuthenticatedRequest, res: Response) => {
-  return res.status(403).json({
-    success: false,
-    error: 'O serviço Prime Video está temporariamente suspenso por enquanto. Por favor, utilize os outros serviços disponíveis (Paramount+, Crunchyroll, ChatGPT, IPTV)!'
-  });
+  try {
+    const user = req.user!;
+    const userIp = getClientIp(req);
+
+    if (isPrimeVideoExpired()) {
+      return res.status(403).json({
+        success: false,
+        error: 'O acesso ao Prime Video expirou em 26/10/2026 e foi bloqueado automaticamente conforme a data de vencimento.'
+      });
+    }
+
+    const primeCreds = db.getCredential('prime');
+
+    const releasedCredentials = {
+      email: primeCreds.email || 'g05280994@gmail.com',
+      password: primeCreds.password || '1418994r',
+      screen: primeCreds.screen || 'Livre / Escolha qualquer perfil',
+      createdAt: PRIME_CREATION_DATE.toISOString(),
+      expiresAt: PRIME_EXPIRATION_DATE.toISOString(),
+      creationDate: '26/09/2026',
+      expirationDate: '26/10/2026',
+      warning: 'Acesso VIP Liberado! Validade em tempo real até 26/10/2026 (bloqueio automático após o término).'
+    };
+
+    const accessLog = db.addAccessLog(user.id, user.email, 'prime', releasedCredentials, userIp);
+
+    // Real-time broadcast notification
+    const callerName = resolveCallerDisplayName(req);
+    db.addNotification(
+      undefined,
+      '🎬 Conta Prime Video VIP Liberada!',
+      `${callerName} acabou de liberar o streaming VIP do Prime Video no catálogo.`,
+      'success',
+      '/catalog',
+      'streaming',
+      callerName,
+      'prime'
+    );
+
+    return res.json({
+      success: true,
+      message: 'Acesso Prime Video liberado com sucesso!',
+      credentials: releasedCredentials,
+      access: {
+        id: accessLog.id,
+        service: 'Prime Video VIP',
+        credentials: releasedCredentials,
+        generatedAt: accessLog.createdAt,
+        instructions: [
+          'Acesse o site ou app oficial do Prime Video (primevideo.com).',
+          'Insira o e-mail: g05280994@gmail.com e a senha: 1418994r.',
+          'Escolha um dos perfis livres e aproveite!',
+          'Acesso válido até 26/10/2026 com contagem em tempo real.'
+        ]
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Erro ao liberar acesso ao Prime Video.' });
+  }
 });
 
 // Generate Free Paramount+ Access (supports both route aliases)
@@ -1172,10 +1258,12 @@ app.get('/api/services/user-accesses', authenticateToken, (req: AuthenticatedReq
     const payments = db.getPayments(user.id);
     const limitCheck = db.checkPrimeGenerationLimit(user.id, userIp);
 
+    const isPrimeBlocked = isPrimeVideoExpired() || limitCheck.isBlocked;
+
     return res.json({
       accessLogs,
       payments,
-      primeBlocked: limitCheck.isBlocked,
+      primeBlocked: isPrimeBlocked,
       clientIp: userIp
     });
   } catch (err: any) {

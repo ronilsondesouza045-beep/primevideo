@@ -157,35 +157,62 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         </div>
 
         {/* ======================================================== */}
-        {/* CARD 1: PRIME VIDEO (SUSPENSO TEMPORARIAMENTE) */}
+        {/* CARD 1: PRIME VIDEO (100% LIBERADO VIP) */}
         {/* ======================================================== */}
-        <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-amber-950/30 group overflow-hidden">
+        <div className={`relative rounded-3xl bg-slate-900/90 border p-6 flex flex-col justify-between transition-all group overflow-hidden ${
+          primeBlocked
+            ? 'border-red-500/40 hover:border-red-500 hover:shadow-2xl hover:shadow-red-950/40'
+            : 'border-slate-800 hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-950/30'
+        }`}>
           
           {/* Subtle Glow */}
-          <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
+          <div className={`absolute top-0 right-0 w-36 h-36 rounded-full blur-3xl pointer-events-none transition-all ${
+            primeBlocked ? 'bg-red-500/10 group-hover:bg-red-500/20' : 'bg-cyan-500/15 group-hover:bg-cyan-500/25'
+          }`} />
 
           <div>
             {/* Header Badge */}
             <div className="flex items-center justify-between gap-1.5 mb-4">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider text-amber-300 bg-amber-500/15 border border-amber-500/30 uppercase flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3 text-amber-400" />
-                TEMPORARIAMENTE SUSPENSO
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase flex items-center gap-1 border ${
+                primeBlocked
+                  ? 'text-red-300 bg-red-500/15 border-red-500/30'
+                  : 'text-cyan-300 bg-cyan-500/20 border-cyan-500/40'
+              }`}>
+                {primeBlocked ? (
+                  <>
+                    <Lock className="w-3 h-3 text-red-400" />
+                    BLOQUEADO AUTOMATICAMENTE
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3 h-3 text-cyan-400 animate-pulse" />
+                    100% GRÁTIS VIP
+                  </>
+                )}
               </span>
-              <span className="text-[10px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                Manutenção
+              <span className={`text-[10px] font-black px-2 py-0.5 rounded border ${
+                primeBlocked
+                  ? 'text-red-400 bg-red-500/10 border-red-500/20'
+                  : 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30'
+              }`}>
+                {primeBlocked ? 'Expirado' : 'Acesso Liberado'}
               </span>
             </div>
 
             {/* Service Title & Logo Branding */}
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-yellow-500 p-0.5 shadow-lg shadow-amber-500/20 shrink-0">
+              <div className={`w-10 h-10 rounded-xl p-0.5 shadow-lg shrink-0 ${
+                primeBlocked
+                  ? 'bg-gradient-to-tr from-red-600 to-rose-500 shadow-red-500/20'
+                  : 'bg-gradient-to-tr from-cyan-500 via-blue-600 to-teal-400 shadow-cyan-500/30'
+              }`}>
                 <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                  <Play className="w-5 h-5 text-amber-400 fill-amber-400" />
+                  <Play className={`w-5 h-5 ${primeBlocked ? 'text-red-400 fill-red-400' : 'text-cyan-400 fill-cyan-400'}`} />
                 </div>
               </div>
               <div>
                 <h3 className="text-lg font-extrabold text-white leading-tight">
-                  Prime Video
+                  Prime Video VIP
                 </h3>
                 <p className="text-[11px] text-slate-400 font-medium">
                   Amazon Prime Oficial
@@ -194,24 +221,34 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             </div>
 
             <p className="text-slate-300 text-xs mb-3 leading-relaxed">
-              Acesso <strong className="text-amber-300">temporariamente suspenso</strong> para manutenção preventiva e atualização de contas.
+              {primeBlocked ? (
+                <>Acesso <strong className="text-red-300">bloqueado automaticamente</strong> devido ao vencimento em 26/10/2026.</>
+              ) : (
+                <>Acesso <strong className="text-cyan-300">100% liberado</strong>! Assista a filmes, séries exclusivas e produções originais em 4K Ultra HD.</>
+              )}
             </p>
 
             {/* Prime Video Catalog Banner */}
-            <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-amber-500/30 group/img bg-slate-950 shadow-md">
+            <div className="relative mb-3.5 rounded-2xl overflow-hidden border border-cyan-500/30 group/img bg-slate-950 shadow-md">
               <img
                 src="https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg"
                 alt="Catálogo Prime Video"
                 referrerPolicy="no-referrer"
-                className="w-full h-32 sm:h-36 object-cover object-center grayscale-[40%] transform group-hover/img:scale-105 transition-transform duration-300"
+                className={`w-full h-32 sm:h-36 object-cover object-center transform group-hover/img:scale-105 transition-transform duration-300 ${
+                  primeBlocked ? 'grayscale-[50%]' : ''
+                }`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold text-amber-200">
-                <span className="bg-slate-950/85 px-2 py-0.5 rounded-md border border-amber-500/30 backdrop-blur-sm">
-                  Prime Video
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold text-cyan-200">
+                <span className="bg-slate-950/85 px-2 py-0.5 rounded-md border border-cyan-500/30 backdrop-blur-sm">
+                  Filmes & Séries Originais
                 </span>
-                <span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-md border border-amber-500/40 backdrop-blur-sm">
-                  Suspenso
+                <span className={`px-2 py-0.5 rounded-md backdrop-blur-sm border ${
+                  primeBlocked
+                    ? 'bg-red-500/20 text-red-300 border-red-500/40'
+                    : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                }`}>
+                  {primeBlocked ? 'Expirado' : '4K Ultra HD'}
                 </span>
               </div>
             </div>
@@ -220,16 +257,16 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
             {onOpenReviews && (
               <button
                 onClick={() => onOpenReviews('prime')}
-                className="w-full mb-3 p-2 rounded-xl bg-slate-950/90 border border-slate-800 hover:border-amber-500/40 text-left transition-all flex items-center justify-between group/rev"
+                className="w-full mb-3 p-2 rounded-xl bg-slate-950/90 border border-slate-800 hover:border-cyan-500/40 text-left transition-all flex items-center justify-between group/rev"
               >
                 <div className="flex items-center gap-1.5">
                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                   <span className="text-xs font-black text-white">4.9/5.0</span>
-                  <span className="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                    Manutenção
+                  <span className="text-[10px] text-cyan-400 font-bold bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
+                    VIP Oficial
                   </span>
                 </div>
-                <span className="text-[10px] font-bold text-amber-400 group-hover/rev:underline flex items-center gap-1">
+                <span className="text-[10px] font-bold text-cyan-400 group-hover/rev:underline flex items-center gap-1">
                   <MessageSquare className="w-3 h-3" />
                   Avaliações
                 </span>
@@ -238,17 +275,17 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
 
             {/* Benefits List */}
             <ul className="space-y-2 mb-4 text-[11px] text-slate-300">
-              <li className="flex items-center gap-1.5 text-amber-300/90">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>Suspenso por enquanto para ajustes</span>
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>E-mail e Senha VIP Liberados</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                <span className="text-slate-400">Novas contas em breve</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Compatível com Smart TV, Celular e PC</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                <span className="text-slate-400">Utilize Paramount+ ou Crunchyroll</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Validade em tempo real até 26/10/2026</span>
               </li>
             </ul>
 
@@ -261,15 +298,44 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
           <div>
             <div className="p-2.5 mb-3 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between text-xs">
               <span className="text-slate-400 text-[11px]">Status:</span>
-              <span className="font-black text-amber-400 text-xs">Suspenso Temporariamente</span>
+              <span className={`font-black text-xs flex items-center gap-1.5 ${
+                primeBlocked ? 'text-red-400' : 'text-emerald-400'
+              }`}>
+                {primeBlocked ? (
+                  <>
+                    <Lock className="w-3 h-3 text-red-400" />
+                    Bloqueado (Expirado)
+                  </>
+                ) : (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    Liberado / VIP Ativo
+                  </>
+                )}
+              </span>
             </div>
 
             <button
               onClick={onGeneratePrime}
-              className="w-full py-3 px-4 rounded-xl font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-1.5 group/btn bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white shadow-amber-600/20"
+              disabled={primeBlocked}
+              className={`w-full py-3 px-4 rounded-xl font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-1.5 group/btn ${
+                primeBlocked
+                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                  : 'bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 hover:from-blue-500 hover:to-teal-400 text-white shadow-cyan-600/30 cursor-pointer active:scale-98'
+              }`}
             >
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>Temporariamente Suspenso</span>
+              {primeBlocked ? (
+                <>
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Acesso Expirado (Bloqueado)</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>LIBERAR ACESSO PRIME VIDEO</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-0.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                </>
+              )}
             </button>
           </div>
 

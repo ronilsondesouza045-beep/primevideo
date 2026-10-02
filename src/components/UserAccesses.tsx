@@ -249,7 +249,12 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                           </div>
                         )}
 
-                        {!isParamount && !isCrunchyroll && !isChatGpt && !isNetflix && <PrimeCountdown createdAt={a.createdAt} />}
+                        {!isParamount && !isCrunchyroll && !isChatGpt && !isNetflix && (
+                          <PrimeCountdown
+                            createdAt={a.credentials.createdAt || a.createdAt}
+                            expiresAt={a.credentials.expiresAt}
+                          />
+                        )}
                       </>
                     )}
                   </div>

@@ -18,13 +18,28 @@
       "status": "active",
       "avatarUrl": "https://ui-avatars.com/api/?name=ronilsondesouza045&background=dc2626&color=ffffff&bold=true",
       "createdAt": "2026-08-22T17:26:38.432Z"
+    },
+    {
+      "id": "usr_1788917801620_pug5m",
+      "email": "gatomemu22@gmail.com",
+      "passwordHash": "$2b$10$EYxEwk4Mi9Hq9WYf1kcGwOPrn2IpyD3vsrTqeuvOyL8EJHhup4ltq",
+      "name": "gatomemu22",
+      "role": "user",
+      "status": "active",
+      "avatarUrl": "https://ui-avatars.com/api/?name=gatomemu22&background=dc2626&color=ffffff&bold=true",
+      "createdAt": "2026-09-09T01:36:41.733Z"
     }
   ],
   "credentials": {
     "prime": {
       "serviceId": "prime",
-      "email": "primevideosouza368@gmail.com",
-      "password": "roni141821",
+      "email": "g05280994@gmail.com",
+      "password": "1418994r",
+      "screen": "Livre / Escolha qualquer perfil",
+      "createdAt": "2026-09-26T00:00:00.000Z",
+      "expiresAt": "2026-10-26T23:59:59.999Z",
+      "creationDate": "26/09/2026",
+      "expirationDate": "26/10/2026",
       "tonLink": ""
     },
     "paramount": {
@@ -58,6 +73,20 @@
     }
   },
   "accessLogs": [
+    {
+      "id": "acc_1788917801738_09yk4",
+      "userId": "usr_1788917801620_pug5m",
+      "userEmail": "gatomemu22@gmail.com",
+      "userIp": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "service": "chatgpt",
+      "credentials": {
+        "email": "gatomemu22@gmail.com",
+        "password": "14182131rr",
+        "screen": "ChatGPT Pro GPT-4o (Login Google)",
+        "warning": "Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo \"Continuar com o Google\"."
+      },
+      "createdAt": "2026-09-09T01:36:41.738Z"
+    },
     {
       "id": "acc_1788275143926_5fnxb",
       "userId": "usr_1787877404018_51o2g",
@@ -158,6 +187,114 @@
     }
   ],
   "visitorLogs": [
+    {
+      "id": "vis_1790898836125_4qxx",
+      "ip": "2804:d41:c57a:300:5ce3:4170:f061:580b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-01T23:53:56.125Z"
+    },
+    {
+      "id": "vis_1790898836118_1c2u",
+      "ip": "2804:d41:c57a:300:5ce3:4170:f061:580b",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-01T23:53:56.118Z"
+    },
+    {
+      "id": "vis_1788920377425_vus4",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T02:19:37.425Z"
+    },
+    {
+      "id": "vis_1788920377418_swlu",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T02:19:37.418Z"
+    },
+    {
+      "id": "vis_1788920105362_jh7i",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T02:15:05.362Z"
+    },
+    {
+      "id": "vis_1788920105354_uk97",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T02:15:05.354Z"
+    },
+    {
+      "id": "vis_1788919453081_m91j",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T02:04:13.081Z"
+    },
+    {
+      "id": "vis_1788919453073_bi60",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T02:04:13.073Z"
+    },
+    {
+      "id": "vis_1788918950405_clyy",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T01:55:50.405Z"
+    },
+    {
+      "id": "vis_1788918950395_g3mz",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T01:55:50.395Z"
+    },
+    {
+      "id": "vis_1788917390613_hcct",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T01:29:50.613Z"
+    },
+    {
+      "id": "vis_1788917390605_g8he",
+      "ip": "2804:d41:c57a:300:84b0:e34e:d66d:a34f",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-09-09T01:29:50.605Z"
+    },
     {
       "id": "vis_1788405211955_hh1c",
       "ip": "2804:d41:c57a:300:cf56:4592:554a:11fd",
@@ -9049,114 +9186,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:46:01.257Z"
-    },
-    {
-      "id": "vis_1786301161121_6rb3",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:01.121Z"
-    },
-    {
-      "id": "vis_1786301160990_0u8v",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:00.990Z"
-    },
-    {
-      "id": "vis_1786301160856_ywoj",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:00.856Z"
-    },
-    {
-      "id": "vis_1786301160701_xxvj",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:00.701Z"
-    },
-    {
-      "id": "vis_1786301160557_fj7v",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:00.557Z"
-    },
-    {
-      "id": "vis_1786301160433_wqy2",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:00.433Z"
-    },
-    {
-      "id": "vis_1786301160245_t6zt",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:00.245Z"
-    },
-    {
-      "id": "vis_1786301160102_lryi",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:00.102Z"
-    },
-    {
-      "id": "vis_1786301159958_9ujn",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:59.958Z"
-    },
-    {
-      "id": "vis_1786301159824_0kke",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:59.824Z"
-    },
-    {
-      "id": "vis_1786301159680_uqit",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:59.680Z"
-    },
-    {
-      "id": "vis_1786301159521_l432",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:45:59.521Z"
     }
   ],
   "supportMessages": [
@@ -9512,26 +9541,27 @@
     {
       "id": "prod_prime",
       "name": "Prime Video VIP (Acesso Grátis)",
-      "description": "Acesso ao catálogo de filmes, séries e produções originais do Prime Video. (Temporariamente suspenso para manutenção).",
+      "description": "Acesso ao catálogo de filmes, séries e produções originais do Prime Video em 4K Ultra HD. Validade em tempo real até 26/10/2026.",
       "category": "Streaming",
       "price": 0,
       "isFree": true,
       "image": "https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg",
       "banner": "https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg",
-      "stockStatus": "SUSPENSO",
+      "stockStatus": "DISPONIVEL",
       "rating": 4.9,
-      "badge": "TEMPORARIAMENTE SUSPENSO",
+      "badge": "100% GRÁTIS VIP",
       "features": [
         "Qualidade 4K Ultra HD",
         "Multi-perfis liberados",
         "Ativação Instantânea 24/7",
-        "Suporte VIP via Chatbot"
+        "Validade em tempo real até 26/10/2026"
       ],
       "instructions": [
-        "Aviso: O serviço Prime Video está temporariamente suspenso no momento.",
-        "Em breve novas contas serão adicionadas."
+        "Copie o e-mail (g05280994@gmail.com) e a senha (1418994r).",
+        "Acesse o Prime Video na Smart TV ou no celular/PC.",
+        "Escolha qualquer perfil e aproveite até o término em 26/10/2026."
       ],
-      "updatedAt": "2026-08-24T19:00:00.000Z"
+      "updatedAt": "2026-09-26T00:00:00.000Z"
     },
     {
       "id": "prod_paramount",
@@ -9775,6 +9805,42 @@
   },
   "notifications": [
     {
+      "id": "notif_1788918609681_699",
+      "title": "🤖 Acesso ChatGPT Plus VIP Liberado!",
+      "message": "gatomemu22 acabou de desbloquear acesso ao ChatGPT Plus com IA.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "streaming",
+      "userName": "gatomemu22",
+      "service": "chatgpt",
+      "createdAt": "2026-09-09T01:50:09.681Z"
+    },
+    {
+      "id": "notif_1788918492496_523",
+      "title": "🤖 Acesso ChatGPT Plus VIP Liberado!",
+      "message": "gatomemu22 acabou de desbloquear acesso ao ChatGPT Plus com IA.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "streaming",
+      "userName": "gatomemu22",
+      "service": "chatgpt",
+      "createdAt": "2026-09-09T01:48:12.496Z"
+    },
+    {
+      "id": "notif_1788917801743_965",
+      "title": "🤖 Acesso ChatGPT Plus VIP Liberado!",
+      "message": "gatomemu22 acabou de desbloquear acesso ao ChatGPT Plus com IA.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "streaming",
+      "userName": "gatomemu22",
+      "service": "chatgpt",
+      "createdAt": "2026-09-09T01:36:41.743Z"
+    },
+    {
       "id": "notif_1788406057323_476",
       "title": "⚡ Código Netflix TV Gerado (Tempo Real)",
       "message": "Gabriel Costa acabou de puxar um código de 4 dígitos para Smart TV na Netflix em tempo real.",
@@ -9855,5 +9921,15 @@
     "lastLink": "https://www.netflix.com/browse?g=dbfdbaa6-ac49-4d9b-af29-115e75419566&lkid=URL_LOGO&lnktrk=EVO",
     "lastCodeSubject": "Netflix: seu código de acesso",
     "lastCodeDate": "2026-09-03T03:14:27.000Z"
+  },
+  "chatgptConfig": {
+    "email": "souzagatopreto50@gmail.com",
+    "appPassword": "nstdyubbfccfrdqa",
+    "manualCode": "",
+    "manualLink": "",
+    "updatedAt": "2026-09-09T02:13:50.000Z",
+    "lastCode": "",
+    "lastLink": "https://chatgpt.com",
+    "lastCodeDate": ""
   }
 }
