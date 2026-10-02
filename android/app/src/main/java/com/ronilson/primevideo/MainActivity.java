@@ -41,10 +41,10 @@ import java.util.List;
 public class MainActivity extends Activity {
 
     private static final String WEB_HOST =
-            "primevideo-ten.vercel.app";
+            "filmes.autos";
 
     private static final String WEB_ORIGIN =
-            "https://primevideo-ten.vercel.app";
+            "https://filmes.autos";
 
     private static final String LOCAL_PREFIX =
             "/__app__/";

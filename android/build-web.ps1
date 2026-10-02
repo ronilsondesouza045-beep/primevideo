@@ -74,7 +74,7 @@ $Bootstrap = @"
     try {
 
         var PROD_ORIGIN =
-            'https://primevideo-ten.vercel.app';
+            'https://filmes.autos';
 
         window.__PRIMEVIDEO_ANDROID__ = {
             native: true,
@@ -456,7 +456,7 @@ $RequiredMarkers = @(
     "__PRIMEVIDEO_FETCH_PATCHED__",
     "__PRIMEVIDEO_OPEN_PATCHED__",
     "Service Worker desativado no APK",
-    "https://primevideo-ten.vercel.app"
+    "https://filmes.autos"
 )
 
 foreach ($Marker in $RequiredMarkers) {

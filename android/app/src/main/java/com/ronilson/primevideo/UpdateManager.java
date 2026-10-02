@@ -23,7 +23,7 @@ public class UpdateManager {
             "PrimeVideoUpdate";
 
     private static final String VERSION_URL =
-            "https://primevideo-ten.vercel.app/android-version.json";
+            "https://filmes.autos/android-version.json";
 
     private final Activity activity;
 
