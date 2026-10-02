@@ -1,14 +1,14 @@
 {
   "platform": "android",
-  "versionCode": 1012,
-  "versionName": "1.0.12",
+  "versionCode": 1013,
+  "versionName": "1.0.13",
   "minVersionCode": 1000,
   "required": false,
   "title": "Nova versao disponivel",
   "message": "Uma nova versao do PrimeVideo esta disponivel.",
   "changes": [
-    "fix(auth): adicionar login Google nativo no Android"
+    "chore: integrate external service worker"
   ],
   "downloadUrl": "https://github.com/ronilsondesouza045-beep/primevideo/releases/latest/download/PrimeVideo-Android.apk",
-  "publishedAt": "2026-10-02T05:55:23.6954454+00:00"
+  "publishedAt": "2026-10-02T06:16:57.3188038+00:00"
 }
