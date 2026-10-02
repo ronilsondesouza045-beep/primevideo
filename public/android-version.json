@@ -1,16 +1,14 @@
 {
-    "platform":  "android",
-    "versionCode":  1000,
-    "versionName":  "1.0.0",
-    "minVersionCode":  1000,
-    "required":  false,
-    "title":  "Nova versao disponivel",
-    "message":  "Uma nova versao do PrimeVideo esta disponivel.",
-    "changes":  [
-                    "Versao Android oficial inicial",
-                    "React integrado diretamente ao APK",
-                    "Sistema automatico de atualizacoes preparado"
-                ],
-    "downloadUrl":  "https://github.com/ronilsondesouza045-beep/primevideo/releases/latest/download/PrimeVideo-Android.apk",
-    "publishedAt":  "2026-10-01T20:46:16.2692874-03:00"
+  "platform": "android",
+  "versionCode": 1005,
+  "versionName": "1.0.5",
+  "minVersionCode": 1000,
+  "required": false,
+  "title": "Nova versao disponivel",
+  "message": "Uma nova versao do PrimeVideo esta disponivel.",
+  "changes": [
+    "feat: update Prime Video service and expiration logic"
+  ],
+  "downloadUrl": "https://github.com/ronilsondesouza045-beep/primevideo/releases/latest/download/PrimeVideo-Android.apk",
+  "publishedAt": "2026-10-02T00:09:37.4335320+00:00"
 }
