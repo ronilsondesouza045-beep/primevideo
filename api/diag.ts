@@ -1,94 +1,116 @@
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
 
 export default {
   async fetch(request: Request) {
     const cwd = process.cwd();
 
-    const seedFile =
+    const bundlePath =
+      path.join(
+        cwd,
+        "dist",
+        "server.cjs"
+      );
+
+    const seedPath =
       path.join(
         cwd,
         "data",
         "streamhub.json"
       );
 
-    const tmpDir =
-      path.join(
-        "/tmp",
-        "data"
-      );
-
-    const info: Record<string, unknown> = {
+    const result: Record<string, unknown> = {
       ok: false,
-      route: "diag",
+      route: "diag-bundle-12h",
       node: process.version,
       vercel: Boolean(process.env.VERCEL),
-      nodeEnv: process.env.NODE_ENV || null,
       cwd,
-      seedFile,
-      seedExists: fs.existsSync(seedFile),
-      tmpExists: fs.existsSync("/tmp")
+      bundlePath,
+      bundleExists: fs.existsSync(bundlePath),
+      seedExists: fs.existsSync(seedPath)
     };
 
-    try {
-      fs.mkdirSync(
-        tmpDir,
-        {
-          recursive: true
-        }
-      );
+    if (!fs.existsSync(bundlePath)) {
+      const distPath =
+        path.join(
+          cwd,
+          "dist"
+        );
 
-      info.tmpWritable = true;
-    }
-    catch (error: any) {
-      info.tmpWritable = false;
-      info.tmpError = String(
-        error?.message ||
-        error
-      );
-    }
+      result.distExists =
+        fs.existsSync(distPath);
 
-    try {
-      const serverModule =
-        await import("../server");
+      if (fs.existsSync(distPath)) {
+        result.distFiles =
+          fs.readdirSync(distPath);
+      }
 
-      info.ok = true;
-      info.serverImport = "OK";
-      info.defaultExportType =
-        typeof serverModule.default;
+      result.rootFiles =
+        fs.readdirSync(cwd)
+          .filter(
+            (name) =>
+              name.includes("server") ||
+              name === "dist"
+          );
 
       return Response.json(
-        info,
+        result,
+        {
+          status: 200
+        }
+      );
+    }
+
+    try {
+      const require =
+        createRequire(
+          import.meta.url
+        );
+
+      const loaded =
+        require(bundlePath);
+
+      const app =
+        loaded && loaded.default
+          ? loaded.default
+          : loaded;
+
+      result.serverBundleLoaded = true;
+      result.moduleType = typeof loaded;
+      result.defaultExportType = typeof app;
+      result.ok = typeof app === "function";
+
+      return Response.json(
+        result,
         {
           status: 200
         }
       );
     }
     catch (error: any) {
-      info.serverImport =
-        "FAILED";
-
-      info.errorName =
+      result.serverBundleLoaded = false;
+      result.errorName =
         String(
           error?.name ||
           "Error"
         );
 
-      info.errorMessage =
+      result.errorMessage =
         String(
           error?.message ||
           error
         );
 
       if (error?.stack) {
-        info.errorStack =
+        result.errorStack =
           String(error.stack)
             .split("\n")
             .slice(0, 20);
       }
 
       return Response.json(
-        info,
+        result,
         {
           status: 200
         }
