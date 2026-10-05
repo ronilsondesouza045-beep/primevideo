@@ -322,65 +322,13 @@ export default function App() {
   };
 
   const handleGenerateChatGpt = async () => {
-    if (!user) {
-      openAuth();
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('streamhub_token');
-      const res = await fetch('/api/services/generate-chatgpt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...(user.email ? { 'x-user-email': user.email } : {})
-        },
-        body: JSON.stringify({ email: user.email })
-      });
-
-      const data = await res.json().catch(() => null);
-      if (res.ok && data?.success && data?.credentials) {
-        setChatGptCreds(data.credentials);
-        fetchUserAccesses();
-      } else {
-        const fallbackCreds = {
-          email: 'gatomemu22@gmail.com',
-          password: '14182131rr',
-          screen: 'ChatGPT Pro GPT-4o (Login Google)',
-          warning: 'Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo "Continuar com o Google".'
-        };
-        setChatGptCreds(fallbackCreds);
-        const localLog: any = {
-          id: 'acc_' + Date.now(),
-          userId: user.id,
-          userEmail: user.email,
-          service: 'chatgpt',
-          credentials: fallbackCreds,
-          createdAt: new Date().toISOString(),
-          ip: '127.0.0.1'
-        };
-        setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
-      }
-    } catch (err) {
-      const fallbackCreds = {
-        email: 'gatomemu22@gmail.com',
-        password: '14182131rr',
-        screen: 'ChatGPT Pro GPT-4o (Login Google)',
-        warning: 'Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo "Continuar com o Google".'
-      };
-      setChatGptCreds(fallbackCreds);
-      const localLog: any = {
-        id: 'acc_' + Date.now(),
-        userId: user.id,
-        userEmail: user.email,
-        service: 'chatgpt',
-        credentials: fallbackCreds,
-        createdAt: new Date().toISOString(),
-        ip: '127.0.0.1'
-      };
-      setUserAccessLogs([localLog, ...userAccessLogs.filter(p => p.id !== localLog.id)]);
-    }
+    // Abre o aviso oficial informando que o ChatGPT expirou e o acesso está bloqueado até nova data
+    setChatGptCreds({
+      email: 'acesso.bloqueado@streamhub.vip',
+      password: '••••••••••••',
+      screen: 'Acesso Expirado (Suspenso)',
+      warning: 'Aviso Oficial: O acesso ao ChatGPT Plus / Pro encerrou sua validade em 22/09/2026 e está temporariamente suspenso até nova data.'
+    });
   };
 
   const handleGenerateNetflix = async () => {

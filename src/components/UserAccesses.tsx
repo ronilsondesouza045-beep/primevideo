@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AccessLog, PaymentRecord } from '../types';
-import { Sparkles, Copy, Check, Play, ShieldCheck, Zap, ExternalLink, Clock, RefreshCw, Tv, AlertTriangle, Flame, Bot, KeyRound } from 'lucide-react';
+import { Sparkles, Copy, Check, Play, ShieldCheck, Zap, ExternalLink, Clock, RefreshCw, Tv, AlertTriangle, Flame, Bot, KeyRound, Lock } from 'lucide-react';
 import { PrimeCountdown } from './PrimeCountdown';
 import { NetflixCodeFetcher } from './NetflixCodeFetcher';
 
@@ -108,14 +108,14 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                           : isFreeFire
                           ? 'text-amber-300 bg-amber-950/60 border-amber-500/30'
                           : isChatGpt
-                          ? 'text-emerald-300 bg-emerald-950/60 border-emerald-500/30'
+                          ? 'text-red-300 bg-red-950/60 border-red-500/30'
                           : isCrunchyroll
                           ? 'text-orange-300 bg-orange-950/60 border-orange-500/30'
                           : isParamount
                           ? 'text-blue-400 bg-blue-950/60 border-blue-500/30'
                           : 'text-cyan-400 bg-cyan-950/60 border-cyan-500/30'
                       }`}>
-                        {isNetflix ? 'NETFLIX VIP ULTRA HD' : isFreeFire ? 'FREE FIRE (100 DIAMANTES)' : isChatGpt ? 'CHATGPT PRO (GPT-4o)' : isCrunchyroll ? 'CRUNCHYROLL GRÁTIS' : isParamount ? 'PARAMOUNT+ GRÁTIS' : 'PRIME VIDEO GRÁTIS'}
+                        {isNetflix ? 'NETFLIX VIP ULTRA HD' : isFreeFire ? 'FREE FIRE (100 DIAMANTES)' : isChatGpt ? 'CHATGPT PRO (EXPIRADO • SUSPENSO)' : isCrunchyroll ? 'CRUNCHYROLL GRÁTIS' : isParamount ? 'PARAMOUNT+ GRÁTIS' : 'PRIME VIDEO GRÁTIS'}
                       </span>
                       <span className="text-[10px] text-slate-400 flex items-center gap-1">
                         <Clock className="w-3 h-3" />
@@ -227,25 +227,14 @@ export const UserAccesses: React.FC<UserAccessesProps> = ({
                         </div>
 
                         {isChatGpt && (
-                          <div className="flex items-center gap-2 pt-1">
-                            <a
-                              href="https://chatgpt.com/auth/login?next=%2F"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 py-1.5 px-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 font-bold text-[11px] flex items-center justify-center gap-1 transition-colors"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                              Entrar na Web
-                            </a>
-                            <a
-                              href="https://play.google.com/store/apps/details?id=com.openai.chatgpt"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-[11px] flex items-center justify-center gap-1 transition-colors"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                              Play Store App
-                            </a>
+                          <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/30 text-red-200 text-xs space-y-1">
+                            <span className="font-bold flex items-center gap-1.5 text-red-300">
+                              <Lock className="w-3.5 h-3.5 text-red-400" />
+                              Acesso Expirado em 22/09/2026
+                            </span>
+                            <p className="text-slate-400 text-[11px] leading-relaxed">
+                              Este serviço está suspenso por enquanto até nova data. O acesso a credenciais está bloqueado aguardando nova conta.
+                            </p>
                           </div>
                         )}
 

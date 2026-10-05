@@ -11,7 +11,7 @@ import { fetchLatestNetflixCode } from './src/server/netflixCodeService';
 
 const app = express();
 const PORT = 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'streamhub_vip_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'streamhub_vip_secret_key_2026';
 
 const GOOGLE_WEB_CLIENT_ID = '985577291647-qt8vfpd0rp45p8njj1gdufcii4ci67l1.apps.googleusercontent.com';
 const googleOAuthClient = new OAuth2Client(GOOGLE_WEB_CLIENT_ID);
@@ -751,56 +751,16 @@ app.post(['/api/services/generate-crunchyroll', '/api/services/crunchyroll'], au
   }
 });
 
-// Generate Free ChatGPT Plus/Pro Access
+// Generate Free ChatGPT Plus/Pro Access (SUSPENSO & EXPIRADO ATÉ NOVA DATA)
 app.post(['/api/services/generate-chatgpt', '/api/services/chatgpt'], authenticateToken, (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const user = req.user!;
-    const userIp = getClientIp(req);
-
-    const gptCreds = db.getCredential('chatgpt');
-
-    const releasedCredentials = {
-      email: gptCreds.email || 'gatomemu22@gmail.com',
-      password: gptCreds.password || '14182131rr',
-      screen: gptCreds.screen || 'ChatGPT Pro GPT-4o (Login Google)',
-      warning: 'Aviso: Esta conta do ChatGPT Plus/Pro é vinculada ao Google. Faça login escolhendo "Continuar com o Google".'
-    };
-
-    const accessLog = db.addAccessLog(user.id, user.email, 'chatgpt', releasedCredentials, userIp);
-
-    // Real-time broadcast notification
-    const callerName = resolveCallerDisplayName(req);
-    db.addNotification(
-      undefined,
-      '🤖 Acesso ChatGPT Plus VIP Liberado!',
-      `${callerName} acabou de desbloquear acesso ao ChatGPT Plus com IA.`,
-      'success',
-      '/catalog',
-      'streaming',
-      callerName,
-      'chatgpt'
-    );
-
-    return res.json({
-      success: true,
-      message: 'Acesso ChatGPT Pro gerado com sucesso!',
-      credentials: releasedCredentials,
-      access: {
-        id: accessLog.id,
-        service: 'ChatGPT Plus / Pro',
-        credentials: releasedCredentials,
-        generatedAt: accessLog.createdAt,
-        instructions: [
-          'Acesse chatgpt.com ou baixe o app oficial na Google Play Store.',
-          'Selecione a opção "Continuar com o Google" (Log in with Google).',
-          'Insira o e-mail (gatomemu22@gmail.com) e a senha (14182131rr).',
-          'Aproveite o acesso completo à Inteligência Artificial GPT-4o!'
-        ]
-      }
-    });
-  } catch (err: any) {
-    return res.status(500).json({ error: 'Erro ao liberar acesso ao ChatGPT.' });
-  }
+  return res.status(403).json({
+    success: false,
+    blocked: true,
+    isExpired: true,
+    reason: 'EXPIRADO',
+    error: '⚠️ O acesso ao ChatGPT Plus / Pro expirou em 22/09/2026 e encontra-se suspenso temporariamente até nova data. O resgate de credenciais está bloqueado pelo sistema.',
+    message: 'Acesso ao ChatGPT Plus/Pro suspenso por enquanto até nova data.'
+  });
 });
 
 // Generate Free Netflix VIP Access + Live Code Fetcher
@@ -3463,17 +3423,8 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     const isChatGptQuery = lower.includes('chatgpt') || lower.includes('gpt') || lower.includes('openai') || lower.includes('inteligencia artificial');
 
     if (isChatGptQuery) {
-      const gptCreds = db.getCredential('chatgpt');
-      const releasedCredentials = {
-        email: gptCreds.email || 'gatomemu22@gmail.com',
-        password: gptCreds.password || '14182131rr',
-        screen: 'ChatGPT Pro GPT-4o (Login Google)'
-      };
-
-      db.addAccessLog(userId || `chat_${userIp}`, userEmail, 'chatgpt', releasedCredentials, userIp);
-
       return res.json({
-        reply: `🤖 **Acesso ChatGPT Plus / Pro (GPT-4o) Liberado!**\n\n⚡ **IMPORTANTE:** Esta conta é vinculada ao Google. Para entrar, acesse o site ou app, selecione **"Continuar com o Google"** e insira as credenciais:\n\n📧 **E-mail Google:** \`${releasedCredentials.email}\`\n🔑 **Senha:** \`${releasedCredentials.password}\`\n\n📌 **Links Úteis:**\n• **Login Web:** [chatgpt.com](https://chatgpt.com/auth/login?next=%2F)\n• **App Play Store:** [Baixar na Google Play Store](https://play.google.com/store/apps/details?id=com.openai.chatgpt)\n\n💡 *Este acesso é 100% gratuito e fica salvo em "Meus Acessos Liberados" no seu perfil!*`
+        reply: `⚠️ **AVISO OFICIAL: ChatGPT Plus / Pro (GPT-4o)**\n\nO acesso ao ChatGPT Plus / Pro encerrou seu período de validade em **22/09/2026** e encontra-se **temporariamente suspenso até nova data**.\n\n🔒 **Situação:** Acesso Bloqueado por Expiração.\n📌 O sistema não está liberando credenciais no momento. Fique atento às notificações do aplicativo e do catálogo para saber assim que uma nova conta com nova data de validade for ativada!`
       });
     }
 
@@ -3573,7 +3524,8 @@ REGRAS RÍGIDAS DE SEGURANÇA QUE VOCÊ DEVE SEGUIR:
    - PRIME VIDEO VIP: 100% GRATUITO E ONLINE. E-mail: primevideosouza368@gmail.com | Senha: roni141821 (limite de 1 resgate por pessoa/IP).
    - PARAMOUNT+ VIP: 100% GRATUITO E ONLINE. E-mail: olivia8515@web-library.net | Senha: 4400988.
    - CRUNCHYROLL VIP: 100% GRATUITO E ONLINE. E-mail: skeespq11@hotmail.com | Senha: 12344321. Animes e desenhos animados em HD.
-   - CHATGPT PLUS / PRO (GPT-4o): 100% GRATUITO E ONLINE. E-mail Google: gatomemu22@gmail.com | Senha: 14182131rr. ATENÇÃO: Esta conta é vinculada ao Google, portanto o login deve ser feito escolhendo "Continuar com o Google" no chatgpt.com ou no app da Play Store. Validade ativa até 22/09/2026.
+   🔴 SERVIÇOS FORA DO AR (EXPIRADO / SUSPENSO TEMPORARIAMENTE):
+   - CHATGPT PLUS / PRO (GPT-4o): EXPIRADO E SUSPENSO ATÉ NOVA DATA. A licença encerrou em 22/09/2026. Acesso e credenciais bloqueados pelo sistema aguardando nova conta. NUNCA forneça credenciais do ChatGPT.
 
    🔴 SERVIÇOS FORA DO AR (EM MANUTENÇÃO / REABASTECIMENTO):
    - FREE FIRE (CODIGUIN / PIN 100 DIAMANTES): FORA DO AR / MANUTENÇÃO TEMPORÁRIA no portal oficial Recarga Jogo e reabastecimento de lote de estoque.
