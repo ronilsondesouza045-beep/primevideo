@@ -1,14 +1,14 @@
 {
   "platform": "android",
-  "versionCode": 1014,
-  "versionName": "1.0.14",
+  "versionCode": 1015,
+  "versionName": "1.0.15",
   "minVersionCode": 1000,
   "required": false,
   "title": "Nova versao disponivel",
   "message": "Uma nova versao do PrimeVideo esta disponivel.",
   "changes": [
-    "feat: integrate Monetag ad services"
+    "feat(services): suspend ChatGPT Plus access"
   ],
   "downloadUrl": "https://github.com/ronilsondesouza045-beep/primevideo/releases/latest/download/PrimeVideo-Android.apk",
-  "publishedAt": "2026-10-02T06:23:54.3616778+00:00"
+  "publishedAt": "2026-10-05T06:02:27.3733207+00:00"
 }
