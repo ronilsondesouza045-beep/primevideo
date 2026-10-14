@@ -106,7 +106,7 @@ export const OnlineUsersAdmin: React.FC<OnlineUsersAdminProps> = ({ currentUser 
 
                 <span className="flex items-center gap-1 text-[10px] text-slate-500">
                   <Clock className="w-3 h-3" />
-                  {new Date(u.lastActive).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date((u as any).lastActive || u.lastActiveAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
             </div>

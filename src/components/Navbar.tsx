@@ -4,7 +4,7 @@ import { notificationsService } from '../services/notificationsService';
 import { 
   Tv, ShieldCheck, LogIn, LogOut, Sparkles, Grid, Award, 
   User as UserIcon, Bell, CheckCircle2, AlertCircle, ShoppingBag, 
-  ChevronDown, Wallet, Search, Heart, Ticket, Activity, Layers
+  ChevronDown, Wallet, Search, Heart, Ticket, Activity, Layers, Bot
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -120,11 +120,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 Painel Admin
               </button>
             )}
+
           </nav>
 
           {/* User Auth & Quick Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            
+
             {/* Command K Search Button */}
             <button
               onClick={onOpenSearch}

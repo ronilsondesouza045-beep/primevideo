@@ -15,6 +15,7 @@ interface FreeFireModalProps {
   pin?: FreeFirePin | null;
   errorMsg?: string | null;
   result?: FreeFireModalResult | null;
+  stock?: { total: number; available: number; claimed: number; outOfStock: boolean };
   onClose: () => void;
   onOpenChat?: () => void;
 }

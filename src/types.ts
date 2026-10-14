@@ -146,13 +146,15 @@ export interface ServiceReview {
 }
 
 export interface ServiceReviewStats {
-  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt';
+  service?: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | 'chatgpt' | any;
   totalReviews: number;
-  workingCount: number;
-  notWorkingCount: number;
-  successRate: number;
+  workingCount?: number;
+  notWorkingCount?: number;
+  successRate?: number;
+  workingPercentage?: number;
   averageRating: number;
-  recentReviews: ServiceReview[];
+  recentReviews?: ServiceReview[];
+  reviews?: ServiceReview[];
 }
 
 export interface FreeTrialClaim {
@@ -340,6 +342,10 @@ export interface HomeContentConfig {
   banners: HomeBanner[];
   announcementText?: string;
   announcementActive?: boolean;
+  announcementBarText?: string;
+  announcementBarActive?: boolean;
+  heroTitle?: string;
+  heroSubtitle?: string;
   featuredProductIds: string[];
 }
 

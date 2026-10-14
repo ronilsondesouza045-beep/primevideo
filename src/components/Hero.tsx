@@ -1,12 +1,13 @@
 import React from 'react';
-import { Play, Flame, ShieldCheck, Zap, Sparkles } from 'lucide-react';
+import { Play, Flame, ShieldCheck, Zap, Sparkles, Bot } from 'lucide-react';
 
 interface HeroProps {
   onGeneratePrime: () => void;
   onBuyNetflix: () => void;
+  onOpenChat?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onGeneratePrime, onBuyNetflix }) => {
+export const Hero: React.FC<HeroProps> = ({ onGeneratePrime, onBuyNetflix, onOpenChat }) => {
   return (
     <section className="relative overflow-hidden pt-8 pb-12 sm:pt-12 sm:pb-16 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       
@@ -18,10 +19,12 @@ export const Hero: React.FC<HeroProps> = ({ onGeneratePrime, onBuyNetflix }) => 
         
         {/* Top Feature Pill */}
         <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold tracking-wide shadow-lg shadow-red-950/40">
-            <Flame className="w-4 h-4 text-red-500 animate-pulse" />
-            <span>PLATAFORMA LÍDER EM ENTRETENIMENTO VIP</span>
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold tracking-wide shadow-lg shadow-red-950/40">
+            <Flame className="w-4 h-4 text-red-400" />
+            <span>PLATAFORMA 100% ATIVA & OPERACIONAL</span>
+            <span className="px-1.5 py-0.2 rounded bg-red-400/20 text-red-200 text-[9px] font-black uppercase">
+              ONLINE
+            </span>
           </div>
         </div>
 
@@ -35,16 +38,16 @@ export const Hero: React.FC<HeroProps> = ({ onGeneratePrime, onBuyNetflix }) => 
           </h1>
           <p className="text-sm sm:text-base text-slate-300 font-medium max-w-2xl mx-auto leading-relaxed">
             Liberação instantânea de acessos exclusivos de streaming. Aproveite nosso 
-            <strong className="text-cyan-400"> Prime Video</strong> e <strong className="text-blue-400">Paramount+</strong> 100% Gratuitos! 
+            <strong className="text-cyan-400"> Prime Video</strong>, <strong className="text-blue-400">Paramount+</strong> e <strong className="text-orange-400">Crunchyroll</strong> 100% gratuitos! 
             <span className="text-slate-400 block sm:inline sm:ml-1 font-semibold">(Netflix VIP estará disponível <strong className="text-amber-400">Em Breve</strong>)</span>.
           </p>
         </div>
 
         {/* Quick Action Hero Buttons */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-2xl mx-auto">
           <button
             onClick={onGeneratePrime}
-            className="w-full sm:w-auto flex-1 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold text-sm shadow-xl shadow-cyan-600/20 hover:shadow-cyan-600/40 transition-all flex items-center justify-center gap-2 group"
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold text-sm shadow-xl shadow-cyan-600/20 hover:shadow-cyan-600/40 transition-all flex items-center justify-center gap-2 group cursor-pointer"
           >
             <Play className="w-4 h-4 fill-white group-hover:scale-110 transition-transform" />
             Gerar Prime Video (Grátis)
@@ -52,7 +55,7 @@ export const Hero: React.FC<HeroProps> = ({ onGeneratePrime, onBuyNetflix }) => 
 
           <button
             onClick={onBuyNetflix}
-            className="w-full sm:w-auto flex-1 px-6 py-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 text-slate-400 font-bold text-sm shadow-md cursor-not-allowed transition-all flex items-center justify-center gap-2 group relative overflow-hidden"
+            className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 text-slate-400 font-bold text-sm shadow-md cursor-not-allowed transition-all flex items-center justify-center gap-2 group relative overflow-hidden"
           >
             <Zap className="w-4 h-4 text-amber-400" />
             <span>Netflix VIP</span>

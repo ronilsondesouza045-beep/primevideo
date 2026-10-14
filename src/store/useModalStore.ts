@@ -107,6 +107,7 @@ export const useModalStore = create<ModalState>((set) => ({
     isSearchOpen: false,
     isNotifsOpen: false,
     isIptvModalOpen: false,
+    isChatOpen: false,
     primeCreds: null,
     paramountCreds: null,
     crunchyrollCreds: null,

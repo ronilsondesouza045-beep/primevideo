@@ -2018,29 +2018,24 @@ class JSONDatabase {
       },
       {
         id: 'prod_chatgpt',
-        name: 'ChatGPT Plus / Pro (GPT-4o)',
-        description: 'Acesso grátis ao ChatGPT Plus com Inteligência Artificial GPT-4o! Inclui criação de imagens com Thinking, agentes Codex e Work, memória expandida e GPTs personalizados.',
+        name: 'ChatGPT Plus / Pro (Suspenso)',
+        description: 'Acesso às ferramentas avançadas do ChatGPT Plus / Pro com GPT-4o. Acesso temporariamente suspenso até nova data.',
         category: 'Inteligência Artificial',
         price: 0,
-        isFree: true,
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10',
-        banner: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10',
-        stockStatus: 'DISPONIVEL',
+        isFree: false,
+        image: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
+        banner: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
+        stockStatus: 'SUSPENSO',
         rating: 5.0,
-        badge: 'GPT-4o PRO GRÁTIS',
+        badge: 'ACESSO SUSPENSO',
         features: [
-          'Modelos avançados',
-          'Criação avançada de imagens com Thinking',
-          'Memória expandida entre chats',
-          'Agente do Work para tarefas em várias etapas',
-          'Agente Codex para programação',
-          'Pesquisa profunda expandida',
-          'Projetos e GPTs personalizados'
+          'Acesso ChatGPT Plus',
+          'Modelo GPT-4o',
+          'Geração de Imagens DALL-E',
+          'Validade encerrada em 22/09/2026'
         ],
         instructions: [
-          'Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131rr).',
-          'Acesse o ChatGPT e selecione "Continuar com o Google".',
-          'Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!'
+          'Aviso Oficial: O acesso ao ChatGPT encerrou sua validade e está suspenso temporariamente.'
         ],
         updatedAt: new Date().toISOString()
       },

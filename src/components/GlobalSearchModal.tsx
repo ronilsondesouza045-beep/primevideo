@@ -5,18 +5,24 @@ import { User } from '../types';
 interface GlobalSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentUser: User | null;
-  onNavigateTab: (tab: 'home' | 'catalog' | 'benefits' | 'accesses' | 'orders' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites' | any) => void;
+  currentUser?: User | null;
+  onNavigateTab?: (tab: 'home' | 'catalog' | 'benefits' | 'accesses' | 'orders' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites' | any) => void;
+  onSelectTab?: (tab: any) => void;
   onSelectProduct?: (productId: string) => void;
 }
 
 export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   isOpen,
   onClose,
-  currentUser,
+  currentUser = null,
   onNavigateTab,
+  onSelectTab,
   onSelectProduct
 }) => {
+  const handleNavigate = (tab: any) => {
+    if (onSelectTab) onSelectTab(tab);
+    if (onNavigateTab) onNavigateTab(tab);
+  };
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<{

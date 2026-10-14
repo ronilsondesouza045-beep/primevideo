@@ -25,7 +25,8 @@ import {
   Tag,
   Layout,
   UserPlus,
-  Radio
+  Radio,
+  Sparkles
 } from 'lucide-react';
 import { AnalyticsDashboardAdmin } from './AnalyticsDashboardAdmin';
 import { OnlineUsersAdmin } from './OnlineUsersAdmin';
@@ -33,10 +34,12 @@ import { CouponsAdmin } from './CouponsAdmin';
 import { HomeConfigAdmin } from './HomeConfigAdmin';
 
 interface AdminPanelProps {
-  currentUser: User | null;
+  currentUser?: User | null;
+  user?: User | null;
 }
 
-export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
+export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => {
+  const activeUser = currentUser || user || null;
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'analytics' | 'online' | 'coupons' | 'home-config' | 'support' | 'users' | 'accesses' | 'payments' | 'credentials' | 'visitors'
   >('analytics');

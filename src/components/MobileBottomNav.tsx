@@ -1,7 +1,6 @@
 import React from 'react';
 import { User } from '../types';
-import { Home, Grid, Sparkles, ShieldCheck, User as UserIcon, Award, Layers } from 'lucide-react';
-
+import { Home, Grid, Sparkles, ShieldCheck, User as UserIcon, Award, Layers, Bot } from 'lucide-react';
 interface MobileBottomNavProps {
   user: User | null;
   activeTab: 'home' | 'catalog' | 'free-tools' | 'benefits' | 'accesses' | 'orders' | 'profile' | 'admin' | 'status' | 'tickets' | 'favorites' | string;
@@ -30,7 +29,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           }`}
         >
           <Grid className="w-5 h-5" />
-          <span className="text-[10px]">Catálogo VIP</span>
+          <span className="text-[10px]">Catálogo</span>
         </button>
 
         {/* Acessos */}

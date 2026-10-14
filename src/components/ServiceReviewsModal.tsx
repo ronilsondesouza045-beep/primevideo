@@ -3,16 +3,23 @@ import { X, Star, ThumbsUp, ThumbsDown, MessageSquare, CheckCircle2, AlertTriang
 import { ServiceReview, ServiceReviewStats, User } from '../types';
 
 interface ServiceReviewsModalProps {
-  service: 'prime' | 'paramount' | 'freefire' | 'crunchyroll';
+  service?: 'prime' | 'paramount' | 'freefire' | 'crunchyroll' | any;
+  serviceId?: any;
+  serviceName?: string;
+  isOpen?: boolean;
   currentUser?: User | null;
   onClose: () => void;
 }
 
 export const ServiceReviewsModal: React.FC<ServiceReviewsModalProps> = ({
-  service,
+  service: serviceProp,
+  serviceId,
+  serviceName,
+  isOpen = true,
   currentUser,
   onClose
 }) => {
+  const service = serviceProp || serviceId || 'prime';
   const [stats, setStats] = useState<ServiceReviewStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);

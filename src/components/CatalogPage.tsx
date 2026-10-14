@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Product, User } from '../types';
 import { 
   Search, Filter, Star, Sparkles, CheckCircle, ShieldCheck, 
-  ArrowRight, Tag, Zap, X, Copy, ExternalLink, HelpCircle, Lock, AlertTriangle
+  ArrowRight, Tag, Zap, X, Copy, ExternalLink, HelpCircle, Lock, AlertTriangle, Bot
 } from 'lucide-react';
+import { useModalStore } from '../store/useModalStore';
 
 interface CatalogPageProps {
   user: User | null;
@@ -31,7 +32,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     prod_prime: 'https://uploads.tracklist.com.br/file/uploads-tracklist-com-br/2024/10/amazon-prime-video.jpg',
     prod_paramount: 'https://t2.tudocdn.net/703654?w=1200&h=1200',
     prod_crunchyroll: 'https://t2.tudocdn.net/793619?w=776&h=338',
-    prod_chatgpt: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10',
+    prod_chatgpt: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
     prod_netflix: 'https://cdn.prod.website-files.com/6615907cf43a722162c27a58/67aca413ce96c91ff946e3f1_netflix.webp',
     prod_freefire: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDn8lFduZ9xS9171yqCOBDrUXUXdqFddrtXYUa0FJKL_12pDpx98a2db0&s=10',
     prod_iptv: 'https://static.wixstatic.com/media/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/70fc80_a1dda17e8d344e9eadde4ed437267403~mv2.jpeg'
@@ -92,26 +93,25 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     },
     {
       id: 'prod_chatgpt',
-      name: 'ChatGPT Plus / Pro (GPT-4o)',
-      description: 'Acesso grátis ao ChatGPT Plus com Inteligência Artificial GPT-4o! Inclui criação de imagens com Thinking, agentes Codex e Work, memória expandida e GPTs personalizados.',
+      name: 'ChatGPT Plus / Pro (Suspenso)',
+      description: 'Acesso às ferramentas avançadas do ChatGPT Plus / Pro com GPT-4o. Acesso temporariamente suspenso até nova data.',
       category: 'Inteligência Artificial',
       price: 0,
-      isFree: true,
+      isFree: false,
       image: OFFICIAL_IMAGES['prod_chatgpt'],
       banner: OFFICIAL_IMAGES['prod_chatgpt'],
-      stockStatus: 'DISPONIVEL',
+      stockStatus: 'SUSPENSO',
       rating: 5.0,
-      badge: 'GPT-4o PRO GRÁTIS',
+      badge: 'ACESSO SUSPENSO',
       features: [
-        'Modelos avançados',
-        'Criação avançada de imagens com Thinking',
-        'Memória expandida entre chats',
-        'Agente do Work para tarefas em várias etapas',
-        'Agente Codex para programação',
-        'Pesquisa profunda expandida',
-        'Projetos e GPTs personalizados'
+        'Acesso ChatGPT Plus',
+        'Modelo GPT-4o',
+        'Geração de Imagens DALL-E',
+        'Validade encerrada em 22/09/2026'
       ],
-      instructions: ['Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131rr).', 'Acesse o ChatGPT e selecione "Continuar com o Google".', 'Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!'],
+      instructions: [
+        'Aviso Oficial: O acesso ao ChatGPT encerrou sua validade e está suspenso temporariamente.'
+      ],
       updatedAt: new Date().toISOString()
     },
     {
@@ -251,7 +251,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base mt-3 leading-relaxed">
-            Resgate contas e acessos de <strong className="text-emerald-400">ChatGPT Plus/Pro</strong>, <strong className="text-blue-400">Paramount+</strong>, <strong className="text-orange-400">Crunchyroll</strong>, códigos <strong className="text-amber-400">Free Fire</strong> e servidores <strong className="text-emerald-400">IPTV</strong> com liberação imediata e suporte 24/7.
+            Acesse <strong className="text-cyan-400">Prime Video</strong>, <strong className="text-blue-400">Paramount+</strong>, <strong className="text-orange-400">Crunchyroll</strong>, códigos <strong className="text-amber-400">Free Fire</strong> e servidores <strong className="text-emerald-400">IPTV</strong> com liberação imediata e suporte 24/7.
           </p>
 
           {/* Trust Badges */}
@@ -442,14 +442,14 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
                     <button
                       onClick={() => handleActionClick(product)}
                       className={`px-4 py-2.5 rounded-xl text-xs font-extrabold text-white shadow-md active:scale-95 transition-all flex items-center gap-1.5 ${
-                        product.stockStatus === 'SUSPENSO'
+                        product.stockStatus === 'SUSPENSO' || product.stockStatus === 'ESGOTADO'
                           ? 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 shadow-amber-600/20'
                           : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-600/30'
                       }`}
                     >
-                      {product.stockStatus === 'SUSPENSO' ? (
+                      {product.stockStatus === 'SUSPENSO' || product.stockStatus === 'ESGOTADO' ? (
                         <>
-                          <span>Suspenso</span>
+                          <span>Aviso</span>
                           <AlertTriangle className="w-3.5 h-3.5" />
                         </>
                       ) : (

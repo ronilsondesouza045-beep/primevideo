@@ -36,11 +36,9 @@
       "email": "g05280994@gmail.com",
       "password": "1418994r",
       "screen": "Livre / Escolha qualquer perfil",
+      "tonLink": "",
       "createdAt": "2026-09-26T00:00:00.000Z",
-      "expiresAt": "2026-10-26T23:59:59.999Z",
-      "creationDate": "26/09/2026",
-      "expirationDate": "26/10/2026",
-      "tonLink": ""
+      "expiresAt": "2026-10-26T23:59:59.999Z"
     },
     "paramount": {
       "serviceId": "paramount",
@@ -91,7 +89,7 @@
       "id": "acc_1788275143926_5fnxb",
       "userId": "usr_1787877404018_51o2g",
       "userEmail": "gatomemu22@gmail.com",
-      "userIp": "2804:d41:c57a:300:cf56:4592:554a:11fd",
+      "userIp": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
       "service": "netflix",
       "credentials": {
         "email": "prine1070@gmail.com",
@@ -187,6 +185,114 @@
     }
   ],
   "visitorLogs": [
+    {
+      "id": "vis_1792016049932_20ag",
+      "ip": "2804:d41:c57a:300:f9a9:ea15:e4a0:91f7",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-14T22:14:09.932Z"
+    },
+    {
+      "id": "vis_1792016049922_8uft",
+      "ip": "2804:d41:c57a:300:f9a9:ea15:e4a0:91f7",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-14T22:14:09.922Z"
+    },
+    {
+      "id": "vis_1791921355915_mgcu",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:55:55.915Z"
+    },
+    {
+      "id": "vis_1791921355891_jgj7",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:55:55.891Z"
+    },
+    {
+      "id": "vis_1791921296598_ecp0",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:54:56.598Z"
+    },
+    {
+      "id": "vis_1791921296587_hz7j",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:54:56.587Z"
+    },
+    {
+      "id": "vis_1791920555316_3620",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:42:35.316Z"
+    },
+    {
+      "id": "vis_1791920555309_5w20",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:42:35.309Z"
+    },
+    {
+      "id": "vis_1791920022642_nwtf",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:33:42.642Z"
+    },
+    {
+      "id": "vis_1791920022636_miin",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:33:42.636Z"
+    },
+    {
+      "id": "vis_1791919889711_sqtj",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:31:29.711Z"
+    },
+    {
+      "id": "vis_1791919889705_ap9t",
+      "ip": "2804:d41:c57a:300:382c:d92b:f36d:3f9e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "browser": "Google Chrome",
+      "device": "Desktop",
+      "path": "/",
+      "timestamp": "2026-10-13T19:31:29.705Z"
+    },
     {
       "id": "vis_1790898836125_4qxx",
       "ip": "2804:d41:c57a:300:5ce3:4170:f061:580b",
@@ -9078,114 +9184,6 @@
       "device": "Desktop",
       "path": "/",
       "timestamp": "2026-08-09T18:46:02.983Z"
-    },
-    {
-      "id": "vis_1786301162849_3i4k",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:02.849Z"
-    },
-    {
-      "id": "vis_1786301162709_8f69",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:02.709Z"
-    },
-    {
-      "id": "vis_1786301162516_ruk2",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:02.516Z"
-    },
-    {
-      "id": "vis_1786301162385_oo1e",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:02.385Z"
-    },
-    {
-      "id": "vis_1786301162251_ncfd",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:02.251Z"
-    },
-    {
-      "id": "vis_1786301162112_h3tm",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:02.112Z"
-    },
-    {
-      "id": "vis_1786301161971_g8ez",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:01.971Z"
-    },
-    {
-      "id": "vis_1786301161835_jqpf",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:01.835Z"
-    },
-    {
-      "id": "vis_1786301161703_5vg0",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:01.703Z"
-    },
-    {
-      "id": "vis_1786301161546_4w2y",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:01.546Z"
-    },
-    {
-      "id": "vis_1786301161389_89uv",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:01.389Z"
-    },
-    {
-      "id": "vis_1786301161257_r9sf",
-      "ip": "2804:d41:c585:5e00:d50e:bf34:e985:ced2",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-      "browser": "Google Chrome",
-      "device": "Desktop",
-      "path": "/",
-      "timestamp": "2026-08-09T18:46:01.257Z"
     }
   ],
   "supportMessages": [
@@ -9688,31 +9686,26 @@
     },
     {
       "id": "prod_chatgpt",
-      "name": "ChatGPT Plus / Pro (GPT-4o)",
-      "description": "Acesso grátis ao ChatGPT Plus com Inteligência Artificial GPT-4o! Inclui criação de imagens com Thinking, agentes Codex e Work, memória expandida e GPTs personalizados.",
+      "name": "ChatGPT Plus / Pro (Suspenso)",
+      "description": "Acesso às ferramentas avançadas do ChatGPT Plus / Pro com GPT-4o. Acesso temporariamente suspenso até nova data.",
       "category": "Inteligência Artificial",
       "price": 0,
-      "isFree": true,
-      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10",
-      "banner": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuW-nECwMijLt1prYNV5Dz9FM9D6p5NNBMmFk63QExCVn6d2pyu5_5ZEqj&s=10",
-      "stockStatus": "DISPONIVEL",
+      "isFree": false,
+      "image": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+      "banner": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+      "stockStatus": "SUSPENSO",
       "rating": 5,
-      "badge": "GPT-4o PRO GRÁTIS",
+      "badge": "ACESSO SUSPENSO",
       "features": [
-        "Modelos avançados",
-        "Criação avançada de imagens com Thinking",
-        "Memória expandida entre chats",
-        "Agente do Work para tarefas em várias etapas",
-        "Agente Codex para programação",
-        "Pesquisa profunda expandida",
-        "Projetos e GPTs personalizados"
+        "Acesso ChatGPT Plus",
+        "Modelo GPT-4o",
+        "Geração de Imagens DALL-E",
+        "Validade encerrada em 22/09/2026"
       ],
       "instructions": [
-        "Copie o e-mail (gatomemu22@gmail.com) e a senha (14182131rr).",
-        "Acesse o ChatGPT e selecione \"Continuar com o Google\".",
-        "Faça login com a conta Google fornecida e aproveite o Plus/Pro GPT-4o!"
+        "Aviso Oficial: O acesso ao ChatGPT encerrou sua validade e está suspenso temporariamente."
       ],
-      "updatedAt": "2026-08-14T19:51:36.079Z"
+      "updatedAt": "2026-08-09T04:34:10.981Z"
     }
   ],
   "userPresence": [
@@ -9804,6 +9797,30 @@
     ]
   },
   "notifications": [
+    {
+      "id": "notif_1791920061467_851",
+      "title": "⚡ Netflix VIP Liberado",
+      "message": "Gatomemu liberou os dados de acesso Netflix VIP Ultra HD.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "netflix",
+      "userName": "Gatomemu",
+      "service": "netflix",
+      "createdAt": "2026-10-13T19:34:21.467Z"
+    },
+    {
+      "id": "notif_1791920059415_345",
+      "title": "🎬 Conta Netflix VIP Liberada!",
+      "message": "gatomemu22 acabou de liberar o acesso à conta Netflix VIP Ultra HD.",
+      "read": false,
+      "type": "success",
+      "link": "/catalog",
+      "category": "netflix",
+      "userName": "gatomemu22",
+      "service": "netflix",
+      "createdAt": "2026-10-13T19:34:19.415Z"
+    },
     {
       "id": "notif_1788918609681_699",
       "title": "🤖 Acesso ChatGPT Plus VIP Liberado!",
