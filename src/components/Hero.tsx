@@ -9,14 +9,14 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onGeneratePrime, onBuyNetflix, onOpenChat }) => {
   return (
-    <section className="relative overflow-hidden pt-8 pb-12 sm:pt-12 sm:pb-16 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-      
+    <section className="relative overflow-hidden pt-8 pb-12 sm:pt-12 sm:pb-16 bg-gradient-to-b from-slate-950/70 via-slate-900/60 to-slate-950/80 backdrop-blur-[1px]">
+
       {/* Glow Backdrops */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-red-600/10 blur-[120px] pointer-events-none rounded-full" />
       <div className="absolute top-20 right-10 w-80 h-80 bg-purple-600/10 blur-[100px] pointer-events-none rounded-full" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Top Feature Pill */}
         <div className="flex justify-center mb-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold tracking-wide shadow-lg shadow-red-950/40">
@@ -37,8 +37,8 @@ export const Hero: React.FC<HeroProps> = ({ onGeneratePrime, onBuyNetflix, onOpe
             </span>
           </h1>
           <p className="text-sm sm:text-base text-slate-300 font-medium max-w-2xl mx-auto leading-relaxed">
-            Liberação instantânea de acessos exclusivos de streaming. Aproveite nosso 
-            <strong className="text-cyan-400"> Prime Video</strong>, <strong className="text-blue-400">Paramount+</strong> e <strong className="text-orange-400">Crunchyroll</strong> 100% gratuitos! 
+            Liberação instantânea de acessos exclusivos de streaming. Aproveite nosso
+            <strong className="text-cyan-400"> Prime Video</strong>, <strong className="text-blue-400">Paramount+</strong> e <strong className="text-orange-400">Crunchyroll</strong> 100% gratuitos!
             <span className="text-slate-400 block sm:inline sm:ml-1 font-semibold">(Netflix VIP estará disponível <strong className="text-amber-400">Em Breve</strong>)</span>.
           </p>
         </div>

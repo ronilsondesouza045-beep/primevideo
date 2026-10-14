@@ -1,220 +1,415 @@
-import React, { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, ShoppingBag, Users, Shield, ArrowUpRight, BarChart3, AlertTriangle, Package, Calendar } from 'lucide-react';
-import { User } from '../types';
+import React, {useEffect, useMemo, useState} from 'react';
+import {
+  Activity,
+  AlertTriangle,
+  BarChart3,
+  DollarSign,
+  ShoppingBag,
+  Users,
+} from 'lucide-react';
+
+import {User} from '../types';
 
 interface AnalyticsDashboardAdminProps {
   currentUser: User | null;
 }
 
-export const AnalyticsDashboardAdmin: React.FC<AnalyticsDashboardAdminProps> = ({ currentUser }) => {
-  const [period, setPeriod] = useState<'today' | '7d' | '30d' | '90d' | '12m'>('30d');
-  const [analytics, setAnalytics] = useState<any>(null);
+type Period = 'today' | '7d' | '30d';
+
+interface SalesPoint {
+  date: string;
+  sales: number;
+  revenue: number;
+  orders: number;
+}
+
+interface AnalyticsData {
+  period: Period;
+  revenue: number;
+  totalOrders: number;
+  pendingOrders: number;
+  approvedOrders: number;
+  totalUsers: number;
+  newUsers: number;
+  onlineUsersCount: number;
+  totalProducts: number;
+  lowStockCount: number;
+  salesChart: SalesPoint[];
+}
+
+const periodLabels: Record<Period, string> = {
+  today: 'Hoje',
+  '7d': '7 dias',
+  '30d': '30 dias',
+};
+
+export const AnalyticsDashboardAdmin: React.FC<
+  AnalyticsDashboardAdminProps
+> = ({currentUser}) => {
+  const [period, setPeriod] = useState<Period>('30d');
+  const [analytics, setAnalytics] =
+    useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchAnalytics();
-  }, [period]);
+    const fetchAnalytics = async () => {
+      setLoading(true);
+      setError('');
 
-  const fetchAnalytics = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('streamhub_token');
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (currentUser?.email) headers['x-user-email'] = currentUser.email;
+      try {
+        const token =
+          localStorage.getItem('streamhub_token');
 
-      const res = await fetch(`/api/admin/analytics?period=${period}`, { headers });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.analytics) setAnalytics(data.analytics);
+        const headers: Record<string, string> = {};
+
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
+        if (currentUser?.email) {
+          headers['x-user-email'] = currentUser.email;
+        }
+
+        const response = await fetch(
+          `/api/admin/analytics?period=${period}`,
+          {headers},
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `HTTP ${response.status}`,
+          );
+        }
+
+        const data = await response.json();
+
+        if (!data.analytics) {
+          throw new Error(
+            'Resposta sem analytics.',
+          );
+        }
+
+        setAnalytics(data.analytics);
+      } catch (err) {
+        console.error(
+          'Erro ao carregar analytics:',
+          err,
+        );
+
+        setError(
+          'Não foi possível carregar os dados administrativos.',
+        );
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      console.error('Error fetching analytics:', e);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const periodLabels = {
-    today: 'Hoje',
-    '7d': 'Últimos 7 dias',
-    '30d': 'Últimos 30 dias',
-    '90d': 'Últimos 90 dias',
-    '12m': 'Últimos 12 meses'
-  };
+    fetchAnalytics();
+  }, [period, currentUser?.email]);
+
+  const chart = analytics?.salesChart ?? [];
+
+  const hasMovement = useMemo(
+    () =>
+      chart.some(
+        (item) =>
+          item.revenue > 0 ||
+          item.orders > 0,
+      ),
+    [chart],
+  );
+
+  const maxRevenue = useMemo(
+    () =>
+      Math.max(
+        1,
+        ...chart.map(
+          (item) => item.revenue,
+        ),
+      ),
+    [chart],
+  );
+
+  if (loading) {
+    return (
+      <div className="py-16 text-center">
+        <div className="w-7 h-7 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-sm text-slate-400">
+          Atualizando dados...
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5">
+        <p className="text-sm text-red-300">
+          {error}
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      
-      {/* Header & Period Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+    <div className="space-y-5">
+
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+
         <div>
-          <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-amber-400" />
-            Métricas Financeiras & Desempenho
-          </h2>
-          <p className="text-xs text-slate-400">
-            Relatórios e faturamento real agregados do gateway Ton, cadastros de clientes e acessos.
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-purple-400" />
+
+            <h2 className="text-lg font-black text-white">
+              Visão geral
+            </h2>
+          </div>
+
+          <p className="mt-1 text-xs text-slate-400">
+            Dados registrados pelo sistema no período selecionado.
           </p>
         </div>
 
-        {/* Period Selector Buttons */}
-        <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
-          {(['today', '7d', '30d', '90d', '12m'] as const).map((p) => (
+        <div className="inline-flex w-fit rounded-xl border border-slate-800 bg-slate-950/70 p-1">
+
+          {(
+            ['today', '7d', '30d'] as const
+          ).map((item) => (
             <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                period === p
-                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/10'
-                  : 'text-slate-400 hover:text-slate-200'
+              key={item}
+              onClick={() =>
+                setPeriod(item)
+              }
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition ${
+                period === item
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              {periodLabels[p]}
+              {periodLabels[item]}
             </button>
           ))}
+
         </div>
       </div>
 
-      {loading ? (
-        <div className="py-12 text-center text-xs text-slate-400">
-          <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          Calculando faturamento e métricas da base...
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+        <MetricCard
+          title="Receita aprovada"
+          value={`R$ ${(analytics?.revenue ?? 0).toFixed(2)}`}
+          detail={`${analytics?.approvedOrders ?? 0} pagamento(s) aprovado(s)`}
+          icon={<DollarSign className="w-5 h-5" />}
+          tone="emerald"
+        />
+
+        <MetricCard
+          title="Pedidos"
+          value={String(
+            analytics?.totalOrders ?? 0,
+          )}
+          detail={`${analytics?.pendingOrders ?? 0} pendente(s)`}
+          icon={<ShoppingBag className="w-5 h-5" />}
+          tone="amber"
+        />
+
+        <MetricCard
+          title="Usuários online"
+          value={String(
+            analytics?.onlineUsersCount ?? 0,
+          )}
+          detail={`${analytics?.totalUsers ?? 0} usuário(s) cadastrado(s)`}
+          icon={<Activity className="w-5 h-5" />}
+          tone="cyan"
+        />
+
+        <MetricCard
+          title="Novos usuários"
+          value={String(
+            analytics?.newUsers ?? 0,
+          )}
+          detail={`No período de ${periodLabels[period].toLowerCase()}`}
+          icon={<Users className="w-5 h-5" />}
+          tone="blue"
+        />
+
+      </div>
+
+
+      <div className="pv2-surface-card rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+
+        <div className="flex items-center justify-between gap-3 mb-5">
+
+          <div>
+            <h3 className="text-sm font-bold text-white">
+              Movimentação financeira
+            </h3>
+
+            <p className="text-[11px] text-slate-500 mt-1">
+              Receita aprovada e pedidos registrados.
+            </p>
+          </div>
+
+          <span className="text-[11px] font-bold text-slate-500">
+            {periodLabels[period]}
+          </span>
+
         </div>
-      ) : (
-        <>
-          {/* Top KPI Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Faturamento Total</span>
-                <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400">
-                  <DollarSign className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="text-2xl font-black text-slate-100">
-                R$ {(analytics?.revenue || 0).toFixed(2)}
-              </div>
-              <p className="text-[11px] text-emerald-400 flex items-center gap-1 font-bold">
-                <TrendingUp className="w-3.5 h-3.5" />
-                Vendas Aprovadas Ton/Pix
-              </p>
-            </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total de Pedidos</span>
-                <div className="p-2 bg-amber-500/10 rounded-xl text-amber-400">
-                  <ShoppingBag className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="text-2xl font-black text-slate-100">
-                {analytics?.ordersCount || 0}
-              </div>
-              <p className="text-[11px] text-amber-400 font-bold">
-                {analytics?.pendingOrders || 0} pendentes / em processamento
-              </p>
-            </div>
+        {!hasMovement ? (
 
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Novos Usuários</span>
-                <div className="p-2 bg-blue-500/10 rounded-xl text-blue-400">
-                  <Users className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="text-2xl font-black text-slate-100">
-                {analytics?.newUsers || 0}
-              </div>
-              <p className="text-[11px] text-blue-400 font-bold">
-                Cadastros ativos no período
-              </p>
-            </div>
+          <div className="py-8 text-center">
+            <BarChart3 className="w-8 h-8 text-slate-700 mx-auto mb-3" />
 
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Estoque Alerta</span>
-                <div className="p-2 bg-red-500/10 rounded-xl text-red-500">
-                  <Package className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="text-2xl font-black text-slate-100">
-                {analytics?.lowStockCount || 0}
-              </div>
-              <p className="text-[11px] text-red-400 font-bold">
-                Produtos com estoque &lt; 5 unidades
-              </p>
-            </div>
+            <p className="text-sm font-bold text-slate-400">
+              Nenhuma movimentação neste período
+            </p>
 
+            <p className="text-xs text-slate-600 mt-1">
+              O gráfico aparecerá quando houver pedidos registrados.
+            </p>
           </div>
 
-          {/* Daily Sales Visual Breakdown Bar */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-              <span>Histórico de Faturamento ({periodLabels[period]})</span>
-              <span className="text-[11px] text-amber-400 font-mono">Dados Reais</span>
-            </h3>
+        ) : (
 
-            {analytics?.dailyChart?.length === 0 ? (
-              <p className="text-xs text-slate-500 text-center py-6">Sem registros de faturamento para o período.</p>
-            ) : (
-              <div className="space-y-2 pt-2">
-                {analytics?.dailyChart?.slice(0, 7).map((d: any, idx: number) => {
-                  const maxAmount = Math.max(...analytics.dailyChart.map((x: any) => x.amount), 1);
-                  const percentage = Math.min(Math.round((d.amount / maxAmount) * 100), 100);
+          <div className="space-y-3">
 
-                  return (
-                    <div key={idx} className="space-y-1">
-                      <div className="flex items-center justify-between text-[11px] font-mono">
-                        <span className="text-slate-400">{d.date}</span>
-                        <span className="text-amber-400 font-bold">R$ {d.amount.toFixed(2)} ({d.count} pedido/s)</span>
-                      </div>
-                      <div className="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
-                        <div
-                          className="bg-gradient-to-r from-amber-500 to-red-500 h-full rounded-full transition-all duration-500"
-                          style={{ width: `${Math.max(percentage, 5)}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+            {chart.map((item) => {
+              const percentage =
+                Math.max(
+                  3,
+                  Math.round(
+                    (item.revenue /
+                      maxRevenue) *
+                      100,
+                  ),
+                );
 
-          {/* Top Best Selling Products */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-              Produtos Mais Vendidos no Período
-            </h3>
+              return (
+                <div
+                  key={item.date}
+                  className="grid grid-cols-[86px_1fr_auto] items-center gap-3"
+                >
 
-            {analytics?.topProducts?.length === 0 ? (
-              <p className="text-xs text-slate-500 text-center py-4">Nenhum produto vendido no período selecionado.</p>
-            ) : (
-              <div className="divide-y divide-slate-800">
-                {analytics?.topProducts?.map((tp: any, idx: number) => (
-                  <div key={idx} className="py-3 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-lg bg-slate-800 text-amber-400 font-bold text-xs flex items-center justify-center shrink-0">
-                        #{idx + 1}
-                      </span>
-                      <span className="text-xs font-bold text-slate-200">{tp.name}</span>
-                    </div>
+                  <span className="text-[11px] text-slate-500 font-mono">
+                    {item.date}
+                  </span>
 
-                    <div className="text-right">
-                      <div className="text-xs font-black text-emerald-400">R$ {tp.revenue.toFixed(2)}</div>
-                      <div className="text-[10px] text-slate-500">{tp.count} unidade(s) sold</div>
-                    </div>
+                  <div className="h-2 rounded-full bg-slate-950 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-purple-600 to-fuchsia-500"
+                      style={{
+                        width: `${percentage}%`,
+                      }}
+                    />
                   </div>
-                ))}
-              </div>
-            )}
+
+                  <div className="text-right">
+                    <p className="text-xs font-bold text-white">
+                      R$ {item.revenue.toFixed(2)}
+                    </p>
+
+                    <p className="text-[10px] text-slate-500">
+                      {item.orders} pedido(s)
+                    </p>
+                  </div>
+
+                </div>
+              );
+            })}
+
           </div>
 
-        </>
+        )}
+
+      </div>
+
+
+      {(analytics?.lowStockCount ?? 0) > 0 && (
+
+        <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+
+          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+
+          <div>
+            <p className="text-sm font-bold text-amber-300">
+              Atenção ao catálogo
+            </p>
+
+            <p className="text-xs text-slate-400 mt-1">
+              {analytics?.lowStockCount} produto(s) estão marcados como estoque baixo ou esgotado.
+            </p>
+          </div>
+
+        </div>
+
       )}
 
     </div>
   );
 };
+
+
+interface MetricCardProps {
+  title: string;
+  value: string;
+  detail: string;
+  icon: React.ReactNode;
+  tone:
+    | 'emerald'
+    | 'amber'
+    | 'cyan'
+    | 'blue';
+}
+
+function MetricCard({
+  title,
+  value,
+  detail,
+  icon,
+  tone,
+}: MetricCardProps) {
+
+  const tones = {
+    emerald:
+      'text-emerald-400 bg-emerald-500/10 border-emerald-500/10',
+    amber:
+      'text-amber-400 bg-amber-500/10 border-amber-500/10',
+    cyan:
+      'text-cyan-400 bg-cyan-500/10 border-cyan-500/10',
+    blue:
+      'text-blue-400 bg-blue-500/10 border-blue-500/10',
+  };
+
+  return (
+    <div className="pv2-kpi-card rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+
+      <div className="flex items-start justify-between gap-3">
+
+        <div>
+          <p className="text-[11px] uppercase tracking-wider font-bold text-slate-500">
+            {title}
+          </p>
+
+          <p className="text-2xl font-black text-white mt-3">
+            {value}
+          </p>
+        </div>
+
+        <div
+          className={`p-2.5 rounded-xl border ${tones[tone]}`}
+        >
+          {icon}
+        </div>
+
+      </div>
+
+      <p className="mt-4 text-[11px] text-slate-500">
+        {detail}
+      </p>
+
+    </div>
+  );
+}
