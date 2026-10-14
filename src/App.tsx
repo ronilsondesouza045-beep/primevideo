@@ -19,15 +19,15 @@ import { Product } from './types';
 import { Tv, ShieldCheck, Heart, Sparkles, Flame, Radio } from 'lucide-react';
 
 export default function App() {
-  const { 
-    user, 
-    userAccessLogs, 
-    userPayments, 
-    setUser, 
-    setUserAccessLogs, 
-    setUserPayments, 
-    checkSession, 
-    logout 
+  const {
+    user,
+    userAccessLogs,
+    userPayments,
+    setUser,
+    setUserAccessLogs,
+    setUserPayments,
+    checkSession,
+    logout
   } = useAuthStore();
 
   const {
@@ -483,7 +483,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white pb-16 md:pb-0 relative overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white pb-16 md:pb-0 relative overflow-x-hidden">
       {/* Ambient background glow & tech grid */}
       <div className="fixed inset-0 bg-tech-grid opacity-30 pointer-events-none z-0" />
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-radial-gradient pointer-events-none z-0" />

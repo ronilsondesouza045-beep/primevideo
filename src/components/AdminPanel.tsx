@@ -458,10 +458,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fadeIn">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fadeIn pv2-admin-shell">
       
       {/* Admin Title Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-purple-950/80 via-slate-900 to-slate-900 border border-purple-500/30 p-5 rounded-2xl backdrop-blur-md shadow-xl">
+      <div className="pv2-admin-commandbar flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-purple-950/80 via-slate-900 to-slate-900 border border-purple-500/30 p-5 rounded-2xl backdrop-blur-md shadow-xl">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-purple-400 shrink-0">
             <ShieldCheck className="w-6 h-6" />
@@ -518,151 +518,155 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
         </div>
       )}
 
-      {/* Admin Nav Tabs */}
-      <div className="flex items-center gap-1.5 border-b border-slate-800/80 pb-2 overflow-x-auto scrollbar-none">
-        
-        <button
-          onClick={() => setActiveTab('analytics')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'analytics'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <BarChart3 className="w-4 h-4 text-amber-400" />
-          Métricas & Relatórios
-        </button>
+      {/* Admin Navigation - Professional V2 */}
+      <div className="pv2-admin-navigation">
 
-        <button
-          onClick={() => setActiveTab('online')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'online'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
-          Usuários Conectados
-        </button>
+        <div className="pv2-admin-primary-nav">
 
-        <button
-          onClick={() => setActiveTab('coupons')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'coupons'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Tag className="w-4 h-4 text-amber-300" />
-          Cupons & Promoções
-        </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`pv2-admin-nav-button ${
+              activeTab === 'analytics'
+                ? 'pv2-admin-nav-button-active'
+                : ''
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Resumo</span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab('home-config')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'home-config'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Layout className="w-4 h-4 text-blue-400" />
-          Layout da Home
-        </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`pv2-admin-nav-button ${
+              activeTab === 'users'
+                ? 'pv2-admin-nav-button-active'
+                : ''
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            <span>Clientes</span>
 
-        <button
-          onClick={() => setActiveTab('dashboard')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'dashboard'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <DollarSign className="w-4 h-4" />
-          Visão Geral
-        </button>
+            {users.length > 0 && (
+              <span className="pv2-admin-count">
+                {users.length}
+              </span>
+            )}
+          </button>
 
-        <button
-          onClick={() => setActiveTab('support')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'support'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <MessageSquare className="w-4 h-4 text-emerald-400" />
-          <span>Atendimento</span>
-          {stats?.unreadMessagesCount ? (
-            <span className="bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full animate-bounce">
-              {stats.unreadMessagesCount}
-            </span>
-          ) : (
-            <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded-full">
-              {supportChats.length}
-            </span>
-          )}
-        </button>
+          <button
+            onClick={() => setActiveTab('payments')}
+            className={`pv2-admin-nav-button ${
+              activeTab === 'payments'
+                ? 'pv2-admin-nav-button-active'
+                : ''
+            }`}
+          >
+            <DollarSign className="w-4 h-4" />
+            <span>Vendas</span>
 
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'users'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Users className="w-4 h-4 text-purple-300" />
-          Usuários ({users.length})
-        </button>
+            {payments.length > 0 && (
+              <span className="pv2-admin-count">
+                {payments.length}
+              </span>
+            )}
+          </button>
 
-        <button
-          onClick={() => setActiveTab('accesses')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'accesses'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Key className="w-4 h-4 text-amber-300" />
-          Logins Gerados ({generatedAccesses.length})
-        </button>
+          <button
+            onClick={() => setActiveTab('support')}
+            className={`pv2-admin-nav-button ${
+              activeTab === 'support'
+                ? 'pv2-admin-nav-button-active'
+                : ''
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>Atendimento</span>
 
-        <button
-          onClick={() => setActiveTab('payments')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'payments'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Zap className="w-4 h-4 text-amber-300" />
-          Vendas Netflix ({payments.length})
-        </button>
+            {!!stats?.unreadMessagesCount && (
+              <span className="pv2-admin-alert-count">
+                {stats.unreadMessagesCount}
+              </span>
+            )}
+          </button>
 
-        <button
-          onClick={() => setActiveTab('credentials')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'credentials'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Lock className="w-4 h-4 text-blue-300" />
-          Contas & Link Ton
-        </button>
+          <button
+            onClick={() => setActiveTab('online')}
+            className={`pv2-admin-nav-button ${
+              activeTab === 'online'
+                ? 'pv2-admin-nav-button-active'
+                : ''
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+            <span>Operação</span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab('visitors')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'visitors'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Globe className="w-4 h-4 text-cyan-400" />
-          Visitas ({visitors.length})
-        </button>
+
+          <div className="pv2-admin-more">
+
+            <select
+              aria-label="Mais ferramentas administrativas"
+              value={
+                [
+                  'coupons',
+                  'home-config',
+                  'accesses',
+                  'credentials',
+                  'visitors',
+                  'dashboard',
+                ].includes(activeTab)
+                  ? activeTab
+                  : ''
+              }
+              onChange={(event) => {
+                if (event.target.value) {
+                  setActiveTab(
+                    event.target.value as
+                      | 'coupons'
+                      | 'home-config'
+                      | 'accesses'
+                      | 'credentials'
+                      | 'visitors'
+                      | 'dashboard'
+                  );
+                }
+              }}
+              className="pv2-admin-more-select"
+            >
+              <option value="">
+                Mais
+              </option>
+
+              <option value="coupons">
+                Cupons e promoções
+              </option>
+
+              <option value="home-config">
+                Layout da Home
+              </option>
+
+              <option value="accesses">
+                Logins gerados
+              </option>
+
+              <option value="credentials">
+                Contas e links
+              </option>
+
+              <option value="visitors">
+                Visitas
+              </option>
+
+              <option value="dashboard">
+                Visão geral antiga
+              </option>
+            </select>
+
+          </div>
+
+        </div>
+
       </div>
-
       {/* SEARCH BAR FOR TABLES */}
       {!['dashboard', 'credentials', 'analytics', 'online', 'coupons', 'home-config'].includes(activeTab) && (
         <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 p-2.5 rounded-xl">
@@ -702,7 +706,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
         <div className="space-y-6 animate-fadeIn">
           {/* Main Stat Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="pv2-kpi-card p-4 rounded-2xl bg-slate-900 border border-slate-800">
               <span className="text-[10px] font-bold text-slate-400 uppercase">Faturamento Total</span>
               <p className="text-xl sm:text-2xl font-black text-emerald-400 mt-1">
                 R$ {stats.totalSales.toFixed(2)}
@@ -710,7 +714,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
               <span className="text-[10px] text-slate-500">Vendas Netflix Aprovadas</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="pv2-kpi-card p-4 rounded-2xl bg-slate-900 border border-slate-800">
               <span className="text-[10px] font-bold text-slate-400 uppercase">Usuários Cadastrados</span>
               <p className="text-xl sm:text-2xl font-black text-white mt-1">
                 {stats.totalUsers}
@@ -718,7 +722,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
               <span className="text-[10px] text-slate-500">Clientes com Conta</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="pv2-kpi-card p-4 rounded-2xl bg-slate-900 border border-slate-800">
               <span className="text-[10px] font-bold text-slate-400 uppercase">Acessos Prime Video</span>
               <p className="text-xl sm:text-2xl font-black text-cyan-400 mt-1">
                 {stats.primeAccessCount}
@@ -726,7 +730,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
               <span className="text-[10px] text-slate-500">Logins Liberados</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="pv2-kpi-card p-4 rounded-2xl bg-slate-900 border border-slate-800">
               <span className="text-[10px] font-bold text-slate-400 uppercase">Acessos Paramount+</span>
               <p className="text-xl sm:text-2xl font-black text-blue-400 mt-1">
                 {stats.paramountAccessCount || 0}
@@ -734,7 +738,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
               <span className="text-[10px] text-slate-500">Logins Gratuitos</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 col-span-2 sm:col-span-1">
+            <div className="pv2-kpi-card p-4 rounded-2xl bg-slate-900 border border-slate-800 col-span-2 sm:col-span-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase">Total de Visitas</span>
               <p className="text-xl sm:text-2xl font-black text-amber-400 mt-1">
                 {stats.totalVisits}
@@ -745,7 +749,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
 
           {/* Device & Browser Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+            <div className="pv2-kpi-card p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
                   <Chrome className="w-3.5 h-3.5 text-blue-400" />
@@ -759,7 +763,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+            <div className="pv2-kpi-card p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
                   <UserCheck className="w-3.5 h-3.5 text-cyan-400" />
@@ -773,7 +777,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+            <div className="pv2-kpi-card p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5 text-emerald-400" />
@@ -787,7 +791,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+            <div className="pv2-kpi-card p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
                   <Smartphone className="w-3.5 h-3.5 text-purple-400" />
@@ -806,7 +810,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
 
       {/* TAB 2: CHAT & ATENDIMENTO */}
       {activeTab === 'support' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-fadeIn space-y-4">
+        <div className="pv2-surface-card bg-slate-900 border border-slate-800 rounded-2xl p-5 animate-fadeIn space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-3">
             <div>
               <h3 className="text-base font-black text-white flex items-center gap-2">
@@ -1193,7 +1197,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 animate-fadeIn">
           
           {/* Prime Video Config */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3.5">
+          <div className="pv2-surface-card p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3.5">
             <div className="flex items-center gap-2">
               <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" />
               <h3 className="text-sm font-bold text-white">Prime Video Grátis</h3>
@@ -1231,7 +1235,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
           </div>
 
           {/* Paramount+ Config */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3.5">
+          <div className="pv2-surface-card p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3.5">
             <div className="flex items-center gap-2">
               <Tv className="w-4 h-4 text-blue-400" />
               <h3 className="text-sm font-bold text-white">Paramount+ Grátis</h3>
@@ -1269,7 +1273,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, user }) => 
           </div>
 
           {/* Netflix & Automação de Código Config */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-red-500/40 shadow-xl space-y-4 col-span-1 md:col-span-2 lg:col-span-1">
+          <div className="pv2-surface-card p-5 rounded-2xl bg-slate-900 border border-red-500/40 shadow-xl space-y-4 col-span-1 md:col-span-2 lg:col-span-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-red-500 fill-red-500" />

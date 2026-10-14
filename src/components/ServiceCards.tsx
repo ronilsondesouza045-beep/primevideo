@@ -53,7 +53,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         {/* ======================================================== */}
         {/* CARD 0: GERADOR & CATÁLOGO IPTV GRÁTIS (DESTAQUE PRINCIPAL) */}
         {/* ======================================================== */}
-        <div className="relative rounded-3xl bg-gradient-to-b from-slate-900 via-indigo-950/40 to-slate-900 border-2 border-cyan-500/50 hover:border-cyan-400 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-cyan-500/20 group overflow-hidden md:col-span-2 lg:col-span-1">
+        <div className="pv2-service-card relative rounded-3xl bg-gradient-to-b from-slate-900 via-indigo-950/40 to-slate-900 border-2 border-cyan-500/50 hover:border-cyan-400 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-cyan-500/20 group overflow-hidden md:col-span-2 lg:col-span-1">
           
           {/* Subtle Glow */}
           <div className="absolute top-0 right-0 w-44 h-44 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/25 transition-all" />
@@ -159,7 +159,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         {/* ======================================================== */}
         {/* CARD 1: PRIME VIDEO (100% LIBERADO VIP) */}
         {/* ======================================================== */}
-        <div className={`relative rounded-3xl bg-slate-900/90 border p-6 flex flex-col justify-between transition-all group overflow-hidden ${
+        <div className={`pv2-service-card relative rounded-3xl bg-slate-900/90 border p-6 flex flex-col justify-between transition-all group overflow-hidden ${
           primeBlocked
             ? 'border-red-500/40 hover:border-red-500 hover:shadow-2xl hover:shadow-red-950/40'
             : 'border-slate-800 hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-950/30'
@@ -344,7 +344,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         {/* ======================================================== */}
         {/* CARD 2: PARAMOUNT+ (100% GRATUITO) */}
         {/* ======================================================== */}
-        <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-blue-500/50 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-blue-950/50 group overflow-hidden">
+        <div className="pv2-service-card relative rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-blue-500/50 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-blue-950/50 group overflow-hidden">
           
           {/* Subtle Glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-blue-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/20 transition-all" />
@@ -461,7 +461,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         {/* ======================================================== */}
         {/* CARD 3: CRUNCHYROLL VIP (100% GRATUITO) */}
         {/* ======================================================== */}
-        <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-orange-500/50 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-orange-950/50 group overflow-hidden">
+        <div className="pv2-service-card relative rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-orange-500/50 p-6 flex flex-col justify-between transition-all hover:shadow-2xl hover:shadow-orange-950/50 group overflow-hidden">
           
           {/* Subtle Glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-orange-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-orange-500/20 transition-all" />
@@ -599,7 +599,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         {/* ======================================================== */}
         {/* CARD 3: FREE FIRE (TEMPORARIAMENTE MANUTENÇÃO / BLOQUEADO) */}
         {/* ======================================================== */}
-        <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 p-6 flex flex-col justify-between transition-all group overflow-hidden opacity-95">
+        <div className="pv2-service-card relative rounded-3xl bg-slate-900/90 border border-slate-800 p-6 flex flex-col justify-between transition-all group overflow-hidden opacity-95">
           
           {/* Subtle Glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -722,7 +722,7 @@ export const ServiceCards: React.FC<ServiceCardsProps> = ({
         {/* ======================================================== */}
         {/* CARD 4: NETFLIX VIP (BLOQUEADO / EM BREVE) */}
         {/* ======================================================== */}
-        <div className="relative rounded-3xl bg-slate-900/60 border border-slate-800 p-6 flex flex-col justify-between transition-all group overflow-hidden opacity-90 hover:opacity-100">
+        <div className="pv2-service-card relative rounded-3xl bg-slate-900/60 border border-slate-800 p-6 flex flex-col justify-between transition-all group overflow-hidden opacity-90 hover:opacity-100">
           
           {/* Subtle Lock Glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
